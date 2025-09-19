@@ -1,22 +1,28 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./home-style.css";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import LogoAgendei from "../../assets/LogoAgendei.png";
+import LogoAgendeiVet from "../../assets/LogoVertical.png";
 
 
 function Home() {
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
+
+     function handleToggle() {
+    setMenuOpen(open => !open);
+  }
+
+  // Fecha o menu mobile ao clicar em algum link
+  function handleNavClick(e) {
+    if (e.target.tagName === "A" && menuOpen) {
+      setMenuOpen(false);
+    }
+  }
 
     return(
         <>
-            <h1>Home</h1>
-            <button onClick={() => navigate('/login')}>
-                Login
-            </button>
-            <button onClick={() => navigate('/cadastro')}>
-                Cadastro
-            </button>
-
         {/* ---------- */}
         <header className="site-header">
     <div className="container header-inner">
@@ -24,14 +30,14 @@ function Home() {
         <img src={LogoAgendeiHori} alt="Logo agendei" width="200px" />
       </a>
 
-      <button className="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">☰</button>
+      <button onClick={handleToggle} className="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">☰</button>
 
-      <nav id="nav" className="nav" aria-label="Principal">
+      <nav onClick={handleNavClick} id="nav" className={`nav${menuOpen ? " open" : ""}`} aria-label="Principal">
         <ul className="nav-list">
           <li><a href="#inicio" className="active">Início</a></li>
           <li><a href="#sobre">Sobre</a></li>
           <li className="sep" aria-hidden="true"></li>
-          <li><a  onClick={() => navigate('/login')}  className="link">Entrar</a></li>
+          <li><a onClick={() => navigate('/login') }  className="link">Entrar</a></li>
           <li><a onClick={() => navigate('/cadastro')} className="btn primary">Cadastrar</a></li>
         </ul>
       </nav>
@@ -157,7 +163,7 @@ function Home() {
         <div className="col brand-col">
         <div className="footer-brand">
             
-            <img src={LogoAgendei} alt="Logo agendei" width="100px" />
+            <img src={LogoAgendeiVet} alt="Logo agendei" width="100px" />
         </div>
         <p className="foot-desc">
             Conectando pessoas e simplificando agendamentos em todo o Brasil.
@@ -186,7 +192,7 @@ function Home() {
     </div>
 
     <div className="container foot-bottom">
-        <small>© <span id="year"></span> Agendei. Todos os direitos reservados. Feito com <span className="heart">❤</span> no Brasil.</small>
+        <small>© 2025 Agendei. Todos os direitos reservados. Feito com <span className="heart">❤</span> no Brasil.</small>
     </div>
     </footer>
 
