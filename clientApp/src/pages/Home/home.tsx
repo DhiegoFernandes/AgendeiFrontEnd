@@ -184,7 +184,7 @@ function Home() {
         <h4>Suporte</h4>
         <ul>
             
-            <li><a href="/politica_privacidade/index.html">Termos de Uso e politicas de privacidade</a></li>
+            <li><a href="/politica_privacidade/index.html">Termos de Uso e Políticas de Privacidade</a></li>
             
         </ul>
         </nav>
