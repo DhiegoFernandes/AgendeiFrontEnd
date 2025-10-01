@@ -15,8 +15,8 @@ function Home() {
   }
 
   // Fecha o menu mobile ao clicar em algum link
-  function handleNavClick(e) {
-    if (e.target.tagName === "A" && menuOpen) {
+  function handleNavClick(e: React.MouseEvent<HTMLElement>) {
+    if ((e.target as HTMLElement).tagName === "A" && menuOpen) {
       setMenuOpen(false);
     }
   }
