@@ -8,4 +8,4 @@ export type ApiContextType = {
     del: <T>(url: string) => Promise<T>
 }
 
-export const ApiContext = createContext<ApiContextType | undefined>(undefined);
+export const ApiContext = createContext<ApiContextType>(null!);

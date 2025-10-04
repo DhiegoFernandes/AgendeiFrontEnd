@@ -33,7 +33,6 @@ function Home() {
           <nav onClick={handleNavClick} id="nav" className={`nav${menuOpen ? " open" : ""}`} aria-label="Principal">
             <ul className="nav-list">
               <li><a href="#inicio" className="active">Início</a></li>
-              <li><a href="#sobre">Sobre</a></li>
               <li><a href="#cliente">Ser Cliente</a></li>
               <li><a href="#prestador">Ser Prestador</a></li>
               <li className="sep" aria-hidden="true"></li>
@@ -126,7 +125,7 @@ function Home() {
         <section id="cliente" className="features" aria-labelledby="ttl-cliente">
           <div className="container">
             <header className="section-head">
-              <h2 id="ttl-beneficios">Por que devo ser cliente no Agendei</h2>
+              <h2 id="ttl-beneficios">Por que devo ser cliente no Agendei?</h2>
               <p>Descubra como o Agendei facilita sua vida ao conectar você aos melhores profissionais de estética e beleza da sua região.</p>
             </header>
 
