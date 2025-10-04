@@ -14,7 +14,6 @@ function Home() {
     setMenuOpen(open => !open);
   }
 
-  // Fecha o menu mobile ao clicar em algum link
   function handleNavClick(e) {
     if (e.target.tagName === "A" && menuOpen) {
       setMenuOpen(false);
@@ -22,7 +21,7 @@ function Home() {
   }
 
     return(
-        <>
+    <>
         {/* ---------- */}
         <header className="site-header">
     <div className="container header-inner">
@@ -195,9 +194,7 @@ function Home() {
         <small>© 2025 Agendei. Todos os direitos reservados. Feito com <span className="heart">❤</span> no Brasil.</small>
     </div>
     </footer>
-
-
-        </>    
+    </>    
     )
 }
 
