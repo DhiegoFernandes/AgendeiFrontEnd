@@ -34,6 +34,8 @@ function Home() {
             <ul className="nav-list">
               <li><a href="#inicio" className="active">Início</a></li>
               <li><a href="#sobre">Sobre</a></li>
+              <li><a href="#cliente">Ser Cliente</a></li>
+              <li><a href="#prestador">Ser Prestador</a></li>
               <li className="sep" aria-hidden="true"></li>
               <li><a onClick={() => navigate('/login')} className="link">Entrar</a></li>
               <li><a onClick={() => navigate('/cadastro')} className="btn primary">Cadastrar</a></li>
@@ -121,30 +123,59 @@ function Home() {
         </section>
 
 
-        <section className="features" aria-labelledby="ttl-beneficios">
+        <section id="cliente" className="features" aria-labelledby="ttl-cliente">
           <div className="container">
             <header className="section-head">
-              <h2 id="ttl-beneficios">Por que usar o Agendei?</h2>
-              <p>Descubra como nossa plataforma pode transformar a forma como você agenda e oferece serviços</p>
+              <h2 id="ttl-beneficios">Por que devo ser cliente no Agendei</h2>
+              <p>Descubra como o Agendei facilita sua vida ao conectar você aos melhores profissionais de estética e beleza da sua região.</p>
             </header>
 
             <div className="cards-3">
               <article className="feature">
                 <div className="icon soft-purple" aria-hidden="true">⏱️</div>
-                <h3>Agendamento Rápido</h3>
-                <p>Agende seus serviços em poucos cliques. Veja horários disponíveis em tempo real e confirme instantaneamente.</p>
+                <h3>Agendamento Fácil e Rápido</h3>
+                <p>Escolha o serviço, veja horários disponíveis em tempo real e confirme o agendamento em poucos cliques.</p>
               </article>
 
               <article className="feature">
                 <div className="icon soft-orange" aria-hidden="true">📍</div>
-                <h3>Localização Inteligente</h3>
-                <p>Encontre prestadores próximos a você. Nossa tecnologia mostra distância e tempo de deslocamento.</p>
+                <h3>Busque por Localização</h3>
+                <p>Encontre profissionais e estabelecimentos próximos. Visualize o endereço no mapa e calcule o tempo de deslocamento.</p>
               </article>
 
               <article className="feature">
                 <div className="icon soft-green" aria-hidden="true">🔔</div>
-                <h3>Notificação</h3>
-                <p>Receba lembretes automáticos sobre seus agendamentos. Nunca mais perca um compromisso.</p>
+                <h3>Avaliações e Experiências</h3>
+                <p>Veja avaliações de outros clientes e escolha prestadores de confiança com base na reputação e qualidade do serviço.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="prestador" className="features" aria-labelledby="ttl-prestador">
+          <div className="container">
+            <header className="section-head">
+              <h2 id="ttl-prestador">Por que anunciar seu negócio no Agendei?</h2>
+              <p>Transforme sua forma de atender e conquiste mais clientes com uma plataforma moderna e eficiente.</p>
+            </header>
+
+            <div className="cards-3">
+              <article className="feature">
+                <div className="icon soft-purple" aria-hidden="true">💼</div>
+                <h3>Gestão de Serviços e Agenda</h3>
+                <p>Controle seus agendamentos, bloqueie horários e visualize sua disponibilidade de forma simples e automatizada.</p>
+              </article>
+
+              <article className="feature">
+                <div className="icon soft-orange" aria-hidden="true">👥</div>
+                <h3>Equipe Colaborativa</h3>
+                <p>Convide outros prestadores para o seu negócio. Cada profissional pode gerenciar seus próprios horários e serviços.</p>
+              </article>
+
+              <article className="feature">
+                <div className="icon soft-green" aria-hidden="true">📊</div>
+                <h3>Relatórios e Desempenho</h3>
+                <p>Acompanhe seus resultados com relatórios de serviços e agendamentos. Entenda o que está funcionando e otimize seu atendimento.</p>
               </article>
             </div>
           </div>
