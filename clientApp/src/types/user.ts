@@ -1,9 +1,9 @@
 export interface User {
-    name: string,
+    nome: string,
     email: string,
     telefone: string,
     senha: string,
     perfil: string,
-    cep: string,
-    endereco: string,
+    cep?: string,
+    endereco?: string,
 }
