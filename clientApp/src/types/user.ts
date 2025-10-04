@@ -11,6 +11,7 @@ export interface User {
 export interface ResponseLogin {
     token: string,
     perfil: EnumUser
+    nome: string
 }
 
 export enum EnumUser {
