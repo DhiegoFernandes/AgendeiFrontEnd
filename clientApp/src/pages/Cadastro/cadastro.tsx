@@ -69,22 +69,25 @@ function Cadastro() {
           <select className="perfil" onChange={e => setPerfil(e.target.value)}>
               <option value="CLIENTE">CLIENTE</option>
               <option value="PRESTADOR">PRESTADOR</option>
-              <option value="ADMIN">ADMIN</option>
           </select>
-          <input 
-              type="text"
-              placeholder="cep"
-              className="name"
-              value={cep}
-              onChange={e => setCep(e.target.value)}
-          />
-          <input 
-              type="text"
-              placeholder="endereço"
-              className="name"
-              value={endereco}
-              onChange={e => setEndereco(e.target.value)}
-          />
+            {perfil === "CLIENTE" && (
+            <>
+                <input 
+                type="text"
+                placeholder="CEP"
+                className="name"
+                value={cep}
+                onChange={e => setCep(e.target.value)}
+                />
+                <input 
+                type="text"
+                placeholder="Endereço"
+                className="name"
+                value={endereco}
+                onChange={e => setEndereco(e.target.value)}
+                />
+            </>
+            )}
           <button type="submit">Cadastrar</button> 
       </form>
       <BtnVoltar />
