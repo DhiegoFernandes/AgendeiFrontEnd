@@ -5,6 +5,13 @@ import Cadastro from '../pages/Cadastro/cadastro';
 import InicioCliente from '../pages/InicioCliente/inicioCliente';
 import InicioPrestador from '../pages/InicioPrestador/inicioPrestador';
 import Comercios from '../pages/comercios/comercios';
+import EscolherServico from '../pages/EscolherServico/escolherServico';
+import AgendarHorario from '../pages/AgendarHorario/agendarHorario';
+import AgendamentosCliente from '../pages/AgendamentoCliente/agendamentoCliente';
+import DadosCliente from '../pages/DadosCliente/dadosCliente';
+import PerfilCliente from '../pages/PerfilCliente/perfilCliente';
+import FazerAvaliacao from '../pages/FazerAvaliacao/fazerAvaliacao';
+
 
 function AppRoutes(){
     return (
@@ -16,6 +23,14 @@ function AppRoutes(){
                 <Route path='/cliente' element={<InicioCliente />} />
                 <Route path='/prestador' element={<InicioPrestador />} />
                 <Route path="/comercios" element={<Comercios />} />
+                <Route path='/escolherservico' element={<EscolherServico />} />
+                <Route path='/agendarhorario' element={<AgendarHorario />} />
+                <Route path='/agendamentocliente' element={<AgendamentosCliente />} />
+                <Route path='/dadosCliente' element={<DadosCliente />} />
+                <Route path='/perfilCliente' element={<PerfilCliente />} />
+                <Route path='/fazerAvaliacao' element={<FazerAvaliacao />} />
+ 
+
             </Routes>
         </Router>
     )
