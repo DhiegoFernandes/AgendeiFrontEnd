@@ -534,10 +534,6 @@ a {
   text-align: center;
 }
 
-.foot-bottom .heart {
-  color: #ff4d6d
-}
-
 /* Animação de flutuar somente no aside do footer */
 .site-footer aside {
   will-change: transform;

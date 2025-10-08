@@ -11,6 +11,7 @@ import AgendamentosCliente from '../pages/AgendamentoCliente/agendamentoCliente'
 import DadosCliente from '../pages/DadosCliente/dadosCliente';
 import PerfilCliente from '../pages/PerfilCliente/perfilCliente';
 import FazerAvaliacao from '../pages/FazerAvaliacao/fazerAvaliacao';
+import { PrivateRoute } from './privateRoute';
 
 
 function AppRoutes(){
@@ -20,8 +21,20 @@ function AppRoutes(){
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path='/cadastro' element={<Cadastro />} />
-                <Route path='/cliente' element={<InicioCliente />} />
-                <Route path='/prestador' element={<InicioPrestador />} />
+                <Route path='/cliente' 
+                    element={
+                        <PrivateRoute>
+                          <InicioCliente />  
+                        </PrivateRoute>
+                    } 
+                />
+                <Route path='/prestador' 
+                    element={
+                        <PrivateRoute>
+                          <InicioPrestador />  
+                        </PrivateRoute>
+                    } 
+                />
                 <Route path="/comercios" element={<Comercios />} />
                 <Route path='/escolherservico' element={<EscolherServico />} />
                 <Route path='/agendarhorario' element={<AgendarHorario />} />
