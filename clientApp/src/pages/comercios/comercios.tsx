@@ -3,6 +3,7 @@ import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import salaoUm from "../../assets/salaoUm.png";
 import salaoDois from "../../assets/salaoDois.png"
 import salaoTres from "../../assets/salaotres.png"
+import { useNavigate } from "react-router-dom";
 
 // Mock dos comércios (pode puxar de API)
 const commercesDemo = [
@@ -52,6 +53,7 @@ const categorias = [
 export default function Comercios() {
   const [cat, setCat] = useState("todos");
   const [q, setQ] = useState("");
+  const navigate = useNavigate();
 
   const filtrar = () =>
     commercesDemo.filter(c => {
@@ -92,7 +94,8 @@ export default function Comercios() {
         </div>
         {/* Ícones e Perfil */}
         <div className="flex items-center gap-4 mt-1 md:mt-0">
-          <button className="bg-purple-600 text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-purple-700 transition cursor-pointer">Perfil</button>
+          <button onClick={() => navigate("/perfilCliente")}
+          className="bg-purple-600 text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-purple-700 transition cursor-pointer">Perfil</button>
           <span className="text-2xl cursor-pointer text-purple-500">🔔</span>
           <div className="w-9 h-9 flex items-center justify-center bg-purple-400 text-white font-bold rounded-full shadow text-lg">MS</div>
         </div>
@@ -130,7 +133,7 @@ export default function Comercios() {
                   alt={c.nome}
                   className="w-full h-full object-cover"
                 />
-                <span className={`
+                {/* <span className={`
                   absolute left-3 top-3 px-4 py-1 rounded-full text-xs font-extrabold
                   ${c.destaque === "Premium"
                     ? "bg-red-500 text-white"
@@ -140,7 +143,7 @@ export default function Comercios() {
                   shadow-sm
                 `}>
                   {c.destaque}
-                </span>
+                </span> */}
               </div>
               {/* Conteúdo */}
               <div className="flex-1 flex flex-col gap-2 px-5 pt-3 pb-6">

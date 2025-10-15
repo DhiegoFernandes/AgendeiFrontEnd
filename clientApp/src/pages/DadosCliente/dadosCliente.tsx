@@ -21,7 +21,7 @@ export default function PerfilCliente() {
       <header className="w-full sticky top-0 z-30 bg-white/90 backdrop-blur shadow-md px-2 py-4 flex items-center justify-between">
         <button
           className="text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-full p-2 transition"
-          onClick={() => navigate("/perfil")}
+          onClick={() => navigate("/perfilCliente")}
           title="Voltar ao perfil"
         >
           <HiOutlineArrowLeft size={26} />
@@ -84,7 +84,7 @@ export default function PerfilCliente() {
 
           <button
             className="w-full mt-7 bg-gradient-to-r from-purple-600 to-purple-500 hover:brightness-110 text-white font-bold py-3 px-6 rounded-lg shadow-lg text-lg transition"
-            onClick={() => navigate("/alterar-dados")}
+            onClick={() => navigate("/alterarDadosCliente")}
           >
             Alterar dados
           </button>

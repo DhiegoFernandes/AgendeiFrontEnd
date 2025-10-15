@@ -64,7 +64,7 @@ export default function EscolherServico() {
       async position => {
         const origem = `${position.coords.latitude},${position.coords.longitude}`;
         try {
-          const apiKey = "AIzaSyByUCkvwfPoKnpQ7ufJJ6T-AapUJBTQvfA"; // <<----- TROQUE PELA SUA CHAVE GOOGLE
+          const apiKey = "AIzaSyDQHCfEBOf_EO6Abo4Q-n987llQhru87Rw"; // <<----- TROQUE PELA SUA CHAVE GOOGLE
           const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origem}&destinations=${encodeURIComponent(
             ENDERECO_DESTINO
           )}&key=${apiKey}&mode=driving`;

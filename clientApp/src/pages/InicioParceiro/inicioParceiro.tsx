@@ -1,0 +1,193 @@
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+const PRESTADOR_NOME = "Guilherme";
+const CATEGORIAS_FIXAS = [
+  "Cabeleireiro", "Barbearia", "Salão de Beleza", "Manicure"
+];
+
+export default function PrimeiroAcessoNegocio() {
+  const navigate = useNavigate();
+
+  const [nome, setNome] = useState("");
+  const [cep, setCep] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [categoria, setCategoria] = useState(CATEGORIAS_FIXAS[0]);
+  const [popup, setPopup] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  const enderecoRef = useRef<HTMLInputElement>(null);
+
+  function handleCep(e: React.ChangeEvent<HTMLInputElement>) {
+    let v = e.target.value.replace(/\D/g, "");
+    if (v.length > 5) v = v.replace(/^(\d{5})(\d)/, "$1-$2");
+    setCep(v.slice(0, 9));
+  }
+
+  async function buscarEnderecoPorCep() {
+    const soNumeros = cep.replace(/\D/g, "");
+    if (soNumeros.length !== 8) return;
+    setEndereco("Buscando...");
+    try {
+      const resp = await fetch(`https://viacep.com.br/ws/${soNumeros}/json/`);
+      const data = await resp.json();
+      if (data.erro) {
+        setEndereco("");
+        alert("CEP não encontrado!");
+      } else {
+        setEndereco(data.logradouro || "");
+        setTimeout(() => enderecoRef.current?.focus(), 180);
+      }
+    } catch {
+      setEndereco("");
+      alert("Erro ao buscar CEP!");
+    }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!nome.trim() || !cep.trim() || !endereco.trim() || !categoria) {
+      setPopup(true);
+      return;
+    }
+    setPopup(true);
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f5fb] px-3">
+      <div className="w-full max-w-md flex flex-col items-center mb-2">
+        <h2 className="text-[1.9rem] font-extrabold mb-1 text-center text-gray-800">
+          Olá {PRESTADOR_NOME},<br />
+          Seja bem-vindo ao{" "}
+          <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-500 font-extrabold align-baseline select-none drop-shadow">
+            Agend
+          </span>
+          <span className="text-orange-500" style={{ fontFamily: "inherit", fontWeight: 900 }}>ei</span>.
+        </h2>
+        <p className="text-center text-gray-500 text-base mb-6 font-medium">
+          Crie seu negócio para começar a atender clientes.
+        </p>
+      </div>
+
+      <form
+        className="w-full max-w-sm rounded-2xl shadow-2xl bg-white py-8 px-7 flex flex-col gap-5 mb-5"
+        onSubmit={handleSubmit}
+        autoComplete="off"
+      >
+        <h3 className="text-2xl font-bold text-purple-700 mb-4 text-center">
+          Criar negócio
+        </h3>
+        <div>
+          <label className="block font-bold text-gray-700 mb-1" htmlFor="nomeNegocio">
+            Nome do comércio
+          </label>
+          <input
+            id="nomeNegocio"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+            placeholder="Digite o nome do comércio"
+            className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
+            required
+          />
+        </div>
+        <div>
+          <label className="block font-bold text-gray-700 mb-1" htmlFor="cepNegocio">
+            CEP
+          </label>
+          <input
+            id="cepNegocio"
+            value={cep}
+            onChange={handleCep}
+            onBlur={buscarEnderecoPorCep}
+            maxLength={9}
+            placeholder="Digite o CEP"
+            className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
+            required
+          />
+        </div>
+        <div>
+          <label className="block font-bold text-gray-700 mb-1" htmlFor="enderecoNegocio">
+            Endereço
+          </label>
+          <input
+            id="enderecoNegocio"
+            ref={enderecoRef}
+            value={endereco}
+            onChange={e => setEndereco(e.target.value)}
+            placeholder="Rua preenchida automaticamente pelo CEP"
+            className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
+            required
+          />
+        </div>
+        <div>
+          <label className="block font-bold text-gray-700 mb-1" htmlFor="categoriaNegocio">
+            Categoria
+          </label>
+          <select
+            id="categoriaNegocio"
+            value={categoria}
+            onChange={e => setCategoria(e.target.value)}
+            className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg bg-white text-base focus:ring-2 focus:ring-purple-400 outline-none"
+            required
+          >
+            {CATEGORIAS_FIXAS.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-4 mt-2">
+          <button
+            type="button"
+            onClick={() => setConfirmCancel(true)}
+            className="w-1/2 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-red-300 hover:text-white transition cursor-pointer text-base"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 py-2 rounded-lg text-white font-bold bg-gradient-to-r from-purple-600 to-purple-700 hover:brightness-110 shadow transition cursor-pointer text-base"
+          >
+            Criar negócio
+          </button>
+        </div>
+      </form>
+
+      {/* Popup confirmação cancelar */}
+      {confirmCancel && (
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center">
+          <div className="bg-white px-9 py-8 rounded-2xl shadow-lg flex flex-col items-center animate-fadeIn">
+            <span className="text-base font-bold text-purple-700 mb-4 text-center">
+              Deseja cancelar o cadastro do negócio?
+            </span>
+            <div className="flex gap-4">
+              <button
+                className="px-8 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-red-300 hover:text-white transition cursor-pointer"
+                onClick={() => setConfirmCancel(false)}
+              >Não</button>
+              <button
+                className="px-8 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold hover:brightness-110 shadow transition cursor-pointer"
+                onClick={() => navigate("/")}
+              >Sim</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup sucesso */}
+      {popup && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white px-9 py-10 rounded-2xl shadow-lg flex flex-col items-center animate-fadeIn">
+            <span className="text-xl font-bold text-purple-700 mb-5 text-center">Negócio cadastrado com sucesso!</span>
+            <button
+              className="mt-2 px-10 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold shadow hover:brightness-105 transition cursor-pointer"
+              onClick={() => setPopup(false)}
+            >
+              Ok
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

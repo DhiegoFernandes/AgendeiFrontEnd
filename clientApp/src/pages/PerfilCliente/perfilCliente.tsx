@@ -55,13 +55,13 @@ export default function PerfilCliente() {
           <div className="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
             <button
               className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow"
-              onClick={() => navigate("/alterar-dados")}
+              onClick={() => navigate("/alterarDadosCliente")}
             >
               Editar Perfil
             </button>
             <button
               className="px-5 py-2 rounded-lg border-2 border-white text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
-              onClick={() => navigate("/agendamentos")}
+              onClick={() => navigate("/agendamentocliente")}
             >
               Ver Agendamentos
             </button>
@@ -107,7 +107,7 @@ export default function PerfilCliente() {
             </h3>
             <ul className="divide-y divide-gray-100">
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/visualizar-dados")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/dadosCliente")}>
                   <div className="flex items-center gap-4">
                     <HiOutlineUserCircle className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">
@@ -119,11 +119,11 @@ export default function PerfilCliente() {
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/alterar-senha")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/alterarDadosCliente")}>
                   <div className="flex items-center gap-4">
                     <FiLock className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">
-                      <strong className="-mb-1">Alterar Senha</strong>
+                      <strong className="-mb-1">Alterar Dados</strong>
                       <span className="text-xs text-gray-500">Mantenha sua conta segura</span>
                     </span>
                   </div>
