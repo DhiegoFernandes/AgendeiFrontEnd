@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
-import type { ResponseLogin } from "../../types/user";
 import api from "../../services/api";
 
 export default function Login() {
@@ -19,11 +18,13 @@ export default function Login() {
                 senha
             }
 
-            const response: ResponseLogin = await api.post("/auth/login", dataToLogin)
+            const response = await api.post("/auth/login", dataToLogin)
 
-            console.log(response.perfil)
+            localStorage.setItem("token", response.data.token)
+            localStorage.setItem("perfil", response.data.perfil)
+            localStorage.setItem("nome", response.data.nome)
 
-            navigate(`/${response.perfil}`)
+            navigate(`/${response.data.perfil}`)
         } catch (error) {
             console.log(error)
         }

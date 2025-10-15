@@ -20,7 +20,7 @@ import DadosParceiro from '../pages/DadosParceiro/dadosParceiro';
 import AlterarDadosParceiro from '../pages/AlterarDadosParceiro/alterarDadosParceiro';
 import AvaliacoesParceiro from '../pages/AvaliacoesParceiro/avaliacoesParceiro';
 import GerenciarNegocio from '../pages/GerenciarNegocio/gerenciarNegocio';
-
+import { PrivateRoute } from './privateRoute';
 
 
 

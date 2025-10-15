@@ -219,7 +219,7 @@ function Home() {
         </div>
 
         <div className="container foot-bottom">
-          <small>© 2025 Agendei. Todos os direitos reservados. Feito com <span className="heart">❤</span> no Brasil.</small>
+          <small>© 2025 Agendei. Todos os direitos reservados.</small>
         </div>
       </footer>
     </>

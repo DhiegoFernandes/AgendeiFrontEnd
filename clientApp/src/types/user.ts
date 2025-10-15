@@ -8,12 +8,6 @@ export interface User {
     endereco?: string,
 }
 
-export interface ResponseLogin {
-    token: string,
-    perfil: EnumUser
-    nome: string
-}
-
 export enum EnumUser {
   cliente = "CLIENTE",
   admin = "ADMIN",
