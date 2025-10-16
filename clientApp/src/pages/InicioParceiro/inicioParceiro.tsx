@@ -71,8 +71,7 @@ export default function PrimeiroAcessoNegocio() {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
-        }
-      )
+        })
 
       navigate("/parceiro/perfil")
 

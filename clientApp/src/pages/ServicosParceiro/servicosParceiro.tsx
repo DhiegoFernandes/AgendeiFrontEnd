@@ -4,10 +4,11 @@ import {
 } from "react-icons/fi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 const COMERCIO = "Barbearia Estilo";
 const PRESTADOR = "Ricardo Almeida";
-const CATEGORIAS_FIXAS = ["Cortes", "Barbas", "Tratamentos", "Combos"];
+const CATEGORIAS_FIXAS = ["SPA", "ESTETICISTA", "OUTROS", "BARBEARIA", "MANICURE", "MAQUIAGEM"];
 const CATEGORIAS_LIST = ["Todas", ...CATEGORIAS_FIXAS];
 const SERVICOS_MOCK = [
   { id: 1, nome: "Corte Masculino", descricao: "Corte com tesoura e máquina", categoria: "Cortes", preco: "R$ 50,00", duracao: 30, ativo: true },
@@ -20,7 +21,7 @@ function currencyMask(value: string) {
   v = (Number(v) / 100).toFixed(2) + "";
   v = v.replace(".", ",");
   return "R$ " + v;
-}
+}  
 
 export default function ServicosParceiro() {
   const navigate = useNavigate();
@@ -66,18 +67,51 @@ export default function ServicosParceiro() {
     setForm(f => ({ ...f, categoria: cat }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (!form.nome.trim() || !form.categoria || !form.preco) {
       setPopup({ msg: "Preencha os campos obrigatórios!" }); return;
     }
+
     setServicos(list => {
       if (form.id !== null && form.id !== undefined) {
         return list.map(s => s.id === form.id ? { ...form } : s);
       } else {
         return [...list, { ...form, id: Date.now() }];
       }
-    });
+    })
+
+    const dataToPost = {
+      titulo: form.nome,
+      descricao: form.descricao,
+      categoria: form.categoria,
+      valor: parseFloat(
+        form.preco
+          .replace("R$", "")
+          .replace(/\./g, "")
+          .replace(",", ".")
+          .trim()
+      ),
+      duracaoMinutos: Number(form.duracao),
+      ativo: form.ativo
+    }
+
+    const token = localStorage.getItem("token")
+
+    try {
+      const response = await api.post('/servicos', dataToPost, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+
     closeForm();
     setTimeout(() => setPopup({ msg: `Serviço ${form.id ? "atualizado" : "cadastrado"} com sucesso!` }), 100);
   }
@@ -117,7 +151,7 @@ export default function ServicosParceiro() {
       <nav className="w-full bg-gradient-to-r from-purple-600 to-purple-400 px-5 py-5 rounded-b-[30px] rounded-t-2xl shadow flex flex-col md:flex-row items-center md:justify-between gap-3 md:gap-2">
         <button
           className="text-white font-bold flex items-center gap-2 transition hover:text-purple-200 cursor-pointer"
-          onClick={() => navigate("/perfilParceiro")}
+          onClick={() => navigate("/parceiro/perfil")}
         >
           <FiArrowLeft size={23} />
           Voltar ao perfil

@@ -55,25 +55,25 @@ export default function PerfilPrestador() {
       desc: "Gerencie sua agenda",
       icon: <HiOutlineCalendar size={28} className="text-purple-500" />,
       highlight: 25,
-      onClick: () => navigate("/agendamentoParceiro"),
+      onClick: () => navigate("/parceiro/agendamento"),
     },
     {
       label: "Relatórios",
       desc: "Análise de desempenho",
       icon: <FaChartColumn size={26} className="text-blue-500" />,
-      onClick: () => navigate("/relatorioParceiro"),
+      onClick: () => navigate("/parceiro/relatorio"),
     },
     {
       label: "Serviços",
       desc: "Cadastre e edite",
       icon: <PiScissorsDuotone size={26} className="text-pink-500" />,
-      onClick: () => navigate("/servicosParceiro"),
+      onClick: () => navigate("/parceiro/servicos"),
     },
     {
       label: "Configurações",
       desc: "Dados de Perfil",
       icon: <HiOutlineCog size={26} className="text-gray-500" />,
-      onClick: () => navigate("/dadosParceiro"),
+      onClick: () => navigate("/parceiro/dados"),
     },
     {
       label: "Convidar parceiro",
@@ -85,13 +85,13 @@ export default function PerfilPrestador() {
       label: "Avaliações",
       desc: "Veja as avaliações",
       icon: <AiFillStar size={26} className="text-yellow-400" />,
-      onClick: () => navigate("/avaliacoesParceiro"),
+      onClick: () => navigate("/parceiro/avaliações"),
     },
     {
       label: "Gerenciar negócio", // <-- ALTERADO
       desc: "Gerencie seu negócio", // <-- ALTERADO
       icon: <BsFillPersonLinesFill size={24} className="text-purple-400" />,
-      onClick: () => navigate("/gerenciarNegocio"), // <-- ALTERADO
+      onClick: () => navigate("/parceiro/gerenciar-negocio"), // <-- ALTERADO
     },
   ];
 
@@ -135,7 +135,7 @@ export default function PerfilPrestador() {
 
       {/* KPIs */}
       <section className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-7 mt-10 px-2">
-        {adminKPIS.map((kpi, idx) => (
+        {adminKPIS.map((kpi) => (
           <article key={kpi.label} className="rounded-xl bg-white py-6 px-6 flex flex-col items-start shadow group hover:shadow-xl transition">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-bold text-gray-600 text-base">{kpi.label}</span>{kpi.icon}

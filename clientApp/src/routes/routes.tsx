@@ -40,7 +40,7 @@ function AppRoutes(){
 
                 <Route path='/prestador/criar-negocio' element={<InicioParceiro />} />
                 <Route path='/parceiro/perfil' element={<PerfilParceiro />} />
-                <Route path='/parceir/agendamento' element={<AgendamentoParceiro />} />
+                <Route path='/parceiro/agendamento' element={<AgendamentoParceiro />} />
                 <Route path='/parceiro/relatorio' element={<RelatorioParceiro />} />
                 <Route path='/parceiro/servicos' element={<ServicosParceiro />} />
                 <Route path='/parceiro/dados' element={<DadosParceiro />} />

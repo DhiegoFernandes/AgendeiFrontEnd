@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addDays, format, isSameDay } from "date-fns";
+import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -44,7 +44,7 @@ export default function AgendaPrestador() {
           <button
             title="Voltar ao perfil"
             className="mr-2 text-white/400 hover:text-gray-300 flex items-center cursor-pointer"
-            onClick={() => navigate("/perfilParceiro")}
+            onClick={() => navigate("/parceiro/perfil")}
           >
             <HiOutlineArrowLeft size={24} />
             <span className="ml-1 hidden md:inline">Voltar ao perfil</span>
@@ -88,7 +88,7 @@ export default function AgendaPrestador() {
             </span>
           </div>
           <div className="flex flex-col gap-4 mt-1">
-            {agendamentos.length ? agendamentos.map((ag, idx) => (
+            {agendamentos.length ? agendamentos.map((ag) => (
               <div
                 key={ag.id}
                 className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between rounded-xl border border-gray-100 py-4 px-5 bg-purple-50/20 shadow-sm transition hover:bg-purple-50"

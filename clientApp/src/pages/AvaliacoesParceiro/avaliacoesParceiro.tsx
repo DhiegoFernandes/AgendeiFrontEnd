@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { FaStar } from "react-icons/fa";
-import { FiUser, FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
 import Logo from "../../assets/LogoAgendei.png";
 import { useNavigate } from "react-router-dom";
 
@@ -62,7 +62,7 @@ export default function AvaliacoesComercio() {
       <header className="w-full bg-white from-purple-600 to-purple-500 py-5 flex flex-col items-center rounded-b-2xl shadow mb-8 relative">
         <button
           className="absolute left-5 top-7 flex items-center text-purple-700 font-bold gap-1 hover:text-purple-500 transition cursor-pointer"
-          onClick={() => navigate("/perfilParceiro")}
+          onClick={() => navigate("/parceiro/perfil")}
         >
           <FiArrowLeft size={22}/> <span className="hidden sm:inline text-base">Voltar ao perfil</span>
         </button>

@@ -56,16 +56,12 @@ export default function RelatorioParceiro() {
   const maxQty = Math.max(...dados.services.map(s => s.qty), 1);
   const navigate = useNavigate();
 
-  function handleVoltar() {
-    window.history.back();
-  }
-
   return (
     <div className="bg-[#f6f5fb] min-h-screen pb-16">
       {/* Header gradient */}
       <header className="bg-gradient-to-br from-purple-600 to-purple-400 shadow text-white rounded-b-3xl pt-9 pb-6 px-4 flex flex-col items-center">
         <button className="self-start flex items-center mb-2 transition hover:text-white/70 font-bold"
-          onClick={() => navigate("/perfilParceiro")}
+          onClick={() => navigate("/parceiro/perfil")}
         >
           <HiOutlineArrowLeft size={24} /> <span className="ml-1">Voltar ao perfil</span>
         </button>
@@ -175,7 +171,7 @@ export default function RelatorioParceiro() {
             <span className="text-gray-500 font-medium">Total: {dados.totalServ}</span>
           </div>
           <ul className="flex flex-col gap-7">
-            {dados.services.map((s, idx) => {
+            {dados.services.map((s) => {
               const pct = Math.max(1, Math.round((s.qty / maxQty) * 100));
               return (
                 <li key={s.name} className="flex flex-col w-full">

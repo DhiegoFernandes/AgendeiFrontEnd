@@ -70,7 +70,7 @@ export default function AlterarDadosPrestador() {
       <nav className="w-full bg-gradient-to-r from-purple-600 to-purple-400 px-5 py-5 mb-8 shadow-lg rounded-b-[32px] flex items-center justify-between">
         <button
           className="flex items-center text-white font-bold gap-2 hover:text-purple-200 transition cursor-pointer"
-          onClick={() => navigate("/perfilParceiro")}
+          onClick={() => navigate("/parceiro/perfil")}
         >
           <FiArrowLeft size={22} />
           <span className="text-base">Voltar ao perfil</span>
@@ -178,7 +178,7 @@ export default function AlterarDadosPrestador() {
               className="mt-2 px-10 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold shadow hover:brightness-105 transition cursor-pointer"
               onClick={() => {
                 setPopup(false);
-                navigate("/perfilParceiro");
+                navigate("/parceiro/perfil");
               }}>
               Ok
             </button>
