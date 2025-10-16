@@ -9,26 +9,30 @@ export default function Login() {
   const [showSenha, setShowSenha] = useState(false);
   const navigate = useNavigate();
 
-      const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        try {
-            const dataToLogin ={
-                email,
-                senha
-            }
-
-            const response = await api.post("/auth/login", dataToLogin)
-
-            localStorage.setItem("token", response.data.token)
-            localStorage.setItem("perfil", response.data.perfil)
-            localStorage.setItem("nome", response.data.nome)
-
-            navigate(`/${response.data.perfil}`)
-        } catch (error) {
-            console.log(error)
+    try {
+        const dataToLogin ={
+            email,
+            senha
         }
+
+        const response = await api.post("/auth/login", dataToLogin)
+
+        localStorage.setItem("token", response.data.token)
+        localStorage.setItem("perfil", response.data.perfil)
+        localStorage.setItem("nome", response.data.nome)
+
+        if (response.data.perfil === "cliente") {  
+          navigate(`/${response.data.perfil}/comercios`)
+        } else {
+          navigate(`/${response.data.perfil}/criar-negocio`)
+        }
+    } catch (error) {
+        console.log(error)
     }
+  }
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex items-center justify-center p-4">

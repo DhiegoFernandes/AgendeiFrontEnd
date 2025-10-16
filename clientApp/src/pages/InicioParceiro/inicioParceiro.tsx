@@ -1,9 +1,18 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
-const PRESTADOR_NOME = "Guilherme";
+const PRESTADOR_NOME = localStorage.getItem("nome");
 const CATEGORIAS_FIXAS = [
-  "Cabeleireiro", "Barbearia", "Salão de Beleza", "Manicure"
+    "BELEZA",
+    "ESTETICA",
+    "SAUDE",
+    "FITNESS",
+    "BARBEARIA",
+    "MAQUIAGEM",
+    "MANICURE",
+    "SPA",
+    "OUTROS"
 ];
 
 export default function PrimeiroAcessoNegocio() {
@@ -44,13 +53,33 @@ export default function PrimeiroAcessoNegocio() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome.trim() || !cep.trim() || !endereco.trim() || !categoria) {
-      setPopup(true);
-      return;
+    const token = localStorage.getItem("token")
+    
+    try{
+      const dataToPost ={
+        nome,
+        cep,
+        endereco,
+        categoria
+      }
+
+      const response = await api.post("/negocios", dataToPost,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      navigate("/parceiro/perfil")
+
+      console.log(response)
+    } catch (error){
+      console.log(error)
     }
-    setPopup(true);
   }
 
   return (
