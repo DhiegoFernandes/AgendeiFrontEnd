@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   HiOutlineStar, HiOutlineClock, HiOutlineCalendar, HiOutlineTrendingUp, HiOutlineCog
@@ -8,10 +8,11 @@ import { FaRegHandshake } from "react-icons/fa6";
 import { PiScissorsDuotone } from "react-icons/pi";
 import { FaChartColumn } from "react-icons/fa6";
 import { BsFillPersonLinesFill } from "react-icons/bs";
+import api from "../../services/api";
 
 function getInitials(name: string) {
   const n = name.split(" ");
-  return n.length > 1 ? (n[0][0] + n[n.length - 1][0]).toUpperCase() : n[0][0].toUpperCase();
+  return n.length > 1 ? (n[0][0] + n[n.length - 1][0]).toUpperCase() : null
 }
 
 const adminKPIS = [
@@ -23,15 +24,42 @@ const adminKPIS = [
 export default function PerfilPrestador() {
   const navigate = useNavigate();
 
-  const barbearia = "Barbearia Estilo";
-  const profissional = "Ricardo Almeida";
-  const funcao = "Barbeiro";
-  const rating = 4.9;
-
   // Modal convidar parceiro
   const [modalConvite, setModalConvite] = useState(false);
   const [emailConvite, setEmailConvite] = useState("");
   const [convitePopup, setConvitePopup] = useState<string | false>(false);
+  const [negocio, setNegocio] = useState("");
+  const [profissional, setProfissional] = useState("");
+  const [categoria, setCategoria] = useState("");
+
+  useEffect(() => {
+    async function buscarDadosUsuario() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await api.get("/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        const user = response.data;
+        const negocio = user.negocio;
+
+        setNegocio(negocio.nome);
+        setProfissional(user.nome);
+        setCategoria(negocio.categoria);
+
+        console.log("Usuário carregado:", user);
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+      }
+    }
+
+    buscarDadosUsuario();
+  }, [])
 
   function handleClickConvidar() {
     setModalConvite(true);
@@ -101,21 +129,21 @@ export default function PerfilPrestador() {
       <header className="w-full bg-gradient-to-br from-purple-600 to-purple-400 shadow-md relative px-4 py-8 rounded-b-3xl">
         <div className="max-w-5xl mx-auto flex flex-col lg:flex-row lg:items-end lg:justify-between">
           <div className="flex-1">
-            <h1 className="text-white font-extrabold text-3xl sm:text-4xl mb-2 drop-shadow-lg">{barbearia}</h1>
+            <h1 className="text-white font-extrabold text-3xl sm:text-4xl mb-2 drop-shadow-lg">{negocio}</h1>
             <div className="flex items-center gap-5 mt-2">
               <div className="w-14 h-14 rounded-full bg-white/25 text-2xl text-white font-extrabold flex items-center justify-center shadow ring-2 ring-white/20 select-none uppercase">
                 {getInitials(profissional)}
               </div>
               <div>
                 <span className="font-bold text-lg text-white">{profissional}</span>
-                <span className="block text-white/80 text-sm">{funcao}</span>
+                <span className="block text-white/80 text-sm">{categoria}</span>
               </div>
             </div>
           </div>
           <div className="flex flex-col items-end gap-4 mt-6 lg:mt-0">
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-xl gap-2 backdrop-blur">
               <HiOutlineStar className="text-yellow-300" size={23} />
-              <span className="font-bold text-lg text-white drop-shadow">{rating.toFixed(1)}</span>
+              <span className="font-bold text-lg text-white drop-shadow">???</span>
             </div>
             <div className="flex gap-3">
               <button className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow transition cursor-pointer"

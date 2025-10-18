@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -24,6 +24,34 @@ export default function PrimeiroAcessoNegocio() {
   const [categoria, setCategoria] = useState(CATEGORIAS_FIXAS[0]);
   const [popup, setPopup] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+
+  useEffect(() => {
+    async function buscarDadosUsuario() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await api.get("/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        const dados = response.data;
+
+        if (dados.negocio) {
+          navigate("/parceiro/perfil")
+        }
+
+        console.log("Usuário carregado:", dados);
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+      }
+    }
+
+    buscarDadosUsuario();
+  }, [])
 
   const enderecoRef = useRef<HTMLInputElement>(null);
 
