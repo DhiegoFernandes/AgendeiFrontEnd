@@ -67,6 +67,7 @@ export default function Cadastro() {
 
             const response = await api.post("/usuarios/registrar", dataToSend)
             console.log(response)
+            navigate("/login")
         } catch (error) {
             console.log(error)
         }

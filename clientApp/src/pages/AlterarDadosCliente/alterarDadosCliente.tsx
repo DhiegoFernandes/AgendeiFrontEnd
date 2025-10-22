@@ -103,7 +103,7 @@ export default function AlterarDadosCliente() {
     e.preventDefault();
     setPopup({
       mensagem: "Deseja descartar as alterações e voltar ao perfil?",
-      acaoSim: () => navigate("/perfilCliente"),
+      acaoSim: () => navigate("/cliente/perfil"),
       soOk: false
     });
   }

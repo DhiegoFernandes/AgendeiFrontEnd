@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { HiOutlineArrowLeft, HiOutlineLogout, HiOutlineUserCircle, HiOutlineMail, HiOutlineLocationMarker, HiOutlineCog } from "react-icons/hi";
-import { AiFillStar, AiOutlineShop } from "react-icons/ai";
+import { HiOutlineArrowLeft, HiOutlineLogout, HiOutlineUserCircle, HiOutlineMail, HiOutlineCog } from "react-icons/hi";
+import { AiFillStar } from "react-icons/ai";
 import { FiLock, FiHelpCircle } from "react-icons/fi";
 import { MdAssignment } from "react-icons/md";
 
@@ -55,7 +55,7 @@ export default function PerfilCliente() {
           <div className="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
             <button
               className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow"
-              onClick={() => navigate("/alterarDadosCliente")}
+              onClick={() => navigate("/cliente/alterar-dados")}
             >
               Editar Perfil
             </button>
@@ -67,7 +67,7 @@ export default function PerfilCliente() {
             </button>
             <button
               className="px-5 py-2 rounded-lg border-2 border-white text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
-              onClick={() => navigate("/comercios")}
+              onClick={() => navigate("/cliente/comercios")}
             >
               Procurar Comercios
             </button>
@@ -107,7 +107,7 @@ export default function PerfilCliente() {
             </h3>
             <ul className="divide-y divide-gray-100">
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/dadosCliente")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/cliente/dados")}>
                   <div className="flex items-center gap-4">
                     <HiOutlineUserCircle className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">
@@ -119,7 +119,7 @@ export default function PerfilCliente() {
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/alterarDadosCliente")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/cliente/alterar-dados")}>
                   <div className="flex items-center gap-4">
                     <FiLock className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">
@@ -183,7 +183,7 @@ export default function PerfilCliente() {
         <section className="flex justify-center mb-10">
           <button
             className="flex items-center gap-2 py-3 px-7 rounded-xl border-2 border-red-300 text-red-600 font-bold bg-white hover:bg-red-50 transition text-lg shadow"
-            onClick={() => alert('Sessão encerrada!')}
+            onClick={() => navigate('/')}
           >
             <HiOutlineLogout />
             Sair

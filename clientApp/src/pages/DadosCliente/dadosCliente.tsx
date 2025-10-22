@@ -84,7 +84,7 @@ export default function PerfilCliente() {
 
           <button
             className="w-full mt-7 bg-gradient-to-r from-purple-600 to-purple-500 hover:brightness-110 text-white font-bold py-3 px-6 rounded-lg shadow-lg text-lg transition"
-            onClick={() => navigate("/alterarDadosCliente")}
+            onClick={() => navigate("/cliente/alterar-dados")}
           >
             Alterar dados
           </button>
