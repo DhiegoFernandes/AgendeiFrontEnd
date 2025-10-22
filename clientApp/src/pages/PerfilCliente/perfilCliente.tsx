@@ -61,7 +61,7 @@ export default function PerfilCliente() {
             </button>
             <button
               className="px-5 py-2 rounded-lg border-2 border-white text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
-              onClick={() => navigate("/agendamentocliente")}
+              onClick={() => navigate("/cliente/agendamento")}
             >
               Ver Agendamentos
             </button>

@@ -19,6 +19,16 @@ import DadosParceiro from '../pages/DadosParceiro/dadosParceiro';
 import AlterarDadosParceiro from '../pages/AlterarDadosParceiro/alterarDadosParceiro';
 import AvaliacoesParceiro from '../pages/AvaliacoesParceiro/avaliacoesParceiro';
 import GerenciarNegocio from '../pages/GerenciarNegocio/gerenciarNegocio';
+import HorarioDeTrabalhoParceiro from '../pages/HorarioDeTrabalhoParceiro/horarioDeTrabalhoParceiro';
+import ADMNavBar from '../pages/ADM/ADMNavBar';
+import ClienteADM from '../pages/ADM/ClienteADM/clienteAdm';
+import ConfiguracaoADM from '../pages/ADM/ConfiguracaoADM/configuracaoAdm';
+import PainelADM from '../pages/ADM/PainelADM/painelAdm';
+import ParceiroADM from '../pages/ADM/ParceiroADM/parceiroAdm';
+import ServicosADM from '../pages/ADM/ServicosADM/servicosAdm';
+
+
+
 // import { PrivateRoute } from './privateRoute';
 
 function AppRoutes(){
@@ -47,6 +57,18 @@ function AppRoutes(){
                 <Route path='/parceiro/alterar-dados' element={<AlterarDadosParceiro />} />
                 <Route path='/parceiro/avaliações' element={<AvaliacoesParceiro />} />
                 <Route path='/parceiro/gerenciar-negocio' element={<GerenciarNegocio />} />
+                <Route path='/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
+
+                <Route path="/admin" element={<ADMNavBar />}>
+                <Route index element={<PainelADM />} />
+                <Route path="painelAdm" element={<PainelADM />} />
+                <Route path="clienteAdm" element={<ClienteADM />} />
+                <Route path="parceiroAdm" element={<ParceiroADM />} />
+                <Route path="servicosAdm" element={<ServicosADM />} />
+                <Route path="configuracaoAdm" element={<ConfiguracaoADM />} />
+                </Route>
+
+                
             </Routes>
         </Router>
     )

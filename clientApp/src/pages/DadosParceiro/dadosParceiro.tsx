@@ -67,7 +67,7 @@ export default function VisualizarDadosPrestador() {
         </div>
         <button
           className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-110 transition cursor-pointer"
-          onClick={() => navigate("/alterarDadosParceiro")}
+          onClick={() => navigate("/parceiro/alterar-dados")}
         >
           Alterar Dados
         </button>
