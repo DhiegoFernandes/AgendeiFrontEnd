@@ -124,10 +124,10 @@ export default function PerfilPrestador() {
       onClick: () => navigate("/parceiro/servicos"),
     },
     {
-      label: "Configurações",
-      desc: "Dados de Perfil",
+      label: "Disponíbilidade",
+      desc: "Gerencie seus dias e horários",
       icon: <HiOutlineCog size={26} className="text-gray-500" />,
-      onClick: () => navigate("/parceiro/dados"),
+      onClick: () => navigate("/parceiro/horarioDeTrabalhoParceiro"),
     },
     {
       label: "Convidar parceiro",
