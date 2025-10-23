@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  FiPlus, FiEdit, FiTrash2, FiX, FiArrowLeft
+  FiPlus, FiEdit, FiX, FiArrowLeft
 } from "react-icons/fi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +8,6 @@ import api from "../../services/api";
 
 const COMERCIO = "Barbearia Estilo";
 const PRESTADOR = "Ricardo Almeida";
-const CATEGORIAS_FIXAS = ["SPA", "ESTETICISTA", "OUTROS", "BARBEARIA", "MANICURE", "MAQUIAGEM"];
-const CATEGORIAS_LIST = ["Todas", ...CATEGORIAS_FIXAS];
-const SERVICOS_MOCK = [
-  { id: 1, nome: "Corte Masculino", descricao: "Corte com tesoura e máquina", categoria: "Cortes", preco: "R$ 50,00", duracao: 30, ativo: true },
-  { id: 2, nome: "Barba Tradicional", descricao: "Aparar, modelar e hidratar barba", categoria: "Barbas", preco: "R$ 35,00", duracao: 20, ativo: true },
-  { id: 3, nome: "Hidratação capilar", descricao: "Revitalize seus fios", categoria: "Tratamentos", preco: "R$ 40,00", duracao: 40, ativo: false },
-];
 
 function currencyMask(value: string) {
   let v = value.replace(/\D/g, "");
@@ -25,34 +18,75 @@ function currencyMask(value: string) {
 
 export default function ServicosParceiro() {
   const navigate = useNavigate();
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState("Todas");
-  const [servicos, setServicos] = useState([...SERVICOS_MOCK]);
+  const [servicos, setServicos] = useState<any[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({
     id: null as number | null,
     nome: "",
     descricao: "",
-    categoria: CATEGORIAS_FIXAS[0],
     preco: "",
     duracao: "",
     ativo: true,
   });
   const [popup, setPopup] = useState<{ msg: string, ok?: () => void } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const MAX_NOME = 50;
   const MAX_DESC = 200;
 
+  // Função para carregar serviços da API
+  async function carregarServicos() {
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      setPopup({ msg: "Token de autenticação não encontrado!" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.get('/servicos/ativos', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Transformar dados da API para o formato local
+      const servicosFormatados = response.data.map((servico: any) => ({
+        id: servico.id,
+        nome: servico.titulo,
+        descricao: servico.descricao,
+        preco: `R$ ${servico.valor.toFixed(2).replace('.', ',')}`,
+        duracao: servico.duracaoMinutos,
+        ativo: servico.ativo
+      }));
+
+      setServicos(servicosFormatados);
+    } catch (error) {
+      console.error('Erro ao carregar serviços:', error);
+      setPopup({ msg: "Erro ao carregar serviços. Tente novamente." });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Carregar serviços ao montar o componente
+  useEffect(() => {
+    carregarServicos();
+  }, []);
+
   function openForm(serv?: typeof form) {
     setForm(serv
       ? { ...serv }
-      : { id: null, nome: "", descricao: "", categoria: CATEGORIAS_FIXAS[0], preco: "", duracao: "", ativo: true }
+      : { id: null, nome: "", descricao: "", preco: "", duracao: "", ativo: true }
     );
     setFormOpen(true);
   }
 
   function closeForm() {
     setFormOpen(false);
-    setForm({ id: null, nome: "", descricao: "", categoria: CATEGORIAS_FIXAS[0], preco: "", duracao: "", ativo: true });
+    setForm({ id: null, nome: "", descricao: "", preco: "", duracao: "", ativo: true });
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -63,29 +97,20 @@ export default function ServicosParceiro() {
     }));
   }
 
-  function handleCategoriaClick(cat: string) {
-    setForm(f => ({ ...f, categoria: cat }));
-  }
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!form.nome.trim() || !form.categoria || !form.preco) {
-      setPopup({ msg: "Preencha os campos obrigatórios!" }); return;
+    if (!form.nome.trim() || !form.preco) {
+      setPopup({ msg: "Preencha os campos obrigatórios!" }); 
+      return;
     }
 
-    setServicos(list => {
-      if (form.id !== null && form.id !== undefined) {
-        return list.map(s => s.id === form.id ? { ...form } : s);
-      } else {
-        return [...list, { ...form, id: Date.now() }];
-      }
-    })
-
+    // Preparar dados para envio
     const dataToPost = {
       titulo: form.nome,
       descricao: form.descricao,
-      categoria: form.categoria,
       valor: parseFloat(
         form.preco
           .replace("R$", "")
@@ -95,50 +120,103 @@ export default function ServicosParceiro() {
       ),
       duracaoMinutos: Number(form.duracao),
       ativo: form.ativo
-    }
+    };
 
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setPopup({ msg: "Token de autenticação não encontrado!" });
+      return;
+    }
 
     try {
-      const response = await api.post('/servicos', dataToPost, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+      let response;
+      
+      if (form.id !== null && form.id !== undefined) {
+        // Atualizar serviço existente
+        response = await api.put(`/servicos/${form.id}`, dataToPost, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } else {
+        // Criar novo serviço
+        response = await api.post('/servicos', dataToPost, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
       }
-    })
 
-    console.log(response)
+      console.log(`Serviço ${form.id ? "atualizado" : "cadastrado"} com sucesso:`, response.data);
+
+      // Recarregar lista de serviços da API
+      await carregarServicos();
+
+      closeForm();
+      setTimeout(() => setPopup({ msg: `Serviço ${form.id ? "atualizado" : "cadastrado"} com sucesso!` }), 100);
+
     } catch (error) {
-      console.log(error)
+      console.error('Erro ao salvar serviço:', error);
+      setPopup({ msg: "Erro ao salvar serviço. Tente novamente." });
     }
-
-    closeForm();
-    setTimeout(() => setPopup({ msg: `Serviço ${form.id ? "atualizado" : "cadastrado"} com sucesso!` }), 100);
   }
 
-  function handleExcluir(id: number) {
-    setPopup({
-      msg: "Deseja excluir esse serviço?",
-      ok: () => setServicos(s => s.filter(el => el.id !== id))
-    });
+
+  async function toggleAtivoServico(id: number) {
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      setPopup({ msg: "Token de autenticação não encontrado!" });
+      return;
+    }
+
+    const servico = servicos.find(s => s.id === id);
+    if (!servico) return;
+
+    const novoStatus = !servico.ativo;
+
+    try {
+      await api.put(`/servicos/${id}`, {
+        titulo: servico.nome,
+        descricao: servico.descricao,
+        valor: parseFloat(
+          servico.preco
+            .replace("R$", "")
+            .replace(/\./g, "")
+            .replace(",", ".")
+            .trim()
+        ),
+        duracaoMinutos: servico.duracao,
+        ativo: novoStatus
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Status do serviço atualizado com sucesso');
+      
+      // Recarregar lista de serviços da API
+      await carregarServicos();
+    } catch (error) {
+      console.error('Erro ao atualizar status do serviço:', error);
+      setPopup({ msg: "Erro ao atualizar status do serviço. Tente novamente." });
+    }
   }
 
   function handleToggleAtivoServico(id: number) {
-    setServicos(list =>
-      list.map(s =>
-        s.id === id ? { ...s, ativo: !s.ativo } : s
-      )
-    );
+    toggleAtivoServico(id);
   }
 
   function handleToggleAtivo() {
     setForm(f => ({ ...f, ativo: !f.ativo }));
   }
 
-  const servicosFiltrados =
-    categoriaSelecionada === "Todas"
-      ? servicos
-      : servicos.filter(s => s.categoria === categoriaSelecionada);
+  const servicosFiltrados = servicos;
 
   function handlePopupOk() { setPopup(null); }
   function handlePopupSim() { popup?.ok?.(); setPopup(null); }
@@ -163,26 +241,8 @@ export default function ServicosParceiro() {
         <div className="w-6 invisible" />
       </nav>
 
-      {/* Categorias */}
-      <div className="max-w-2xl mx-auto flex flex-wrap gap-2 mt-8 mb-3 pb-1 px-2">
-        {CATEGORIAS_LIST.map(cat => (
-          <button
-            key={cat}
-            className={
-              "px-5 py-2 rounded-full font-bold shadow transition-all border cursor-pointer " +
-              (categoriaSelecionada === cat
-                ? "bg-gradient-to-r from-purple-600 to-purple-400 text-white border-transparent"
-                : "bg-gray-100 text-gray-700 hover:bg-purple-50 border-gray-200")
-            }
-            onClick={() => setCategoriaSelecionada(cat)}
-            style={{ minWidth: 80 }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
 
-      <div className="max-w-2xl mx-auto flex justify-end mb-4 px-2">
+      <div className="max-w-2xl mx-auto flex justify-end mb-4 px-2 mt-5">
         <button
           className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold py-2 px-7 rounded-lg shadow-md hover:brightness-110 transition text-base cursor-pointer"
           onClick={() => openForm()}
@@ -235,26 +295,6 @@ export default function ServicosParceiro() {
               <span className="text-sm text-purple-400 absolute right-8 mt-1">{form.descricao.length}/{MAX_DESC}</span>
             </div>
 
-            <div>
-              <label className="font-bold text-gray-700">Categoria</label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {CATEGORIAS_FIXAS.map(cat => (
-                  <button
-                    type="button"
-                    key={cat}
-                    className={
-                      "px-5 py-2 rounded-full text-base font-bold shadow cursor-pointer transition " +
-                      (form.categoria === cat
-                        ? "bg-gradient-to-r from-purple-600 to-purple-400 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-purple-50")
-                    }
-                    onClick={() => handleCategoriaClick(cat)}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
               <div>
@@ -345,7 +385,10 @@ export default function ServicosParceiro() {
       {/* Listagem de serviços */}
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-6 px-3 flex flex-col gap-3">
         <h2 className="text-lg font-bold text-gray-900 mb-2">Serviços cadastrados</h2>
-        {servicosFiltrados.length === 0 && (
+        {loading && (
+          <div className="text-purple-600 text-center my-10">Carregando serviços...</div>
+        )}
+        {!loading && servicosFiltrados.length === 0 && (
           <div className="text-gray-400 text-center my-10">Nenhum serviço encontrado.</div>
         )}
         {servicosFiltrados.map(serv => (
@@ -389,7 +432,6 @@ export default function ServicosParceiro() {
               </div>
               <div className="text-gray-500 font-medium text-base mt-1">{serv.descricao}</div>
               <div className="flex flex-wrap gap-3 mt-2">
-                <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-base font-bold">{serv.categoria}</span>
                 <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-base font-bold">{serv.preco}</span>
                 <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200 text-gray-800 text-base font-bold">
                   <AiOutlineClockCircle /> {serv.duracao} min
@@ -402,12 +444,6 @@ export default function ServicosParceiro() {
                 onClick={() => openForm(serv)}
               >
                 <FiEdit size={18}/> Atualizar
-              </button>
-              <button className="bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg py-2 px-4 transition flex items-center gap-2 shadow cursor-pointer"
-                title="Excluir"
-                onClick={() => handleExcluir(serv.id)}
-              >
-                <FiTrash2 size={18}/> Excluir
               </button>
             </div>
           </div>

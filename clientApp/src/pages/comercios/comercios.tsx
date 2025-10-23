@@ -2,7 +2,7 @@ import { useState } from "react";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import salaoUm from "../../assets/salaoUm.png";
 import salaoDois from "../../assets/salaoDois.png"
-import salaoTres from "../../assets/salaotres.png"
+import salaoTres from "../../assets/salaoTres.png"
 import { useNavigate } from "react-router-dom";
 
 // Mock dos comércios (pode puxar de API)
@@ -167,7 +167,8 @@ export default function Comercios() {
                   </span>
                 </div>
                 <div className="mt-auto flex justify-end">
-                  <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-purple-700 transition cursor-pointer">
+                  <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-purple-700 transition cursor-pointer"
+                  onClick={() => navigate("/cliente/agendar-horario")}>
                     Agendar
                   </button>
                 </div>

@@ -11,8 +11,18 @@ import { BsFillPersonLinesFill } from "react-icons/bs";
 import api from "../../services/api";
 
 function getInitials(name: string) {
-  const n = name.split(" ");
-  return n.length > 1 ? (n[0][0] + n[n.length - 1][0]).toUpperCase() : null
+  if (!name || typeof name !== 'string') {
+    return null;
+  }
+  
+  const n = name.trim().split(" ").filter(word => word.length > 0);
+  
+  if (n.length >= 2) {
+    return (n[0][0] + n[1][0]).toUpperCase();
+  } else if (n.length === 1) {
+    return n[0][0].toUpperCase();
+  }
+  return null;
 }
 
 const adminKPIS = [
@@ -66,12 +76,28 @@ export default function PerfilPrestador() {
     setEmailConvite("");
   }
 
-  function handleEnviarConvite(e: React.FormEvent) {
+  async function handleEnviarConvite(e: React.FormEvent) {
     e.preventDefault();
     if (!emailConvite.match(/^[\w-.]+@[\w-.]+\.[a-zA-Z]{2,}$/)) {
       setConvitePopup("E-mail inválido!");
       return;
     }
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await api.post("/negocios/convidar", { emailPrestador: emailConvite } , {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(response)
+    } catch (error) {
+      console.error("Erro ao enviar convite:", error);
+    }
+
     setModalConvite(false);
     setConvitePopup("Convite enviado!");
     setEmailConvite("");
