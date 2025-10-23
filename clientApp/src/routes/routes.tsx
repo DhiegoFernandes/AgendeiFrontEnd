@@ -57,7 +57,7 @@ function AppRoutes(){
                 <Route path='/parceiro/alterar-dados' element={<AlterarDadosParceiro />} />
                 <Route path='/parceiro/avaliações' element={<AvaliacoesParceiro />} />
                 <Route path='/parceiro/gerenciar-negocio' element={<GerenciarNegocio />} />
-                <Route path='/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
+                <Route path='/parceiro/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
 
                 <Route path="/admin" element={<ADMNavBar />}>
                 <Route index element={<PainelADM />} />

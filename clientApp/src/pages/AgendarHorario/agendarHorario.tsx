@@ -1,20 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { format, formatISO } from "date-fns";
+import { format, formatISO, isToday, addMinutes, setHours, setMinutes, isBefore } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import salaoDois from "../../assets/salaoDois.png"
+import { HiOutlineCalendar, HiOutlineClock, HiOutlineCheck, HiOutlineX } from "react-icons/hi";
 
-const profissional = {
-  nome: "Ricardo Almeida",
-  nota: 4.8,
-  funcao: "Cabeleireiro",
-  salao: "Salão Beleza Total",
-  servico: "Corte Masculino",
-  preco: 45,
-  duracao: 30,
-};
+// Configurações de funcionamento
+const HORARIO_INICIO = 9; // 9h
+const HORARIO_FIM = 18; // 18h
+const INTERVALO_MINUTOS = 30; // 30 minutos entre horários
 
 export default function AgendarHorario() {
   const navigate = useNavigate();
@@ -23,10 +19,23 @@ export default function AgendarHorario() {
   const [hora, setHora] = useState<string | null>(null);
   const [loadingHorarios, setLoadingHorarios] = useState(false);
   const [erroHorarios, setErroHorarios] = useState<string | null>(null);
+  const [showConfirmacao, setShowConfirmacao] = useState(false);
+  
+  // Dados do profissional e serviço - Em uma aplicação real, esses dados viriam de uma API ou context
+  // TODO: Substituir por dados da API de profissionais e serviços
+  const profissional = {
+    nome: "Ricardo Almeida",
+    nota: 4.8,
+    funcao: "Cabeleireiro",
+    salao: "Salão Beleza Total",
+    servico: "Corte Masculino",
+    preco: 45,
+    duracao: 30,
+  };
 
-  // Fetch horários sempre que a data muda
+  // Gerar horários sempre que a data muda
   useEffect(() => {
-    async function fetchHorarios() {
+    function gerarHorarios() {
       setLoadingHorarios(true);
       setErroHorarios(null);
       setHora(null);
@@ -39,25 +48,78 @@ export default function AgendarHorario() {
       }
 
       try {
-        const iso = formatISO(data, { representation: "date" }); // "YYYY-MM-DD"
-        // Altere a URL para sua API real!
-        const resp = await fetch(`/api/horarios?data=${iso}`);
-        if (!resp.ok) throw new Error("Erro carregando horários");
-        const lista: string[] = await resp.json();
-        setHorarios(lista);
+        // TODO: Substituir esta lógica pela chamada à API de horários disponíveis
+        // const response = await fetch(`/api/horarios?profissional=${profissionalId}&data=${formattedDate}`);
+        // const horariosDisponiveis = await response.json();
+
+        // Enquanto não temos a API, gerar horários das 9h às 18h com intervalos de 30 minutos
+        const horariosDisponiveis: string[] = [];
+        const agora = new Date();
+        const diaAtual = isToday(data);
+
+        // Hora de início do dia
+        let horarioAtual = setHours(setMinutes(new Date(data), 0), HORARIO_INICIO);
+        
+        // Hora de término do dia
+        const horarioFim = setHours(setMinutes(new Date(data), 0), HORARIO_FIM);
+        
+        // Gerar horários em intervalos
+        while (isBefore(horarioAtual, horarioFim)) {
+          // Se for o dia atual, só mostrar horários futuros
+          if (!diaAtual || (diaAtual && isBefore(agora, horarioAtual))) {
+            horariosDisponiveis.push(format(horarioAtual, "HH:mm"));
+          }
+          
+          // Avança para o próximo horário
+          horarioAtual = addMinutes(horarioAtual, INTERVALO_MINUTOS);
+        }
+
+        // Simular horários já agendados (para demonstração)
+        // TODO: Remover essa lógica quando integrar com a API real
+        const horariosFinais = horariosDisponiveis.filter(() => Math.random() > 0.3);
+        
+        setHorarios(horariosFinais);
       } catch (e) {
         setHorarios([]);
-        setErroHorarios("Não foi possível carregar horários.");
+        setErroHorarios("Não foi possível gerar horários.");
       }
       setLoadingHorarios(false);
     }
-    fetchHorarios();
+    
+    // Pequeno atraso para simular carregamento
+    const timeout = setTimeout(() => {
+      gerarHorarios();
+    }, 300);
+
+    return () => clearTimeout(timeout);
   }, [data]);
 
-  function handleAgendar() {
-    alert(
-      `Agendamento confirmado!\n\nProfissional: ${profissional.nome}\nServiço: ${profissional.servico}\nData: ${format(data, "PPP", { locale: ptBR })}\nHorário: ${hora}\nValor: R$ ${profissional.preco.toFixed(2)}`
-    );
+  // Função para confirmar o agendamento
+  async function handleAgendar() {
+    try {
+      // TODO: Substituir por chamada à API de agendamento
+      // const response = await fetch('/api/agendamentos', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     profissionalId: profissional.id,
+      //     servicoId: profissional.servicoId,
+      //     data: formatISO(data),
+      //     hora: hora
+      //   })
+      // });
+      
+      // Simular um tempo de resposta do servidor
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Fechamos o modal e redirecionamos para outra página
+      setShowConfirmacao(false);
+      
+      // TODO: Redirecionar para página de sucesso ou histórico de agendamentos
+      navigate("/agendamentoconcluido");
+    } catch (error) {
+      console.error("Erro ao realizar agendamento:", error);
+    }
   }
 
   return (
@@ -77,7 +139,7 @@ export default function AgendarHorario() {
       </header>
 
       {/* CARD PROFISSIONAL */}
-      <section className="max-w-2xl mx-auto mt-8 flex flex-col gap-6">
+      <section className="max-w-2xl mx-auto mt-8 flex flex-col gap-6 px-4">
         <div className="flex flex-col md:flex-row items-center bg-white rounded-2xl shadow px-8 py-6 justify-between">
           <div className="flex items-center gap-6 w-full">
             <img
@@ -98,7 +160,7 @@ export default function AgendarHorario() {
           </div>
           <button
             className="ml-0 md:ml-4 px-4 py-2 font-bold text-purple-600 border-2 border-purple-200 bg-white rounded-lg shadow hover:bg-purple-50 transition whitespace-nowrap mt-4 md:mt-0"
-            onClick={() => navigate("/escolherservico")}
+            onClick={() => navigate("/cliente/escolher-servico")}
           >
             Trocar serviço
           </button>
@@ -135,10 +197,10 @@ export default function AgendarHorario() {
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 mt-2">
             {loadingHorarios && (
-              <span className="col-span-full text-center text-purple-600 animate-pulse">Carregando horários...</span>
+              <span className="col-span-full text-center text-purple-600 animate-pulse py-6">Carregando horários...</span>
             )}
             {erroHorarios && (
-              <span className="col-span-full text-center text-red-500">{erroHorarios}</span>
+              <span className="col-span-full text-center text-red-500 py-6">{erroHorarios}</span>
             )}
             {!loadingHorarios && !erroHorarios && horarios.length > 0 && horarios.map(hr => (
               <button
@@ -154,7 +216,11 @@ export default function AgendarHorario() {
               </button>
             ))}
             {!loadingHorarios && !erroHorarios && horarios.length === 0 && (
-              <span className="col-span-full text-center text-gray-500">Sem horários disponíveis</span>
+              <span className="col-span-full text-center text-gray-500 py-6">
+                {data.getDay() === 0 
+                  ? "Não funciona aos domingos" 
+                  : "Sem horários disponíveis para esta data"}
+              </span>
             )}
           </div>
         </div>
@@ -194,11 +260,73 @@ export default function AgendarHorario() {
                       transition focus:ring-4 ring-purple-300
                       ${!hora ? "opacity-60 cursor-not-allowed" : "hover:bg-purple-700"}`}
           disabled={!hora}
-          onClick={handleAgendar}
+          onClick={() => setShowConfirmacao(true)}
         >
           Confirmar Agendamento
         </button>
       </footer>
+
+      {/* Modal de confirmação personalizado */}
+      {showConfirmacao && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-fadeIn">
+            <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mx-auto mb-5">
+              <HiOutlineCheck className="text-purple-600 text-3xl" />
+            </div>
+
+            <h3 className="text-2xl font-bold text-center text-gray-800 mb-2">Confirmar Agendamento</h3>
+            
+            <p className="text-gray-600 text-center mb-6">
+              Você está agendando um horário para o serviço abaixo:
+            </p>
+            
+            <div className="bg-gray-50 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-purple-100 rounded-full">
+                  <img 
+                    src={salaoDois} 
+                    alt={profissional.nome} 
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-800">{profissional.servico}</h4>
+                  <p className="text-gray-600 text-sm">Com {profissional.nome}</p>
+                </div>
+                <div className="ml-auto">
+                  <p className="font-bold text-purple-700">R$ {profissional.preco.toFixed(2)}</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <HiOutlineCalendar className="text-purple-600" />
+                  <span className="text-gray-700">{format(data, "PPPP", { locale: ptBR })}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <HiOutlineClock className="text-purple-600" />
+                  <span className="text-gray-700">Horário: {hora}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowConfirmacao(false)}
+                className="flex-1 py-3 px-4 border border-gray-300 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition flex items-center justify-center gap-1"
+              >
+                <HiOutlineX /> Cancelar
+              </button>
+              <button 
+                onClick={handleAgendar}
+                className="flex-1 py-3 px-4 bg-purple-600 rounded-xl font-semibold text-white hover:bg-purple-700 transition flex items-center justify-center gap-1"
+              >
+                <HiOutlineCheck /> Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

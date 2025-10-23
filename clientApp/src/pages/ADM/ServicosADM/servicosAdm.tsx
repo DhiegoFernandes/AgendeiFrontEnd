@@ -29,7 +29,7 @@ export default function ServicosAdm() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-6">Altere serviços</h2>
+      <h2 className="text-2xl font-bold mb-6">Visualizar serviços</h2>
       <ul className="flex flex-col gap-6">
         {PRESTADORES.map(pres => (
           <li key={pres.id} className="bg-gray-50 rounded-xl shadow px-6 py-5">
