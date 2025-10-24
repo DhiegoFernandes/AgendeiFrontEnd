@@ -1,68 +1,117 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import salaoUm from "../../assets/salaoUm.png";
 import salaoDois from "../../assets/salaoDois.png"
 import salaoTres from "../../assets/salaoTres.png"
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
-// Mock dos comércios (pode puxar de API)
-const commercesDemo = [
-  {
-    id: 1,
-    nome: "Studio Beauty & Hair",
-    destaque: "Premium",
-    img: salaoUm,
-    rating: 4.9,
-    tags: ["Cabeleireiro", "Manicure", "Estética"],
-    distancia: "23 km",
-    bairro: "Centro",
-    status: { texto: "Disponível hoje", cor: "green" }
-  },
-  {
-    id: 2,
-    nome: "Barbearia Vintage",
-    destaque: "Destaque",
-    img: salaoDois,
-    rating: 4.2,
-    tags: ["Barbearia", "Corte Masculino"],
-    distancia: "15 km",
-    bairro: "Jardins",
-    status: { texto: "Disponível hoje", cor: "green" }
-  },
-  {
-    id: 3,
-    nome: "Espaço Beleza Total",
-    destaque: "Popular",
-    img: salaoTres,
-    rating: 4.7,
-    tags: ["Manicure", "Pedicure", "Estética"],
-    distancia: "31 km",
-    bairro: "Vila Nova",
-    status: { texto: "Poucos horários", cor: "yellow" }
-  }
-];
+// Imagens para os negócios (pode ser expandido conforme necessário)
+const imagensNegocios = [salaoUm, salaoDois, salaoTres];
 
 const categorias = [
   { nome: "Todos", tag: "todos" },
-  { nome: "Cabeleireiros", tag: "cabeleireiro" },
-  { nome: "Barbearias", tag: "barbearia" },
-  { nome: "Manicure", tag: "manicure" },
-  { nome: "Estética", tag: "estética" }
+  { nome: "Beleza", tag: "BELEZA" },
+  { nome: "Estética", tag: "ESTETICA" },
+  { nome: "Saúde", tag: "SAUDE" },
+  { nome: "Fitness", tag: "FITNESS" },
+  { nome: "Barbearia", tag: "BARBEARIA" },
+  { nome: "Maquiagem", tag: "MAQUIAGEM" },
+  { nome: "Manicure", tag: "MANICURE" },
+  { nome: "SPA", tag: "SPA" },
+  { nome: "Outros", tag: "OUTROS" }
 ];
+
+interface Negocio {
+  id: number;
+  nome: string;
+  endereco: string;
+  cep: string;
+  notaMedia: number;
+  distanciaKm: number;
+  categoria: string;
+}
+
+interface NegocioFormatado {
+  id: number;
+  nome: string;
+  endereco: string;
+  cep: string;
+  rating: number;
+  distancia: string;
+  categoria: string;
+  img: string;
+  status: { texto: string; cor: string };
+}
 
 export default function Comercios() {
   const [cat, setCat] = useState("todos");
   const [q, setQ] = useState("");
+  const [negocios, setNegocios] = useState<NegocioFormatado[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Função para carregar negócios da API
+  async function carregarNegocios() {
+    setLoading(true);
+    setError(null);
+    
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      setError("Token de autenticação não encontrado!");
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await api.get('/negocios/busca-negocios', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Transformar dados da API para o formato local
+      const negociosFormatados: NegocioFormatado[] = response.data.map((negocio: Negocio, index: number) => ({
+        id: negocio.id,
+        nome: negocio.nome,
+        endereco: negocio.endereco,
+        cep: negocio.cep,
+        rating: negocio.notaMedia,
+        distancia: `${negocio.distanciaKm.toFixed(1)} km`,
+        categoria: negocio.categoria,
+        img: imagensNegocios[index % imagensNegocios.length], // Rotaciona as imagens
+        status: { 
+          texto: "Ajustar", 
+          cor: "yellow" 
+        }
+      }));
+      
+      setNegocios(negociosFormatados);
+    } catch (error) {
+      console.error('Erro ao carregar negócios:', error);
+      setError("Erro ao carregar negócios. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Carregar negócios ao montar o componente
+  useEffect(() => {
+    carregarNegocios();
+  }, []);
+
   const filtrar = () =>
-    commercesDemo.filter(c => {
+    negocios.filter(c => {
       const matchCat =
-        cat === "todos" || c.tags.map(t => t.toLowerCase()).includes(cat);
+        cat === "todos" || c.categoria === cat;
       const matchQ =
         !q ||
         c.nome.toLowerCase().includes(q.toLowerCase()) ||
-        c.tags.join(" ").toLowerCase().includes(q.toLowerCase());
+        c.endereco.toLowerCase().includes(q.toLowerCase()) ||
+        c.categoria.toLowerCase().includes(q.toLowerCase());
       return matchCat && matchQ;
     });
 
@@ -122,9 +171,23 @@ export default function Comercios() {
       </nav>
       {/* Destaque */}
       <main className="container mx-auto max-w-7xl py-8 px-2">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">Em Destaque</h2>
-        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {filtrar().map(c => (
+        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">Negócios Disponíveis</h2>
+        
+        {loading && (
+          <div className="text-center text-purple-600 text-lg my-10">
+            Carregando negócios...
+          </div>
+        )}
+        
+        {error && (
+          <div className="text-center text-red-600 text-lg my-10">
+            {error}
+          </div>
+        )}
+        
+        {!loading && !error && (
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {filtrar().map(c => (
             <div key={c.id} className="bg-white rounded-xl shadow-lg flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl">
               {/* Banner Foto */}
               <div className="relative h-44 w-full overflow-hidden">
@@ -154,8 +217,8 @@ export default function Comercios() {
                     <span className="text-gray-800 ml-1">{c.rating.toFixed(1)}</span>
                   </div>
                 </div>
-                <p className="text-gray-700 text-base leading-tight">{c.tags.join(" · ")}</p>
-                <p className="text-gray-400 text-sm">{c.distancia} · {c.bairro}</p>
+                <p className="text-gray-700 text-base leading-tight">{c.categoria}</p>
+                <p className="text-gray-400 text-sm">{c.distancia} · {c.endereco}</p>
                 <div className="flex flex-wrap gap-2 my-1">
                   <span className={`
                     rounded-full px-4 py-1 text-sm font-semibold border
@@ -168,19 +231,20 @@ export default function Comercios() {
                 </div>
                 <div className="mt-auto flex justify-end">
                   <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-purple-700 transition cursor-pointer"
-                  onClick={() => navigate("/cliente/agendar-horario")}>
+                  onClick={() => navigate("/cliente/escolher-servico")}>
                     Agendar
                   </button>
                 </div>
               </div>
             </div>
           ))}
-          {filtrar().length === 0 && (
-            <div className="col-span-full text-center text-gray-400 mt-8">
-              Nenhum comércio encontrado.
-            </div>
-          )}
-        </div>
+            {filtrar().length === 0 && (
+              <div className="col-span-full text-center text-gray-400 mt-8">
+                Nenhum negócio encontrado.
+              </div>
+            )}
+          </div>
+        )}
       </main>
  </div>
 );

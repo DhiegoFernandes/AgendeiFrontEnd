@@ -1,29 +1,29 @@
-import { useState, useMemo } from "react";
+import React from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { FiArrowLeft } from "react-icons/fi";
 import Logo from "../../assets/LogoAgendei.png";
 import { useNavigate } from "react-router-dom";
+import Rating from '@mui/material/Rating';
+import Box from '@mui/material/Box';
+import { Star as StarIcon } from '@mui/icons-material';
+import api from "../../services/api";
+import type { Avaliacao } from "../../types/user";
 
-type Review = {
-  nome: string
-  data: string
-  servico: string
-  comentario: string
-  nota: number
-}
 
-const AVALIACOES_MOCK: Review[] = [
-  { nome: "Marina Alves", data: "12/06/2024", servico: "Sobrancelha", comentario: "Amei o resultado, super indico!", nota: 5 },
-  { nome: "Leonardo S.", data: "07/07/2024", servico: "Corte masculino", comentario: "Atendimento ótimo, corte no tempo.", nota: 4 },
-  { nome: "Juliana Souza", data: "29/05/2024", servico: "Luzes", comentario: "Profissionais incríveis, amei as luzes!", nota: 5 },
-  { nome: "Carlos M.", data: "10/04/2024", servico: "Barba", comentario: "Poderia caprichar mais no acabamento, mas foi bom.", nota: 3 },
-  { nome: "Anderson Lopes", data: "18/07/2024", servico: "Corte masculino", comentario: "Top, Zé é fera!", nota: 4 },
-  { nome: "Camila F.", data: "02/06/2024", servico: "Limpeza de pele", comentario: "Atendimento maravilhoso. Recomendo.", nota: 5 },
-  { nome: "Patricia Lemos", data: "05/07/2024", servico: "Escova", comentario: "Não gostei do resultado, escova saiu rápido.", nota: 2 },
-  { nome: "Bruno Dias", data: "09/07/2024", servico: "Penteado", comentario: "Equipe nota 10. Ficou lindo!", nota: 5 },
-  { nome: "Amanda Reis", data: "17/05/2024", servico: "Tratamento Capilar", comentario: "Fiquei muito satisfeita.", nota: 4 },
-  { nome: "Paulo Silva", data: "03/05/2024", servico: "Corte", comentario: "Serviço bom, ambiente agradável.", nota: 3 }
-];
+const labels = {
+  0.5: '0.5',
+  1: '1',
+  1.5: '1.5',
+  2: '2',
+  2.5: '2.5',
+  3: '3',
+  3.5: '3.5',
+  4: '4',
+  4.5: '4.5',
+  5: '5',
+};
+
 
 const STAR_FILTERS = [
   { label: "Todos", val: "all" },
@@ -40,13 +40,64 @@ function getInitials(nome: string) {
 }
 
 export default function AvaliacoesComercio() {
+  const [value, setValue] = React.useState(2);
+  const [hover, setHover] = React.useState(-1);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [filtro, setFiltro] = useState<"all" | "5" | "4" | "3" | "2" | "1">("all");
   const navigate = useNavigate();
 
+  // Função para carregar as avaliações
+  const carregarAvaliacoes = async () => {
+    setLoading(true);
+    setError(null);
+    
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      setError("Token de autenticação não encontrado!");
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      // Buscar dados do usuário atual
+      const userResponse = await api.get('/usuarios/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const userData = userResponse.data;
+      
+      // Buscar avaliações do negócio
+      const avaliacoesResponse = await api.get(`/avaliacoes/negocio/${userData.negocio.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      setAvaliacoes(avaliacoesResponse.data);
+    } catch (err) {
+      console.error('Erro ao carregar avaliações:', err);
+      setError('Erro ao carregar avaliações. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarAvaliacoes();
+  }, []);
+
   const avaliacoesFiltradas = useMemo(() => {
-    if (filtro === "all") return AVALIACOES_MOCK;
-    return AVALIACOES_MOCK.filter(a => a.nota === parseInt(filtro));
-  }, [filtro]);
+    if (filtro === "all") return avaliacoes;
+    return avaliacoes.filter(a => a.nota === parseInt(filtro));
+  }, [filtro, avaliacoes]);
 
   const { media, breakdown } = useMemo(() => {
     const notas = avaliacoesFiltradas.map(a => a.nota);
@@ -58,6 +109,29 @@ export default function AvaliacoesComercio() {
 
   return (
     <div className="min-h-screen bg-[#f9fafb] pb-20">
+      {/* <Box
+      sx={{
+        width: 200,
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <Rating
+        name="hover-feedback"
+        value={value}
+        precision={0.5}
+        onChange={(event, newValue) => {
+          setValue(newValue as number);
+        }}
+        onChangeActive={(event, newHover) => {
+          setHover(newHover);
+        }}
+        emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+      />
+      {value !== null && (
+        <Box sx={{ ml: 2 }}>{labels[hover !== -1 ? hover as keyof typeof labels : value as keyof typeof labels]}</Box>
+      )}
+    </Box> */}
       {/* Header/Hero */}
       <header className="w-full bg-white from-purple-600 to-purple-500 py-5 flex flex-col items-center rounded-b-2xl shadow mb-8 relative">
         <button
@@ -128,15 +202,23 @@ export default function AvaliacoesComercio() {
           </div>
 
           <ul className="flex flex-col gap-6">
-            {avaliacoesFiltradas.length === 0 && (
+            {loading && (
+              <li className="text-gray-400 mt-7 text-lg font-medium text-center">Carregando avaliações...</li>
+            )}
+            
+            {error && (
+              <li className="text-red-500 mt-7 text-lg font-medium text-center">{error}</li>
+            )}
+            
+            {!loading && !error && avaliacoesFiltradas.length === 0 && (
               <li className="text-gray-400 mt-7 text-lg font-medium text-center">Nenhuma avaliação encontrada.</li>
             )}
 
-            {avaliacoesFiltradas.map((a, i) => (
-              <li key={i} className="flex items-start gap-5 p-4 rounded-xl bg-gray-50 hover:bg-purple-50 shadow transition">
+            {!loading && !error && avaliacoesFiltradas.map((a, i) => (
+              <li key={a.id} className="flex items-start gap-5 p-4 rounded-xl bg-gray-50 hover:bg-purple-50 shadow transition">
                 <div className="flex flex-col items-center mt-1">
                   <span className="w-11 h-11 rounded-full bg-purple-400 text-white flex items-center justify-center font-bold text-lg shadow text-center select-none">
-                    {getInitials(a.nome)}
+                    {getInitials(a.nomeCliente)}
                   </span>
                   <div className="flex mt-2">
                     {Array.from({ length: 5 }).map((_, idx) => (
@@ -150,10 +232,10 @@ export default function AvaliacoesComercio() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1">
-                    <span className="font-bold text-gray-900 text-base">{a.nome}</span>
-                    <span className="text-gray-400 text-xs">{a.data}</span>
+                    <span className="font-bold text-gray-900 text-base">{a.nomeCliente}</span>
+                    <span className="text-gray-400 text-xs">Avaliação #{a.id}</span>
                   </div>
-                  <span className="inline-block text-sm text-purple-600 font-bold bg-purple-100 px-3 py-0.5 rounded-full">{a.servico}</span>
+                  <span className="inline-block text-sm text-purple-600 font-bold bg-purple-100 px-3 py-0.5 rounded-full">{a.nomeNegocio}</span>
                   <div className="text-base text-gray-800 mt-2 break-words leading-snug">{a.comentario}</div>
                 </div>
               </li>

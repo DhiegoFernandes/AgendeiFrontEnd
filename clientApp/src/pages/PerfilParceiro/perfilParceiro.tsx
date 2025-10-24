@@ -173,14 +173,9 @@ export default function PerfilPrestador() {
             </div>
             <div className="flex gap-3">
               <button className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow transition cursor-pointer"
-                onClick={() => navigate("/agendamentoParceiro")}
+                onClick={() => navigate("/parceiro/agendamento")}
               >
                 Abrir Agenda
-              </button>
-              <button className="px-5 py-2 rounded-lg border-2 border-white text-purple-900 bg-white/90 hover:bg-white font-semibold shadow transition cursor-pointer"
-                onClick={() => navigate("/novo-agendamento")}
-              >
-                Novo Agendamento
               </button>
             </div>
           </div>

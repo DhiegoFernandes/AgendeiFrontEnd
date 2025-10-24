@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ComercioImg from "../../assets/salaoTres.png";
 import { FaCut } from "react-icons/fa";
-import { FaClock, FaRoute } from "react-icons/fa";
 
 const categorias = [
   { tag: "todos", nome: "Todos" },
@@ -244,50 +243,7 @@ export default function EscolherServico() {
             </button>
             
             <div className="p-4">
-              <h2 className="text-xl font-bold text-purple-700 mb-2">Localização da Barbearia Estilo</h2>
-              
-              {/* Informações de distância e tempo */}
-              <div className="flex flex-wrap gap-4 mb-4">
-                {carregando ? (
-                  <div className="w-full py-2 text-center text-gray-500">
-                    Calculando distância e tempo...
-                  </div>
-                ) : (
-                  <>
-                    {distancia && (
-                      <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg">
-                        <FaRoute className="text-purple-600" />
-                        <div>
-                          <p className="text-xs text-gray-500 font-medium">Distância aproximada</p>
-                          <p className="font-bold text-purple-800">{distancia}</p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {tempo && (
-                      <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg">
-                        <FaClock className="text-purple-600" />
-                        <div>
-                          <p className="text-xs text-gray-500 font-medium">Tempo estimado</p>
-                          <p className="font-bold text-purple-800">{tempo}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    {!distancia && !tempo && !carregando && !erro && (
-                      <div className="w-full py-2 text-center text-gray-500">
-                        As informações de distância e tempo serão exibidas em instantes
-                      </div>
-                    )}
-                  </>
-                )}
-                
-                {erro && (
-                  <div className="w-full text-yellow-600 text-sm bg-yellow-50 p-2 rounded">
-                    {erro}
-                  </div>
-                )}
-              </div>
+              <h2 className="text-xl font-bold text-purple-700 mb-2">Localização da ...</h2>
             </div>
             
             {/* Mapa do Google - Usando iframe padrão */}
