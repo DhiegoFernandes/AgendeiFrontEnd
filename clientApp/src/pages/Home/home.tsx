@@ -11,7 +11,6 @@ import salaoTres from "../../assets/salaoTres.png";
 import { HiOutlineMenu, HiLightBulb } from "react-icons/hi";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { 
-  FaLightbulb, 
   FaBolt, 
   FaClock, 
   FaBriefcase, 
