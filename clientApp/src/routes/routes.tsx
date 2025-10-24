@@ -26,6 +26,7 @@ import ConfiguracaoADM from '../pages/ADM/ConfiguracaoADM/configuracaoAdm';
 import PainelADM from '../pages/ADM/PainelADM/painelAdm';
 import ParceiroADM from '../pages/ADM/ParceiroADM/parceiroAdm';
 import ServicosADM from '../pages/ADM/ServicosADM/servicosAdm';
+import PoliticaPrivacidade from '../pages/PoliticaPrivacidade/politicaPrivacidade';
 
 
 
@@ -38,6 +39,7 @@ function AppRoutes(){
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path='/cadastro' element={<Cadastro />} />
+                <Route path='/politicaPrivacidade' element={<PoliticaPrivacidade />} />
 
                 <Route path="/cliente/comercios" element={<Comercios />} />
                 <Route path='/cliente/escolher-servico' element={<EscolherServico />} />
