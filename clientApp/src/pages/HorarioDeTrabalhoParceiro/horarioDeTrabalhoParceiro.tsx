@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { FiUser } from "react-icons/fi";
 import { HiOutlineClock, HiOutlineCheck } from "react-icons/hi";
-import LogoAgendei from "../../assets/AgendeiHorizontal.png";
 import api from "../../services/api";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 
 /* Dias utilitários */
 const NOMES_DIAS = [
@@ -51,6 +51,7 @@ export default function DisponibilidadePrestador() {
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingDay, setSavingDay] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   // Função para carregar disponibilidades da API
   const carregarDisponibilidades = async () => {
@@ -250,14 +251,11 @@ export default function DisponibilidadePrestador() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
       {/* Header logo */}
-      <header className="w-full bg-white px-5 py-4 shadow flex items-center justify-between rounded-b-2xl mb-6 max-w-4xl mx-auto">
-        <img src={LogoAgendei} alt="Agendei" className="w-32 sm:w-38 select-none" />
-        <span className="text-purple-600 bg-purple-100 rounded-full p-2">
-          <FiUser size={24} />
-        </span>
-      </header>
+        <
+          Header
+        />
       
-      <div className="max-w-3xl w-full flex flex-col items-center">
+      <div className="max-w-3xl w-full flex flex-col items-center mt-5">
         <section className="w-full flex flex-col items-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-1 text-center">Atualizar Disponibilidade</h2>
           <p className="text-gray-500 text-base text-center">Defina seus horários de trabalho para cada dia da semana</p>

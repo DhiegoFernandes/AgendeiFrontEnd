@@ -5,6 +5,7 @@ import {
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import Header from "../../components/Header";
 
 const COMERCIO = "Barbearia Estilo";
 const PRESTADOR = "Ricardo Almeida";
@@ -226,21 +227,9 @@ export default function ServicosParceiro() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-14">
       {/* Navbar moderna */}
-      <nav className="w-full bg-gradient-to-r from-purple-600 to-purple-400 px-5 py-5 rounded-b-[30px] rounded-t-2xl shadow flex flex-col md:flex-row items-center md:justify-between gap-3 md:gap-2">
-        <button
-          className="text-white font-bold flex items-center gap-2 transition hover:text-purple-200 cursor-pointer"
-          onClick={() => navigate("/parceiro/perfil")}
-        >
-          <FiArrowLeft size={23} />
-          Voltar ao perfil
-        </button>
-        <div className="text-center flex-1">
-          <div className="text-xl md:text-2xl text-white font-extrabold">{COMERCIO}</div>
-          <span className="font-semibold text-purple-200/90">{PRESTADOR}</span>
-        </div>
-        <div className="w-6 invisible" />
-      </nav>
-
+        <
+          Header
+        />
 
       <div className="max-w-2xl mx-auto flex justify-end mb-4 px-2 mt-5">
         <button

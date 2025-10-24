@@ -6,6 +6,7 @@ import "react-day-picker/dist/style.css";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { AiOutlineUser } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 
 // Exemplo de interface para agendamento
 interface Agendamento {
@@ -95,25 +96,12 @@ export default function AgendaPrestador() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-16">
       {/* Header */}
-      <header className="w-full flex justify-center mt-6 mb-10">
-        <div className="max-w-3xl w-full flex items-center bg-gradient-to-r from-purple-600 to-purple-400 text-white rounded-xl px-3 md:px-9 py-4 shadow">
-          <button
-            title="Voltar ao perfil"
-            className="mr-2 text-white/400 hover:text-gray-300 flex items-center cursor-pointer"
-            onClick={() => navigate("/parceiro/perfil")}
-          >
-            <HiOutlineArrowLeft size={24} />
-            <span className="ml-1 hidden md:inline">Voltar ao perfil</span>
-          </button>
-          <h1 className="mx-auto text-xl md:text-2xl font-bold text-center tracking-wide w-full">
-            Minha Agenda
-          </h1>
-          <span className="w-12" />
-        </div>
-      </header>
+        <
+          Header
+        />
 
       {/* Main grid */}
-      <main className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-2 z-0">
+      <main className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-2 z-0 mt-10">
         {/* Card calendário */}
         <section className="bg-white rounded-2xl shadow-lg px-6 md:px-8 py-7 min-h-[340px] flex flex-col">
           <h2 className="font-bold text-lg mb-2 text-gray-700">Selecione uma data</h2>

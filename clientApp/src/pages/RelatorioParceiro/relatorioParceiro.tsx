@@ -3,6 +3,7 @@ import { HiOutlineDocumentReport, HiOutlineArrowLeft, HiArrowNarrowUp, HiArrowNa
 import { FaMoneyBillTrendUp, FaChartSimple } from "react-icons/fa6";
 import { FaMoneyBill1Wave } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 
 // Mock dos dados por período
 const MOCK = {
@@ -77,43 +78,15 @@ export default function RelatorioParceiro() {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen pb-16">
       {/* Header com alinhamento central */}
-      <header className="bg-gradient-to-r from-purple-700 to-indigo-600 text-white rounded-b-[2.5rem] pt-9 pb-8 px-4 flex flex-col items-center shadow-xl">
-        <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
-          <div className="self-start w-full">
-            <button 
-              className="flex items-center mb-4 transition hover:bg-white/10 rounded-full pl-2 pr-3 py-1 font-medium"
-              onClick={() => navigate("/parceiro/perfil")}
-            >
-              <HiOutlineArrowLeft size={20} className="mr-1" /> Voltar ao perfil
-            </button>
-          </div>
-          
-          {/* Título centralizado */}
-          <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center">
-            Relatório de Desempenho
+        <
+          Header
+        />
+
+        <div className="mx-auto max-w-md w-full mt-5 bg-white border border-gray-100 rounded-lg shadow-sm py-3 px-4">
+          <h1 className="font-extrabold text-xl md:text-2xl text-purple-700 text-center">
+            Relatórios
           </h1>
-          
-          {/* Tabs centralizadas */}
-          <nav className="flex gap-2 bg-white/10 p-1 rounded-full shadow-inner backdrop-blur-sm mx-auto" role="tablist">
-            {TABS.map(tab => (
-              <button
-                key={tab.key}
-                className={
-                  "px-6 py-2.5 rounded-full font-bold text-base transition-all " +
-                  (periodo === tab.key
-                    ? "bg-white text-purple-700 shadow"
-                    : "bg-transparent text-white hover:bg-white/20")
-                }
-                role="tab"
-                aria-selected={periodo === tab.key}
-                onClick={() => setPeriodo(tab.key as any)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
         </div>
-      </header>
 
       {/* Conteúdo principal */}
       <main className="max-w-4xl mx-auto px-4 mt-15">

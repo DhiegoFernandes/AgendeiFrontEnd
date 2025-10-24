@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import { FiArrowLeft } from "react-icons/fi";
+import Header from "../../components/Header";
 
 const CATEGORIAS_FIXAS = ["Cabeleireiro", "Barbearia", "Salão de Beleza", "Manicure"];
 
@@ -69,18 +70,10 @@ export default function GerenciarNegocio() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
       {/* Navbar */}
-      <nav className="w-full bg-gradient-to-r from-purple-600 to-purple-400 px-5 py-5 mb-8 shadow-lg rounded-b-[32px] flex items-center justify-between">
-        <button
-          className="flex items-center text-white font-bold gap-2 hover:text-purple-200 transition cursor-pointer"
-          onClick={() => navigate("/parceiro/perfil")}
-        >
-          <FiArrowLeft size={22} />
-          <span className="text-base">Voltar ao perfil</span>
-        </button>
-        <span className="text-2xl font-extrabold text-white tracking-wide mx-auto">Atualize seu negócio</span>
-        <span className="w-36 hidden sm:block"></span>
-      </nav>
-      <form className="bg-white max-w-md w-full rounded-3xl shadow-2xl px-8 py-10 flex flex-col gap-6"
+        <
+          Header
+        />
+      <form className="mt-10 bg-white max-w-md w-full rounded-3xl shadow-2xl px-8 py-10 flex flex-col gap-6"
         onSubmit={handleSubmit} autoComplete="off">
         <div>
           <label className="block font-bold text-gray-700 mb-1" htmlFor="nomeNegocio">

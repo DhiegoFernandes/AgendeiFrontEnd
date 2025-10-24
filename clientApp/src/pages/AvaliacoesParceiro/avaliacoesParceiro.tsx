@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import { Star as StarIcon } from '@mui/icons-material';
 import api from "../../services/api";
 import type { Avaliacao } from "../../types/user";
+import Header from "../../components/Header";
 
 
 const labels = {
@@ -133,18 +134,11 @@ export default function AvaliacoesComercio() {
       )}
     </Box> */}
       {/* Header/Hero */}
-      <header className="w-full bg-white from-purple-600 to-purple-500 py-5 flex flex-col items-center rounded-b-2xl shadow mb-8 relative">
-        <button
-          className="absolute left-5 top-7 flex items-center text-purple-700 font-bold gap-1 hover:text-purple-500 transition cursor-pointer"
-          onClick={() => navigate("/parceiro/perfil")}
-        >
-          <FiArrowLeft size={22}/> <span className="hidden sm:inline text-base">Voltar ao perfil</span>
-        </button>
-        <img src={Logo} alt="logo" className="mb-2 w-24 rounded-xl shadow-lg mt-2" />
-        <h1 className="font-extrabold text-3xl text-purple-700 drop-shadow tracking-wide">Avaliações</h1>
-      </header>
+        <
+          Header
+        />
 
-      <main className="max-w-6xl mx-auto grid md:grid-cols-[320px,1fr] gap-8 px-2">
+      <main className="max-w-6xl mx-auto grid md:grid-cols-[320px,1fr] gap-8 px-2 mt-10">
         {/* Card summary & breakdown */}
         <section className="bg-white rounded-2xl shadow p-6 flex flex-col items-center">
           <div className="flex flex-col items-center gap-1">
