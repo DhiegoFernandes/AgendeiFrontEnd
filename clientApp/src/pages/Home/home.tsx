@@ -79,7 +79,7 @@ function Home() {
             } transition-all duration-200 md:static md:shadow-none`}
             aria-label="Principal"
           >
-            <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base">
+            <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base mt-16">
               <li className="w-full md:w-auto"><a href="#inicio" className="block py-3.5 px-5 md:p-0 text-purple-800 font-bold">Início</a></li>
               <li className="w-full md:w-auto"><a href="#cliente" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Ser Cliente</a></li>
               <li className="w-full md:w-auto"><a href="#prestador" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Ser Prestador</a></li>
@@ -309,7 +309,7 @@ function Home() {
       </footer>
       
       {/* Estilo para a animação de flutuação */}
-      <style jsx>{`
+      <style >{`
         @keyframes float {
           0% {
             transform: translateY(0px);
