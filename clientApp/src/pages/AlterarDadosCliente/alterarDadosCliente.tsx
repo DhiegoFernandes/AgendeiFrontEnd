@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import ClientNavbar from "../../components/ClientNavbar";
 
 // Mock do usuário atual - substitua por dados da API/contexo real.
 const dadosCliente = {
@@ -111,19 +112,13 @@ export default function AlterarDadosCliente() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
       {/* Header */}
-      <header className="w-full mt-5 mb-8 flex justify-center">
-        <div className="bg-gradient-to-r from-purple-600 to-purple-400 text-white rounded-xl px-9 py-4 shadow text-2xl font-bold tracking-wide text-center max-w-xl w-full">
-          Alterar meus dados
-        </div>
-      </header>
+        <
+          ClientNavbar
+        />
 
       {/* Card */}
-      <main className="flex-1 w-full flex flex-col items-center ">
+      <main className="flex-1 w-full flex flex-col items-center mt-5">
         <section className="bg-white max-w-md w-full rounded-2xl shadow-xl px-7 py-8 flex flex-col items-center gap-2 mb-8">
-          {/* Avatar */}
-          <div className="w-20 h-20 mb-7 mt-1 rounded-full bg-purple-500 text-white flex items-center justify-center font-extrabold text-3xl select-none shadow">
-            {getInitials(nome)}
-          </div>
 
           <form className="w-full flex flex-col gap-4" autoComplete="off" onSubmit={onSalvar}>
             {/* Nome */}
@@ -249,19 +244,12 @@ export default function AlterarDadosCliente() {
             </div>
 
             {/* BOTÕES */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <button
-                type="button"
-                className="w-full sm:w-1/2 py-3 rounded-lg bg-gray-100 border border-gray-300 font-bold text-gray-700 hover:bg-purple-50 transition shadow"
-                onClick={onVoltarPerfil}
-              >
-                Voltar ao perfil
-              </button>
+            <div className="flex sm:flex-row justify-center gap-3">
               <button
                 type="submit"
-                className="w-full sm:w-1/2 py-3 rounded-lg 
-                 bg-gradient-to-r from-purple-600 to-purple-500
-                  hover:brightness-105 text-white font-bold transition shadow"
+                className="w-full sm:w-auto px-8 py-3 rounded-lg 
+                bg-gradient-to-r from-purple-600 to-purple-500
+                  hover:brightness-105 text-white font-bold transition shadow cursor-pointer"
               >
                 Salvar alterações
               </button>

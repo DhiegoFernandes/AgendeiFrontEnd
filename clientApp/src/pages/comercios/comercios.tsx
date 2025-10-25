@@ -145,7 +145,6 @@ export default function Comercios() {
         <div className="flex items-center gap-4 mt-1 md:mt-0">
           <button onClick={() => navigate("/cliente/perfil")}
           className="bg-purple-600 text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-purple-700 transition cursor-pointer">Perfil</button>
-          <span className="text-2xl cursor-pointer text-purple-500">🔔</span>
           <div className="w-9 h-9 flex items-center justify-center bg-purple-400 text-white font-bold rounded-full shadow text-lg">MS</div>
         </div>
       </header>

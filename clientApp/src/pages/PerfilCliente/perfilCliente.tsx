@@ -152,7 +152,7 @@ export default function PerfilCliente() {
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/politica-privacidade")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/politicaPrivacidade")}>
                   <div className="flex items-center gap-4">
                     <HiOutlineMail className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">

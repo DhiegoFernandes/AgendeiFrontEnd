@@ -8,6 +8,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import ClientNavbar from "../../components/ClientNavbar";
 
 // EXEMPLO de interface, ajuste conforme seu backend/DTO:
 type Agendamento = {
@@ -130,23 +131,9 @@ export default function AgendamentosClienteNovo() {
   return (
     <div className="bg-[#f6f5fb] min-h-screen">
       {/* Modern Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-b-gray-100 shadow-sm px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate("/cliente/perfil")}
-          className="text-purple-600 hover:bg-purple-50 rounded-full p-2 transition cursor-pointer"
-          title="Voltar ao perfil"
-        >
-          <HiArrowLeft size={26}/>
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-purple-700">Agendamentos</h1>
-        </div>
-        <button
-          className="text-gray-400 hover:text-purple-600 p-2 rounded-full transition cursor-pointer"
-          title="Ajuda"
-        >
-          <HiCalendar size={22} />
-        </button>
-      </header>
+        <
+          ClientNavbar
+        />
 
       <main className="max-w-3xl mx-auto px-2">
         {/* Busca */}

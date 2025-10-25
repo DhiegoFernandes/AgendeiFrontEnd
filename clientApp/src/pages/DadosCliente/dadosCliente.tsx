@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { MdEmail, MdLocationOn, MdPhone, MdPerson } from "react-icons/md";
 import Logo from "../../assets/LogoAgendei.png"; // Ajuste o path da sua logo
+import ClientNavbar from "../../components/ClientNavbar";
 
 // Sugestão: dados do usuário vindos da API ou contexto
 const user = {
@@ -18,17 +19,9 @@ export default function PerfilCliente() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
       {/* Header fixo */}
-      <header className="w-full sticky top-0 z-30 bg-white/90 backdrop-blur shadow-md px-2 py-4 flex items-center justify-between">
-        <button
-          className="text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-full p-2 transition"
-          onClick={() => navigate("/perfilCliente")}
-          title="Voltar ao perfil"
-        >
-          <HiOutlineArrowLeft size={26} />
-        </button>
-        <h1 className="text-2xl font-bold text-purple-700 mx-auto">Meus Dados</h1>
-        <span className="w-[44px]" /> {/* Espaço para balancear o ícone de voltar */}
-      </header>
+        <
+          ClientNavbar
+        />
 
       {/* Card centralizado */}
       <main className="w-full flex-1 flex flex-col items-center justify-center px-2">
