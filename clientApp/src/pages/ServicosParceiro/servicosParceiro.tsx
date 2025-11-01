@@ -46,7 +46,24 @@ export default function ServicosParceiro() {
 
     setLoading(true);
     try {
-      const response = await api.get('/servicos/ativos', {
+      // Primeiro, buscar dados do usuário para obter o ID do negócio
+      const userResponse = await api.get('/usuarios/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const userData = userResponse.data;
+      const negocioId = userData.negocio?.id;
+
+      if (!negocioId) {
+        setPopup({ msg: "Negócio não encontrado. Verifique se você tem um negócio cadastrado." });
+        return;
+      }
+
+      // Agora buscar os serviços do negócio específico
+      const response = await api.get(`/servicos/negocio/${negocioId}/todos`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

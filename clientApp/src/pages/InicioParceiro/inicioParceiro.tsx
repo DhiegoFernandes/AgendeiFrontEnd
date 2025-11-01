@@ -21,6 +21,7 @@ export default function PrimeiroAcessoNegocio() {
   const [nome, setNome] = useState("");
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState("");
+  const [numero, setNumero] = useState("");
   const [categoria, setCategoria] = useState(CATEGORIAS_FIXAS[0]);
   const [popup, setPopup] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -90,6 +91,7 @@ export default function PrimeiroAcessoNegocio() {
         nome,
         cep,
         endereco,
+        numero,
         categoria
       }
 
@@ -171,6 +173,19 @@ export default function PrimeiroAcessoNegocio() {
             value={endereco}
             onChange={e => setEndereco(e.target.value)}
             placeholder="Rua preenchida automaticamente pelo CEP"
+            className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
+            required
+          />
+        </div>
+        <div>
+          <label className="block font-bold text-gray-700 mb-1" htmlFor="numeroNegocio">
+            Número
+          </label>
+          <input
+            id="numeroNegocio"
+            value={numero}
+            onChange={e => setNumero(e.target.value)}
+            placeholder="Ex: 123"
             className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
             required
           />

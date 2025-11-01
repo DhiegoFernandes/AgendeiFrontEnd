@@ -1,30 +1,10 @@
-import React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
-import { FiArrowLeft } from "react-icons/fi";
-import Logo from "../../assets/LogoAgendei.png";
-import { useNavigate } from "react-router-dom";
-import Rating from '@mui/material/Rating';
-import Box from '@mui/material/Box';
-import { Star as StarIcon } from '@mui/icons-material';
 import api from "../../services/api";
 import type { Avaliacao } from "../../types/user";
 import Header from "../../components/Header";
-
-
-const labels = {
-  0.5: '0.5',
-  1: '1',
-  1.5: '1.5',
-  2: '2',
-  2.5: '2.5',
-  3: '3',
-  3.5: '3.5',
-  4: '4',
-  4.5: '4.5',
-  5: '5',
-};
-
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const STAR_FILTERS = [
   { label: "Todos", val: "all" },
@@ -40,15 +20,17 @@ function getInitials(nome: string) {
   return arr.slice(0, 2).map(n => n[0]).join("").toUpperCase();
 }
 
+function formatarDataAvaliacao(dataAvaliacao: string) {
+  const data = new Date(dataAvaliacao);
+  return format(data, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+}
+
 export default function AvaliacoesComercio() {
-  const [value, setValue] = React.useState(2);
-  const [hover, setHover] = React.useState(-1);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [filtro, setFiltro] = useState<"all" | "5" | "4" | "3" | "2" | "1">("all");
-  const navigate = useNavigate();
 
   // Função para carregar as avaliações
   const carregarAvaliacoes = async () => {
@@ -110,33 +92,7 @@ export default function AvaliacoesComercio() {
 
   return (
     <div className="min-h-screen bg-[#f9fafb] pb-20">
-      {/* <Box
-      sx={{
-        width: 200,
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <Rating
-        name="hover-feedback"
-        value={value}
-        precision={0.5}
-        onChange={(event, newValue) => {
-          setValue(newValue as number);
-        }}
-        onChangeActive={(event, newHover) => {
-          setHover(newHover);
-        }}
-        emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
-      />
-      {value !== null && (
-        <Box sx={{ ml: 2 }}>{labels[hover !== -1 ? hover as keyof typeof labels : value as keyof typeof labels]}</Box>
-      )}
-    </Box> */}
-      {/* Header/Hero */}
-        <
-          Header
-        />
+      <Header />
 
       <main className="max-w-6xl mx-auto grid md:grid-cols-[320px,1fr] gap-8 px-2 mt-10">
         {/* Card summary & breakdown */}
@@ -208,7 +164,7 @@ export default function AvaliacoesComercio() {
               <li className="text-gray-400 mt-7 text-lg font-medium text-center">Nenhuma avaliação encontrada.</li>
             )}
 
-            {!loading && !error && avaliacoesFiltradas.map((a, i) => (
+            {!loading && !error && avaliacoesFiltradas.map((a) => (
               <li key={a.id} className="flex items-start gap-5 p-4 rounded-xl bg-gray-50 hover:bg-purple-50 shadow transition">
                 <div className="flex flex-col items-center mt-1">
                   <span className="w-11 h-11 rounded-full bg-purple-400 text-white flex items-center justify-center font-bold text-lg shadow text-center select-none">
@@ -227,7 +183,7 @@ export default function AvaliacoesComercio() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-1">
                     <span className="font-bold text-gray-900 text-base">{a.nomeCliente}</span>
-                    <span className="text-gray-400 text-xs">Avaliação #{a.id}</span>
+                    <span className="text-gray-400 text-xs">{formatarDataAvaliacao(a.dataAvaliacao)}</span>
                   </div>
                   <span className="inline-block text-sm text-purple-600 font-bold bg-purple-100 px-3 py-0.5 rounded-full">{a.nomeNegocio}</span>
                   <div className="text-base text-gray-800 mt-2 break-words leading-snug">{a.comentario}</div>

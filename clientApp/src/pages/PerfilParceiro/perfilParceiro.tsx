@@ -9,6 +9,8 @@ import { PiScissorsDuotone } from "react-icons/pi";
 import { FaChartColumn } from "react-icons/fa6";
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import api from "../../services/api";
+import { obterMetricasAgendamentos } from "../../services/metricasService";
+import type { MetricasAgendamento } from "../../types/user";
 
 function getInitials(name: string) {
   if (!name || typeof name !== 'string') {
@@ -25,11 +27,7 @@ function getInitials(name: string) {
   return null;
 }
 
-const adminKPIS = [
-  { label: "Hoje", value: 8, subtitle: "Agendamentos", icon: <HiOutlineCalendar size={26} className="text-purple-500" /> },
-  { label: "Pendentes", value: 3, subtitle: "Agendamentos", icon: <HiOutlineClock size={26} className="text-yellow-400" /> },
-  { label: "Este mês", value: 42, subtitle: "Concluídos", icon: <HiOutlineTrendingUp size={26} className="text-green-500" /> },
-];
+// KPIs serão criados dinamicamente com base nas métricas dos agendamentos
 
 export default function PerfilPrestador() {
   const navigate = useNavigate();
@@ -41,6 +39,31 @@ export default function PerfilPrestador() {
   const [negocio, setNegocio] = useState("");
   const [profissional, setProfissional] = useState("");
   const [categoria, setCategoria] = useState("");
+  const [notaMedia, setNotaMedia] = useState<number | null>(null);
+  const [fotoNegocio, setFotoNegocio] = useState<string | null>(null);
+  
+  // Estados para métricas dos agendamentos
+  const [metricas, setMetricas] = useState<MetricasAgendamento>({
+    agendamentosHoje: 0,
+    agendamentosPendentes: 0,
+    agendamentosPendentesSemana: 0,
+    agendamentosConcluidosMes: 0,
+  });
+  const [carregandoMetricas, setCarregandoMetricas] = useState(true);
+
+  // Função para carregar métricas dos agendamentos
+  const carregarMetricas = async () => {
+    try {
+      setCarregandoMetricas(true);
+      const dadosMetricas = await obterMetricasAgendamentos();
+      setMetricas(dadosMetricas);
+    } catch (error) {
+      console.error("Erro ao carregar métricas dos agendamentos:", error);
+      // Em caso de erro, manter valores padrão (0)
+    } finally {
+      setCarregandoMetricas(false);
+    }
+  };
 
   useEffect(() => {
     async function buscarDadosUsuario() {
@@ -58,17 +81,69 @@ export default function PerfilPrestador() {
         const user = response.data;
         const negocio = user.negocio;
 
-        setNegocio(negocio.nome);
-        setProfissional(user.nome);
-        setCategoria(negocio.categoria);
+        // Validar se o negócio existe
+        if (!negocio || !negocio.id) {
+          console.error("Negócio não encontrado para o usuário");
+          return;
+        }
+
+        // Definir dados básicos do negócio
+        setNegocio(negocio.nome || "");
+        setProfissional(user.nome || "");
+        setCategoria(negocio.categoria || "");
 
         console.log("Usuário carregado:", user);
+
+        // Segunda chamada para buscar dados do negócio incluindo nota média
+        try {
+          const negocioResponse = await api.get(`/negocios/${negocio.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          const negocioData = negocioResponse.data;
+          setNotaMedia(negocioData.notaMedia || null);
+          
+          console.log("Dados do negócio carregados:", negocioData);
+        } catch (negocioError) {
+          console.error("Erro ao buscar dados do negócio:", negocioError);
+          // Continua mesmo se falhar
+        }
+
+        // Buscar foto do negócio de forma independente (não bloqueia o resto se falhar)
+        // Esta busca é opcional e não deve travar a página se falhar
+        try {
+          const fotoResponse = await api.get(`/negocios/${negocio.id}/fotos/16`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            responseType: 'blob'
+          });
+
+          // Converter blob para URL para exibição
+          if (fotoResponse.data && fotoResponse.data.size > 0) {
+            const imageUrl = URL.createObjectURL(fotoResponse.data);
+            setFotoNegocio(imageUrl);
+            console.log("Foto do negócio carregada com sucesso");
+          } else {
+            console.log("Foto não encontrada ou vazia");
+            setFotoNegocio(null);
+          }
+        } catch (fotoError) {
+          // Se não houver foto, simplesmente não definir fotoNegocio (permanece null)
+          // Esta é uma operação opcional, então o erro não é crítico
+          console.log("Foto do negócio não encontrada ou indisponível - continuando sem foto");
+          setFotoNegocio(null);
+        }
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);
       }
     }
 
     buscarDadosUsuario();
+    carregarMetricas();
   }, [])
 
   function handleClickConvidar() {
@@ -108,7 +183,7 @@ export default function PerfilPrestador() {
       label: "Agendamentos",
       desc: "Gerencie sua agenda",
       icon: <HiOutlineCalendar size={28} className="text-purple-500" />,
-      highlight: 25,
+      highlight: carregandoMetricas ? undefined : (metricas.agendamentosPendentes > 0 ? metricas.agendamentosPendentes : undefined),
       onClick: () => navigate("/parceiro/agendamento"),
     },
     {
@@ -149,6 +224,30 @@ export default function PerfilPrestador() {
     },
   ];
 
+  // Função para criar KPIs dinamicamente baseado nas métricas
+  const criarKPIs = () => {
+    return [
+      { 
+        label: "Hoje", 
+        value: carregandoMetricas ? "..." : metricas.agendamentosHoje, 
+        subtitle: "Agendamentos", 
+        icon: <HiOutlineCalendar size={26} className="text-purple-500" /> 
+      },
+      { 
+        label: "Pendentes (semana)", 
+        value: carregandoMetricas ? "..." : metricas.agendamentosPendentesSemana, 
+        subtitle: "Agendamentos", 
+        icon: <HiOutlineClock size={26} className="text-yellow-400" /> 
+      },
+      { 
+        label: "Este mês", 
+        value: carregandoMetricas ? "..." : metricas.agendamentosConcluidosMes, 
+        subtitle: "Concluídos", 
+        icon: <HiOutlineTrendingUp size={26} className="text-green-500" /> 
+      },
+    ];
+  };
+
   return (
     <div className="bg-[#f6f5fb] min-h-screen">
       {/* Hero/Header */}
@@ -157,8 +256,16 @@ export default function PerfilPrestador() {
           <div className="flex-1">
             <h1 className="text-white font-extrabold text-3xl sm:text-4xl mb-2 drop-shadow-lg">{negocio}</h1>
             <div className="flex items-center gap-5 mt-2">
-              <div className="w-14 h-14 rounded-full bg-white/25 text-2xl text-white font-extrabold flex items-center justify-center shadow ring-2 ring-white/20 select-none uppercase">
-                {getInitials(profissional)}
+              <div className="w-14 h-14 rounded-full bg-white/25 text-2xl text-white font-extrabold flex items-center justify-center shadow ring-2 ring-white/20 select-none uppercase overflow-hidden">
+                {fotoNegocio ? (
+                  <img 
+                    src={fotoNegocio} 
+                    alt="Foto do negócio" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  getInitials(profissional)
+                )}
               </div>
               <div>
                 <span className="font-bold text-lg text-white">{profissional}</span>
@@ -169,14 +276,11 @@ export default function PerfilPrestador() {
           <div className="flex flex-col items-end gap-4 mt-6 lg:mt-0">
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-xl gap-2 backdrop-blur">
               <HiOutlineStar className="text-yellow-300" size={23} />
-              <span className="font-bold text-lg text-white drop-shadow">???</span>
+              <span className="font-bold text-lg text-white drop-shadow">
+                {notaMedia !== null ? notaMedia.toFixed(1) : "N/A"}
+              </span>
             </div>
             <div className="flex gap-3">
-              <button className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow transition cursor-pointer"
-                onClick={() => navigate("/parceiro/agendamento")}
-              >
-                Abrir Agenda
-              </button>
             </div>
           </div>
         </div>
@@ -184,7 +288,7 @@ export default function PerfilPrestador() {
 
       {/* KPIs */}
       <section className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-7 mt-10 px-2">
-        {adminKPIS.map((kpi) => (
+        {criarKPIs().map((kpi) => (
           <article key={kpi.label} className="rounded-xl bg-white py-6 px-6 flex flex-col items-start shadow group hover:shadow-xl transition">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-bold text-gray-600 text-base">{kpi.label}</span>{kpi.icon}

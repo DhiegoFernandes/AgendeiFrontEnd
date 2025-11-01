@@ -11,6 +11,7 @@ export default function Cadastro() {
   const [celular, setCelular] = useState("");
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState("");
+  const [numero, setNumero] = useState("");
   const [senha, setSenha] = useState("");
   const [termos, setTermos] = useState(false);
   const [showSenha, setShowSenha] = useState(false);
@@ -62,7 +63,8 @@ export default function Cadastro() {
                 senha,
                 perfil: tipo,
                 cep,
-                endereco
+                endereco,
+                numero
             }
 
             const response = await api.post("/usuarios/registrar", dataToSend)
@@ -183,10 +185,24 @@ export default function Cadastro() {
                   value={endereco}
                   required
                   onChange={e => setEndereco(e.target.value)}
-                  placeholder="Ex: Rua 25 de março Nº 352"
+                  placeholder="Ex: Rua 25 de março"
                   className="w-full border border-gray-300 rounded p-2 outline-purple-400"
                   type="text"
                   ref={inputEndereco}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-bold mb-1">
+                  Número <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={numero}
+                  required
+                  onChange={e => setNumero(e.target.value)}
+                  placeholder="Ex: 352"
+                  className="w-full border border-gray-300 rounded p-2 outline-purple-400"
+                  type="text"
                   autoComplete="off"
                 />
               </div>

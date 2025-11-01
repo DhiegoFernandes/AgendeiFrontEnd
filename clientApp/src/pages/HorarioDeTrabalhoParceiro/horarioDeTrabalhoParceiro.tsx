@@ -260,7 +260,7 @@ export default function DisponibilidadePrestador() {
           <h2 className="text-2xl font-bold text-gray-800 mb-1 text-center">Atualizar Disponibilidade</h2>
           <p className="text-gray-500 text-base text-center">Defina seus horários de trabalho para cada dia da semana</p>
           <p className="text-gray-400 text-sm text-center mt-2">
-            💡 <strong>Dica:</strong> Defina os horários, ative o dia e clique em "Salvar" para cada dia
+            💡 <strong>Dica:</strong> Defina os horários, e clique em "Salvar" para cada dia
           </p>
           
           {error && (

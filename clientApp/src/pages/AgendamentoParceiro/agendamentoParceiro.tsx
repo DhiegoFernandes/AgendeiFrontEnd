@@ -1,29 +1,37 @@
 import { useState, useEffect } from "react";
-import { addDays, format } from "date-fns";
+import { addDays, format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { HiOutlineArrowLeft } from "react-icons/hi";
-import { AiOutlineUser } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
+import { FaPen, FaCalendarCheck } from "react-icons/fa";
 import Header from "../../components/Header";
+import api from "../../services/api";
 
-// Exemplo de interface para agendamento
+// Interface atualizada para corresponder aos dados da API
 interface Agendamento {
   id: number;
-  cliente: string;
-  servico: string;
-  hora: string;
+  clienteNome: string;
+  prestadorNome: string;
+  servicoTitulo: string;
+  servicoId: number;
+  enderecoNegocio: string;
+  dataHora: string;
+  status: string;
 }
 
-// Exemplo: interface para horário disponível (por serviço)
-interface HorariosPorServico {
-  [servico: string]: string[];
+// Interface para os horários disponíveis da API
+interface HorariosDisponiveis {
+  servicoId: number;
+  diasDisponiveis: {
+    dia: string;
+    horarios: string[];
+  }[];
 }
 
 export default function AgendaPrestador() {
   const [data, setData] = useState<Date>(new Date()); // Data escolhida no calendário
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [agendamentosFiltrados, setAgendamentosFiltrados] = useState<Agendamento[]>([]);
   const [modalEdit, setModalEdit] = useState<{
     id: number,
     servico: string,
@@ -32,66 +40,262 @@ export default function AgendaPrestador() {
     hora: string
   } | null>(null);
   const [popup, setPopup] = useState<false | string>(false);
-  const [horariosDisponiveis, setHorariosDisponiveis] = useState<HorariosPorServico>({});
+  const [modalCancelar, setModalCancelar] = useState<{
+    id: number;
+    clienteNome: string;
+  } | null>(null);
+  const [modalConcluir, setModalConcluir] = useState<{
+    id: number;
+    clienteNome: string;
+  } | null>(null);
+  const [horariosDisponiveis, setHorariosDisponiveis] = useState<string[]>([]);
+  const [carregandoHorarios, setCarregandoHorarios] = useState(false);
 
-  const navigate = useNavigate();
-
-  // --- BUSCAR AGENDAMENTOS DO DIA SELECIONADO ---
+  // --- BUSCAR AGENDAMENTOS DO PRESTADOR ---
   useEffect(() => {
-    // =======================
-    // AQUI: Busque na sua API os agendamentos do dia
-    // Exemplo:
-    // fetch(`/api/agendamentos?date=${format(data, "yyyy-MM-dd")}`)
-    //   .then(resp => resp.json())
-    //   .then((lista: Agendamento[]) => setAgendamentos(lista));
-    // =======================
-    setAgendamentos([]); // Remova esta linha quando usar API real
-  }, [data]);
+    async function buscarAgendamentos() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-  // --- BUSCAR HORÁRIOS DISPONÍVEIS POR SERVIÇO ---
-  useEffect(() => {
-    // =======================
-    // AQUI: Busque horários disponíveis por serviço da sua API
-    // Exemplo:
-    // fetch("/api/horariosDisponiveis")
-    //   .then(resp => resp.json())
-    //   .then((obj: HorariosPorServico) => setHorariosDisponiveis(obj));
-    // =======================
-    setHorariosDisponiveis({}); // Remova esta linha quando usar API real
+      try {
+        const response = await api.get("/agendamentos/prestador", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        setAgendamentos(response.data);
+        console.log("Agendamentos carregados:", response.data);
+        console.log("Primeiro agendamento:", response.data[0]);
+      } catch (error) {
+        console.error("Erro ao buscar agendamentos:", error);
+        setAgendamentos([]);
+      }
+    }
+
+    buscarAgendamentos();
   }, []);
 
-  function handleEditar(ag: Agendamento, idx: number) {
-    setModalEdit({
-      id: ag.id,
-      index: idx,
-      date: data,
-      hora: ag.hora,
-      servico: ag.servico
+  // --- FILTRAR AGENDAMENTOS POR DATA SELECIONADA ---
+  useEffect(() => {
+    const filtrados = agendamentos.filter(agendamento => {
+      const dataAgendamento = new Date(agendamento.dataHora);
+      return isSameDay(dataAgendamento, data);
     });
-  }
+    
+    setAgendamentosFiltrados(filtrados);
+  }, [agendamentos, data]);
 
-  function handleSaveEdit(e: React.FormEvent) {
-    e.preventDefault();
-    if (modalEdit) {
-      // =======================
-      // AQUI: Envie atualização via API (PUT/PATCH) para id = modalEdit.id
-      // Por exemplo:
-      // await fetch(`/api/agendamentos/${modalEdit.id}`, {... dados ...});
-      // Após sucesso, refaça o fetch dos agendamentos do dia: veja o useEffect acima.
-      // =======================
-      setPopup("Agendamento atualizado com sucesso!");
-      setModalEdit(null);
+  // --- BUSCAR HORÁRIOS DISPONÍVEIS DO SERVIÇO ---
+  async function buscarHorariosDisponiveis(servicoId: number, data: Date) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Token não encontrado");
+      return;
+    }
+
+    setCarregandoHorarios(true);
+    try {
+      const dataFormatada = format(data, "yyyy-MM-dd");
+      const url = `/servicos/${servicoId}/horarios-disponiveis-data?data=${dataFormatada}`;
+      
+      console.log('Fazendo requisição para:', url);
+      console.log('ServicoId:', servicoId);
+      console.log('Data formatada:', dataFormatada);
+      
+      const response = await api.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      console.log('Resposta completa da API:', response);
+      const dados: HorariosDisponiveis = response.data;
+      
+      console.log('Dados recebidos da API:', dados);
+      
+      // A API já retorna os horários para a data específica consultada
+      // Se há diasDisponiveis, pega os horários do primeiro (e único) dia
+      if (dados.diasDisponiveis && dados.diasDisponiveis.length > 0) {
+        const horarios = dados.diasDisponiveis[0].horarios;
+        console.log('Horários encontrados:', horarios);
+        setHorariosDisponiveis(horarios);
+      } else {
+        console.log('Nenhum dia disponível encontrado');
+        setHorariosDisponiveis([]);
+      }
+    } catch (error: any) {
+      console.error("Erro ao buscar horários disponíveis:", error);
+      console.error("Detalhes do erro:", error.response?.data);
+      setHorariosDisponiveis([]);
+    } finally {
+      setCarregandoHorarios(false);
     }
   }
 
-  // Retorna horários permitidos conforme serviço selecionado
-  function horasParaServico(servico: string) {
-    // =======================
-    // AQUI: horáriosDisponiveis[servico] vindo da sua API
-    // Exemplo de retorno: ["09:00", "10:00", "12:00", "15:00"]
-    // =======================
-    return horariosDisponiveis[servico] || [];
+  async function handleEditar(ag: Agendamento, idx: number) {
+    const dataAgendamento = new Date(ag.dataHora);
+    const hora = format(dataAgendamento, "HH:mm");
+    
+    console.log('Agendamento selecionado:', ag);
+    console.log('ServicoId:', ag.servicoId);
+    console.log('Data do agendamento:', dataAgendamento);
+    
+    setModalEdit({
+      id: ag.id,
+      index: idx,
+      date: dataAgendamento,
+      hora: hora,
+      servico: ag.servicoTitulo
+    });
+
+    // Buscar horários disponíveis para o serviço na data selecionada
+    // Usar servicoId fixo para teste se não estiver sendo retornado pela API
+    const servicoIdParaBuscar = ag.servicoId || 1;
+    await buscarHorariosDisponiveis(servicoIdParaBuscar, dataAgendamento);
   }
+
+  async function handleSaveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!modalEdit) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPopup("Erro: Token de autenticação não encontrado!");
+      return;
+    }
+
+    try {
+      // Combinar data e hora selecionados
+      const dataSelecionada = format(modalEdit.date, "yyyy-MM-dd");
+      const dataHoraCompleta = `${dataSelecionada}T${modalEdit.hora}:00`;
+      
+      console.log('Atualizando agendamento:', {
+        id: modalEdit.id,
+        dataHora: dataHoraCompleta
+      });
+
+      // Requisição PUT para atualizar o agendamento
+      await api.put(`/agendamentos/${modalEdit.id}`, {
+        dataHora: dataHoraCompleta
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setPopup("Agendamento atualizado com sucesso!");
+      setModalEdit(null);
+      setHorariosDisponiveis([]);
+      
+      // Recarregar agendamentos após atualização
+      const response = await api.get("/agendamentos/prestador", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      setAgendamentos(response.data);
+      
+    } catch (error: any) {
+      console.error("Erro ao atualizar agendamento:", error);
+      console.error("Detalhes do erro:", error.response?.data);
+      setPopup("Erro ao atualizar agendamento. Tente novamente.");
+    }
+  }
+
+  // Função para abrir modal de confirmação de cancelamento
+  function handleCancelarAgendamento(agendamento: Agendamento) {
+    setModalCancelar({
+      id: agendamento.id,
+      clienteNome: agendamento.clienteNome
+    });
+  }
+
+  // Função para confirmar cancelamento
+  async function confirmarCancelamento() {
+    if (!modalCancelar) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPopup("Erro: Token de autenticação não encontrado!");
+      return;
+    }
+
+    try {
+      // Requisição DELETE para cancelar o agendamento
+      await api.delete(`/agendamentos/${modalCancelar.id}`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setPopup("Agendamento cancelado com sucesso!");
+      setModalCancelar(null);
+      
+      // Recarregar agendamentos após cancelamento
+      const response = await api.get("/agendamentos/prestador", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      setAgendamentos(response.data);
+    } catch (error) {
+      console.error("Erro ao cancelar agendamento:", error);
+      setPopup("Erro ao cancelar agendamento. Tente novamente.");
+    }
+  }
+
+  // Função para abrir modal de confirmação de conclusão
+  function handleConcluirAgendamento(agendamento: Agendamento) {
+    setModalConcluir({
+      id: agendamento.id,
+      clienteNome: agendamento.clienteNome
+    });
+  }
+
+  // Função para confirmar conclusão
+  async function confirmarConclusao() {
+    if (!modalConcluir) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPopup("Erro: Token de autenticação não encontrado!");
+      return;
+    }
+
+    try {
+      // Requisição PUT para concluir o agendamento
+      await api.put(`/agendamentos/${modalConcluir.id}/concluir`, {}, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setPopup("Agendamento concluído com sucesso!");
+      setModalConcluir(null);
+      
+      // Recarregar agendamentos após conclusão
+      const response = await api.get("/agendamentos/prestador", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      setAgendamentos(response.data);
+    } catch (error) {
+      console.error("Erro ao concluir agendamento:", error);
+      setPopup("Erro ao concluir agendamento. Tente novamente.");
+    }
+  }
+
+
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-16">
@@ -128,46 +332,69 @@ export default function AgendaPrestador() {
               {format(data, "PPPP", { locale: ptBR })}
             </h3>
             <span className="text-gray-400 text-base">
-              {agendamentos.length} agendamento{agendamentos.length !== 1 && "s"}
+              {agendamentosFiltrados.length} agendamento{agendamentosFiltrados.length !== 1 && "s"}
             </span>
           </div>
           <div className="flex flex-col gap-4 mt-1">
             {/* Renderize seus agendamentos aqui */}
-            {agendamentos.length ? agendamentos.map((ag, idx) => (
-              <div
-                key={ag.id}
-                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between rounded-xl border border-gray-100 py-4 px-5 bg-purple-50/20 shadow-sm transition hover:bg-purple-50"
-              >
-                <div className="flex-1 flex flex-col justify-center gap-0.5">
-                  <div className="flex items-center gap-3">
-                    <AiOutlineUser className="text-purple-600" size={22} />
-                    <span className="font-extrabold text-lg text-gray-800">{ag.cliente}</span>
+            {agendamentosFiltrados.length ? agendamentosFiltrados.map((ag, idx) => {
+              const dataAgendamento = new Date(ag.dataHora);
+              const hora = format(dataAgendamento, "HH:mm");
+              
+              return (
+                <div
+                  key={ag.id}
+                  className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between rounded-xl border border-gray-100 py-4 px-5 bg-purple-50/20 shadow-sm transition hover:bg-purple-50"
+                >
+                  <div className="flex-1 flex flex-col justify-center gap-0.5">
+                    <div className="flex items-center gap-3">
+                      <span className="font-extrabold text-lg text-gray-800">{ag.clienteNome}</span>
+                    </div>
+                    <span className="text-gray-500 font-semibold">{ag.servicoTitulo}</span>
+                    <span className="text-gray-500 text-sm">{ag.prestadorNome}</span>
+                    <span className="text-gray-400 text-sm">{ag.enderecoNegocio}</span>
+                    <div className="flex items-start">
+                      <span className={`text-xs px-2 py-1 rounded-full inline-block ${
+                        ag.status === 'CONCLUIDO' ? 'bg-green-200 text-green-800 font-semibold' :
+                        ag.status === 'PENDENTE' ? 'bg-yellow-100 text-yellow-700' :
+                        ag.status === 'CANCELADO' ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {ag.status}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-gray-500 font-semibold ml-8 mt-0.5">{ag.servico}</span>
-                </div>
-                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 mt-3 sm:mt-0">
-                  <span className="rounded-xl px-4 py-2 font-bold bg-gradient-to-r from-purple-50 to-white text-purple-600 text-base shadow border border-purple-100 select-none min-w-[72px] text-center">
-                    {ag.hora}
-                  </span>
-                  <div className="flex gap-2 mt-0">
-                    <button
-                      className="px-4 py-2 w-[90px] rounded-lg bg-gradient-to-r from-purple-600 to-purple-400 text-white font-bold shadow hover:brightness-105 transition cursor-pointer"
-                      title="Atualizar"
-                      onClick={() => handleEditar(ag, idx)}
-                    >
-                      Atualizar
-                    </button>
-                    <button
-                      className="px-4 py-2 w-[90px] rounded-lg bg-red-500 text-white font-bold shadow hover:bg-red-600 transition cursor-pointer"
-                      title="Cancelar"
-                      onClick={() => {/* Sua ação para cancelar aqui */}}
-                    >
-                      Cancelar
-                    </button>
+                  <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 mt-3 sm:mt-0">
+                    <span className="rounded-xl px-4 py-2 font-bold bg-gradient-to-r from-purple-50 to-white text-purple-600 text-base shadow border border-purple-100 select-none min-w-[72px] text-center">
+                      {hora}
+                    </span>
+                    <div className="flex gap-2 mt-0">
+                      <button
+                        className="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-400 text-white font-bold shadow hover:brightness-105 transition cursor-pointer flex items-center justify-center"
+                        title="Atualizar"
+                        onClick={() => handleEditar(ag, idx)}
+                      >
+                        <FaPen size={14} />
+                      </button>
+                      <button
+                        className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-green-500 text-white font-bold shadow hover:brightness-105 transition cursor-pointer flex items-center justify-center"
+                        title="Concluir agendamento"
+                        onClick={() => handleConcluirAgendamento(ag)}
+                      >
+                        <FaCalendarCheck size={14} />
+                      </button>
+                      <button
+                        className="px-2 py-2 w-[90px] rounded-lg bg-red-500 text-white font-bold shadow hover:bg-red-600 transition cursor-pointer"
+                        title="Cancelar"
+                        onClick={() => handleCancelarAgendamento(ag)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )) : (
+              );
+            }) : (
               <div className="text-center text-gray-400 font-semibold mt-10">
                 Nenhum agendamento nesta data.
               </div>
@@ -193,7 +420,17 @@ export default function AgendaPrestador() {
               <DayPicker
                 mode="single"
                 selected={modalEdit.date}
-                onSelect={d => d && setModalEdit(em => em && { ...em, date: d })}
+                onSelect={async (d) => {
+                  if (d) {
+                    setModalEdit(em => em && { ...em, date: d });
+                    // Buscar horários disponíveis para a nova data
+                    const agendamentoAtual = agendamentos.find(ag => ag.id === modalEdit.id);
+                    if (agendamentoAtual) {
+                      const servicoIdParaBuscar = agendamentoAtual.servicoId || 1;
+                      await buscarHorariosDisponiveis(servicoIdParaBuscar, d);
+                    }
+                  }
+                }}
                 locale={ptBR}
                 weekStartsOn={0}
                 fromDate={addDays(new Date(), -7)}
@@ -212,25 +449,86 @@ export default function AgendaPrestador() {
                 value={modalEdit.hora}
                 onChange={e => setModalEdit(em => em ? { ...em, hora: e.target.value } : em)}
                 required
+                disabled={carregandoHorarios}
               >
-                {/* Puxe os horários disponíveis do serviço pelo backend */}
-                {(horariosDisponiveis[modalEdit.servico] || []).map(hora => (
+                <option value="">
+                  {carregandoHorarios ? "Carregando horários..." : "Selecione um horário"}
+                </option>
+                {horariosDisponiveis.map(hora => (
                   <option key={hora} value={hora}>{hora}</option>
                 ))}
               </select>
               <span className="text-sm text-gray-400 mt-1 block">Serviço: {modalEdit.servico}</span>
+              {horariosDisponiveis.length === 0 && !carregandoHorarios && (
+                <span className="text-sm text-red-500 mt-1 block">
+                  Nenhum horário disponível para esta data
+                </span>
+              )}
             </div>
             <div className="flex w-full mt-1 gap-4">
               <button
                 type="button"
                 className="w-1/2 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-red-300 hover:text-white transition cursor-pointer"
-                onClick={() => setModalEdit(null)}>Cancelar</button>
+                onClick={() => {
+                  setModalEdit(null);
+                  setHorariosDisponiveis([]);
+                }}>Cancelar</button>
               <button
                 type="submit"
                 className="w-1/2 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold hover:brightness-110 shadow transition cursor-pointer"
               >Salvar</button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Modal de confirmação de conclusão */}
+      {modalConcluir && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white rounded-2xl px-8 py-8 shadow-lg min-w-[320px] max-w-sm flex flex-col items-center relative animate-fadeIn">
+            <span className="text-xl font-bold text-purple-700 mb-5 text-center">
+              Deseja realmente concluir o agendamento de <strong>{modalConcluir.clienteNome}</strong>?
+            </span>
+            <div className="flex gap-5 mt-2">
+              <button
+                className="px-7 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold shadow hover:brightness-105 transition"
+                onClick={confirmarConclusao}
+              >
+                Sim
+              </button>
+              <button
+                className="px-7 py-2 bg-gray-50 border border-gray-300 text-gray-600 rounded-lg font-bold shadow hover:bg-gray-100 transition"
+                onClick={() => setModalConcluir(null)}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmação de cancelamento */}
+      {modalCancelar && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white rounded-2xl px-8 py-8 shadow-lg min-w-[320px] max-w-sm flex flex-col items-center relative animate-fadeIn">
+            <span className="text-xl font-bold text-purple-700 mb-5 text-center">
+              Deseja realmente cancelar o agendamento de <strong>{modalCancelar.clienteNome}</strong>?
+            </span>
+            <div className="flex gap-5 mt-2">
+              <button
+                className="px-7 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold shadow hover:brightness-105 transition"
+                onClick={confirmarCancelamento}
+              >
+                Sim
+              </button>
+              <button
+                className="px-7 py-2 bg-gray-50 border border-gray-300 text-gray-600 rounded-lg font-bold shadow hover:bg-gray-100 transition"
+                onClick={() => setModalCancelar(null)}
+              >
+                Não
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -6,6 +6,7 @@ export interface User {
     perfil: string,
     cep?: string,
     endereco?: string,
+    numero?: string,
 }
 
 export enum EnumUser {
@@ -41,4 +42,50 @@ export type Avaliacao = {
   nomeCliente: string;
   nota: number;
   comentario: string;
+  dataAvaliacao: string;
+};
+
+export type Agendamento = {
+  id: number;
+  clienteNome: string;
+  prestadorNome: string;
+  servicoTitulo: string;
+  enderecoNegocio: string;
+  dataHora: string;
+  status: "CONCLUIDO" | "PENDENTE" | "CANCELADO";
+};
+
+export type MetricasAgendamento = {
+  agendamentosHoje: number;
+  agendamentosPendentes: number;
+  agendamentosPendentesSemana: number;
+  agendamentosConcluidosMes: number;
+};
+
+export type RelatorioFinanceiro = {
+  ganhosEsperados: number;
+  ganhosRealizados: number;
+  taxaCancelamentos: number;
+};
+
+export type ServicoMaisVendido = {
+  tituloServico: string;
+  quantidadeAgendamentos: number;
+  totalFaturado: number;
+};
+
+export type EvolucaoMensal = {
+  mes: string; // formato "YYYY-MM"
+  faturamento: number;
+};
+
+export type EvolucaoAnual = {
+  ano: number;
+  faturamento: number;
+};
+
+export type FotoNegocio = {
+  id: number;
+  nomeArquivo: string;
+  url: string;
 };

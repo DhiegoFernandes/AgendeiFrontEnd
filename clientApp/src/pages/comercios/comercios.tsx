@@ -213,7 +213,7 @@ export default function Comercios() {
                   <h3 className="font-bold text-lg text-gray-900">{c.nome}</h3>
                   <div className="flex items-center gap-1 font-semibold text-yellow-500">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 1.5l2.59 6.85h7.2l-5.8 4.22L16.12 19 10 14.88 3.88 19l1.13-6.43-5.8-4.22h7.2z"/></svg>
-                    <span className="text-gray-800 ml-1">{c.rating.toFixed(1)}</span>
+                    <span className="text-gray-800 ml-1">{c.rating}</span>
                   </div>
                 </div>
                 <p className="text-gray-700 text-base leading-tight">{c.categoria}</p>
