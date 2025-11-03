@@ -27,6 +27,7 @@ import PainelADM from '../pages/ADM/PainelADM/painelAdm';
 import ParceiroADM from '../pages/ADM/ParceiroADM/parceiroAdm';
 import ServicosADM from '../pages/ADM/ServicosADM/servicosAdm';
 import PoliticaPrivacidade from '../pages/PoliticaPrivacidade/politicaPrivacidade';
+import GerenciarPerfilParceiro from '../pages/GerenciarPerfilParceiro/gerenciarPerfilParceiro';
 
 
 
@@ -60,6 +61,7 @@ function AppRoutes(){
                 <Route path='/parceiro/avaliações' element={<AvaliacoesParceiro />} />
                 <Route path='/parceiro/gerenciar-negocio' element={<GerenciarNegocio />} />
                 <Route path='/parceiro/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
+                <Route path='/parceiro/gerenciarPerfilParceiro' element={<GerenciarPerfilParceiro />} />
 
                 <Route path="/admin" element={<ADMNavBar />}>
                 <Route index element={<PainelADM />} />

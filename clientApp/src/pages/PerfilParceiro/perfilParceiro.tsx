@@ -8,6 +8,7 @@ import { FaRegHandshake } from "react-icons/fa6";
 import { PiScissorsDuotone } from "react-icons/pi";
 import { FaChartColumn } from "react-icons/fa6";
 import { BsFillPersonLinesFill } from "react-icons/bs";
+import { MdManageAccounts } from "react-icons/md";
 import api from "../../services/api";
 import { obterMetricasAgendamentos } from "../../services/metricasService";
 import type { MetricasAgendamento } from "../../types/user";
@@ -221,6 +222,12 @@ export default function PerfilPrestador() {
       desc: "Gerencie seu negócio", // <-- ALTERADO
       icon: <BsFillPersonLinesFill size={24} className="text-purple-400" />,
       onClick: () => navigate("/parceiro/gerenciar-negocio"), // <-- ALTERADO
+    },
+    {
+      label: "Gerenciar Perfil", 
+      desc: "Gerencie seu Perfil", 
+      icon: <MdManageAccounts  size={24} className="text-blue-400" />,
+      onClick: () => navigate("/parceiro/gerenciarPerfilParceiro"), // <-- ALTERADO
     },
   ];
 
