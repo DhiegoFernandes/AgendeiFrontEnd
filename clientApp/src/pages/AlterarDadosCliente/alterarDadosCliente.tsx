@@ -1,20 +1,19 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import ClientNavbar from "../../components/ClientNavbar";
+import api from "../../services/api";
 
-// Mock do usuário atual - substitua por dados da API/contexo real.
-const dadosCliente = {
-  nome: "Maria Costa",
-  email: "maria@email.com",
-  celular: "(11) 98564-1254",
-  cep: "01234-567",
-  endereco: "Rua Alegre das Flores Nº 10"
-};
-
-function getInitials(nome: string) {
-  const arr = nome.split(" ");
-  return arr.length > 1 ? arr[0][0] + arr[arr.length-1][0] : arr[0][0];
+interface UserData {
+  id: number;
+  nome: string;
+  email: string;
+  telefone: string;
+  perfil: string;
+  ativo: boolean;
+  cep: string;
+  endereco: string;
+  numero: string;
 }
 
 type PopupType = { mensagem: string; acaoSim?: () => void; soOk?: boolean };
@@ -22,19 +21,85 @@ type PopupType = { mensagem: string; acaoSim?: () => void; soOk?: boolean };
 export default function AlterarDadosCliente() {
   const navigate = useNavigate();
   // States dos campos
-  const [nome, setNome] = useState(dadosCliente.nome);
-  const [email, setEmail] = useState(dadosCliente.email);
-  const [celular, setCelular] = useState(dadosCliente.celular);
-  const [cep, setCep] = useState(dadosCliente.cep);
-  const [endereco, setEndereco] = useState(dadosCliente.endereco);
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [celular, setCelular] = useState("");
+  const [cep, setCep] = useState("");
+  const [endereco, setEndereco] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmaSenha, setConfirmaSenha] = useState("");
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [confirmaVisivel, setConfirmaVisivel] = useState(false);
   const [erroSenha, setErroSenha] = useState("");
   const [popup, setPopup] = useState<null | PopupType>(null);
+  const [loading, setLoading] = useState(true);
 
   const enderecoRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    async function buscarDadosUsuario() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await api.get("/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        const userData: UserData = response.data;
+        
+        // Preencher os campos com os dados do usuário
+        setNome(userData.nome || "");
+        setEmail(userData.email || "");
+        
+        // Formatar telefone
+        const telefoneFormatado = formatarTelefone(userData.telefone || "");
+        setCelular(telefoneFormatado);
+        
+        // Formatar CEP
+        const cepFormatado = formatarCep(userData.cep || "");
+        setCep(cepFormatado);
+        
+        // Combinar endereço e número
+        const enderecoCompleto = [userData.endereco, userData.numero].filter(Boolean).join(", ");
+        setEndereco(enderecoCompleto || "");
+        
+        console.log("Dados do usuário carregados:", userData);
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    buscarDadosUsuario();
+  }, []);
+
+  // Função auxiliar para formatar telefone
+  function formatarTelefone(telefone: string) {
+    const numeros = telefone.replace(/\D/g, "");
+    if (numeros.length === 11) {
+      return numeros.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    } else if (numeros.length === 10) {
+      return numeros.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    }
+    return telefone;
+  }
+
+  // Função auxiliar para formatar CEP
+  function formatarCep(cep: string) {
+    const numeros = cep.replace(/\D/g, "");
+    if (numeros.length === 8) {
+      return numeros.replace(/(\d{5})(\d{3})/, "$1-$2");
+    }
+    return cep;
+  }
 
   // Máscara para celular
   function handleCelular(e: React.ChangeEvent<HTMLInputElement>) {
@@ -109,12 +174,18 @@ export default function AlterarDadosCliente() {
     });
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f6f5fb] flex items-center justify-center">
+        <div className="text-purple-600 text-xl">Carregando...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
       {/* Header */}
-        <
-          ClientNavbar
-        />
+      <ClientNavbar />
 
       {/* Card */}
       <main className="flex-1 w-full flex flex-col items-center mt-5">

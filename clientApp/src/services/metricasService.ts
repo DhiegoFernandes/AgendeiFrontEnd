@@ -45,6 +45,7 @@ export function calcularMetricasAgendamentos(agendamentos: Agendamento[]): Metri
   let agendamentosPendentes = 0;
   let agendamentosConcluidosMes = 0;
   let agendamentosPendentesSemana = 0;
+  let agendamentosConcluidosHoje = 0;
 
   agendamentos.forEach((agendamento) => {
     const dataAgendamento = new Date(agendamento.dataHora);
@@ -65,6 +66,14 @@ export function calcularMetricasAgendamentos(agendamentos: Agendamento[]): Metri
       agendamento.status === "PENDENTE"
     ) {
       agendamentosPendentes++;
+    }
+
+    // Agendamentos concluídos para hoje
+    if (
+      dataAgendamentoNormalizada.getTime() === hojeNormalizado.getTime() &&
+      agendamento.status === "CONCLUIDO"
+    ) {
+      agendamentosConcluidosHoje++;
     }
 
     // Agendamentos pendentes na semana atual
@@ -91,6 +100,7 @@ export function calcularMetricasAgendamentos(agendamentos: Agendamento[]): Metri
     agendamentosPendentes,
     agendamentosPendentesSemana,
     agendamentosConcluidosMes,
+    agendamentosConcluidosHoje,
   };
 }
 

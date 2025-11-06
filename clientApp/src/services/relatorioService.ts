@@ -1,5 +1,5 @@
 import api from "./api";
-import type { RelatorioFinanceiro, ServicoMaisVendido, EvolucaoMensal, EvolucaoAnual } from "../types/user";
+import type { RelatorioFinanceiro, ServicoMaisVendido, EvolucaoMensal, EvolucaoAnual, RelatorioNegocio } from "../types/user";
 import { format } from "date-fns";
 
 /**
@@ -105,6 +105,33 @@ export async function buscarEvolucaoAnual(anoInicio: number, anoFim: number): Pr
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar evolução anual:", error);
+    throw error;
+  }
+}
+
+/**
+ * Busca o relatório do negócio para um mês específico
+ * @param negocioId - ID do negócio
+ * @param ano - Ano (ex: 2025)
+ * @param mes - Mês (ex: 11)
+ */
+export async function buscarRelatorioNegocio(negocioId: number, ano: number, mes: number): Promise<RelatorioNegocio> {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token não encontrado");
+    }
+
+    const response = await api.get(`/relatorios/negocio/${negocioId}?ano=${ano}&mes=${mes}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar relatório do negócio:", error);
     throw error;
   }
 }

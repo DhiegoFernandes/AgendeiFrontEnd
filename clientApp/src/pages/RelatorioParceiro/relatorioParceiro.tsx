@@ -3,12 +3,12 @@ import { FaMoneyBillTrendUp, FaChartSimple } from "react-icons/fa6";
 import { FaMoneyBill1Wave } from "react-icons/fa6";
 import { HiOutlineXCircle } from "react-icons/hi";
 import Header from "../../components/Header";
-import { buscarRelatorioFinanceiroMensal, buscarServicosMaisVendidos, buscarEvolucaoMensal, buscarEvolucaoAnual } from "../../services/relatorioService";
-import type { RelatorioFinanceiro, ServicoMaisVendido, EvolucaoMensal, EvolucaoAnual } from "../../types/user";
+import { buscarRelatorioFinanceiroMensal, buscarServicosMaisVendidos, buscarEvolucaoMensal, buscarEvolucaoAnual, buscarRelatorioNegocio } from "../../services/relatorioService";
+import type { RelatorioFinanceiro, ServicoMaisVendido, EvolucaoMensal, EvolucaoAnual, RelatorioNegocio } from "../../types/user";
+import api from "../../services/api";
+import { FaUsers, FaUser } from "react-icons/fa6";
 import GraficoEvolucaoMensal from "../../components/GraficoEvolucaoMensal";
 import GraficoEvolucaoAnual from "../../components/GraficoEvolucaoAnual";
-import { format } from "date-fns";
-import { ptBR as ptBRLocale } from "date-fns/locale";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -57,6 +57,12 @@ export default function RelatorioParceiro() {
   // Estados para evolução anual (gráfico)
   const [evolucaoAnual, setEvolucaoAnual] = useState<EvolucaoAnual[]>([]);
   const [carregandoEvolucaoAnual, setCarregandoEvolucaoAnual] = useState(true);
+  
+  // Estados para relatório do negócio
+  const [relatorioNegocio, setRelatorioNegocio] = useState<RelatorioNegocio | null>(null);
+  const [modalPrestadores, setModalPrestadores] = useState(false);
+  const [negocioId, setNegocioId] = useState<number | null>(null);
+  const [mesAnoRelatorioNegocio, setMesAnoRelatorioNegocio] = useState<Dayjs>(dayjs());
 
   // Carregar dados financeiros do mês atual
   useEffect(() => {
@@ -76,6 +82,56 @@ export default function RelatorioParceiro() {
 
     carregarDadosFinanceiros();
   }, []);
+
+  // Buscar ID do negócio do usuário logado
+  useEffect(() => {
+    async function buscarNegocioId() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await api.get("/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        const user = response.data;
+        const negocio = user.negocio;
+
+        if (negocio && negocio.id) {
+          setNegocioId(negocio.id);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar ID do negócio:", error);
+      }
+    }
+
+    buscarNegocioId();
+  }, []);
+
+  // Carregar relatório do negócio quando o ID ou mês/ano mudarem
+  useEffect(() => {
+    async function carregarRelatorioNegocio() {
+      if (!negocioId) return;
+
+      try {
+        const ano = mesAnoRelatorioNegocio.year();
+        const mes = mesAnoRelatorioNegocio.month() + 1; // dayjs month() retorna 0-11, então +1 para 1-12
+        
+        const dados = await buscarRelatorioNegocio(negocioId, ano, mes);
+        setRelatorioNegocio(dados);
+      } catch (error) {
+        // Se der erro, não exibe o componente (não seta nada no estado)
+        console.error("Erro ao carregar relatório do negócio:", error);
+        setRelatorioNegocio(null);
+      }
+    }
+
+    // Executar quando o negocioId ou mesAnoRelatorioNegocio mudarem
+    carregarRelatorioNegocio();
+  }, [negocioId, mesAnoRelatorioNegocio]);
 
   // Carregar serviços mais vendidos
   useEffect(() => {
@@ -152,11 +208,152 @@ export default function RelatorioParceiro() {
       {/* Conteúdo principal */}
       <main className="max-w-4xl mx-auto px-4 mt-15">
         {/* Título do bloco financeiro */}
-        <div className="-mt-10 mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {format(new Date(), "MMMM 'de' yyyy", { locale: ptBRLocale }).replace(/^\w/, (c) => c.toUpperCase())}
-          </h2>
+        <div className="-mt-10 mb-6">
         </div>
+        
+        {/* Bloco de relatório do negócio - só aparece se houver dados */}
+        {relatorioNegocio && (
+          <section className="mb-12">
+            {/* Cabeçalho do relatório do negócio */}
+            <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">{relatorioNegocio.nomeNegocio}</h2>
+                <h3 className="text-lg font-semibold text-gray-600">
+                  {mesAnoRelatorioNegocio.format('MMMM [de] YYYY').replace(/^\w/, (c) => c.toUpperCase())}
+                </h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <ThemeProvider theme={purpleTheme}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+                    <DatePicker
+                      label="Mês e Ano"
+                      views={['month', 'year']}
+                      value={mesAnoRelatorioNegocio}
+                      onChange={(newValue) => {
+                        if (newValue) {
+                          setMesAnoRelatorioNegocio(newValue);
+                        }
+                      }}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          sx: {
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '8px',
+                              backgroundColor: 'white',
+                              '& fieldset': {
+                                borderColor: '#d1d5db', // gray-300 - borda padrão neutra
+                              },
+                              '&:hover fieldset': {
+                                borderColor: '#9333ea', // purple-600 - borda roxa no hover
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#9333ea', // purple-600 - borda roxa quando focado
+                                borderWidth: '2px',
+                              },
+                            },
+                            '& .MuiInputLabel-root': {
+                              '&.Mui-focused': {
+                                color: '#9333ea', // purple-600
+                              },
+                            },
+                          },
+                        },
+                        popper: {
+                          sx: {
+                            '& .MuiPickersDay-root.Mui-selected': {
+                              backgroundColor: '#9333ea !important', // purple-600
+                              color: 'white',
+                              '&:hover': {
+                                backgroundColor: '#7e22ce !important', // purple-700
+                              },
+                            },
+                            '& .MuiPickersMonth-root.Mui-selected': {
+                              backgroundColor: '#9333ea !important', // purple-600
+                              color: 'white !important',
+                              '&:hover': {
+                                backgroundColor: '#7e22ce !important', // purple-700
+                              },
+                            },
+                            '& .MuiPickersYear-yearButton.Mui-selected': {
+                              backgroundColor: '#9333ea !important', // purple-600
+                              color: 'white !important',
+                              '&:hover': {
+                                backgroundColor: '#7e22ce !important', // purple-700
+                              },
+                            },
+                            '& .MuiIconButton-root': {
+                              color: '#9333ea', // purple-600
+                              '&:hover': {
+                                backgroundColor: 'rgba(147, 51, 234, 0.1)', // purple com opacidade
+                              },
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
+                </ThemeProvider>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Card: Ganhos Totais */}
+              <article className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-gray-500 font-medium mb-1">Ganhos Totais</p>
+                    <h2 className="text-3xl font-bold text-gray-800">
+                      {ptBR(relatorioNegocio.ganhosTotais, true)}
+                    </h2>
+                  </div>
+                  <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+                    <FaMoneyBillTrendUp size={24} />
+                  </div>
+                </div>
+              </article>
+              
+              {/* Card: Total de Serviços */}
+              <article className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-gray-500 font-medium mb-1">Total de Serviços</p>
+                    <h2 className="text-3xl font-bold text-gray-800">
+                      {relatorioNegocio.totalServicos}
+                    </h2>
+                  </div>
+                  <div className="p-3 bg-green-100 text-green-600 rounded-full">
+                    <FaChartSimple size={24} />
+                  </div>
+                </div>
+              </article>
+              
+              {/* Card: Ver Prestadores (Botão) */}
+              <button
+                onClick={() => setModalPrestadores(true)}
+                className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all cursor-pointer text-left"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-gray-500 font-medium mb-1">Ver Prestadores</p>
+                    <h2 className="text-lg font-bold text-purple-600">
+                      {relatorioNegocio.prestadores.length} prestador{relatorioNegocio.prestadores.length !== 1 ? 'es' : ''}
+                    </h2>
+                  </div>
+                  <div className="p-3 bg-purple-100 text-purple-600 rounded-full">
+                    <FaUsers size={24} />
+                  </div>
+                </div>
+              </button>
+            </div>
+          </section>
+        )}
+        
+        {/* Divisor visual entre os grupos de cards */}
+        {relatorioNegocio && (
+          <div className="mb-8 pt-8 border-t-2 border-gray-300">
+            <h2 className="text-xl font-bold text-gray-800 mb-6">Relatório Financeiro Mensal</h2>
+          </div>
+        )}
         
         {/* Resumo em cards */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -439,6 +636,136 @@ export default function RelatorioParceiro() {
         
         {/* Botões de ação removidos */}
       </main>
+
+      {/* Modal de Prestadores */}
+      {modalPrestadores && relatorioNegocio && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setModalPrestadores(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-5 flex items-center justify-between rounded-t-2xl z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <FaUsers size={20} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Prestadores</h2>
+                  <p className="text-sm text-purple-100">{relatorioNegocio.nomeNegocio}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setModalPrestadores(false)}
+                className="text-white hover:bg-white/20 rounded-full p-2 transition-all cursor-pointer"
+                title="Fechar"
+              >
+                <HiOutlineXCircle size={24} />
+              </button>
+            </div>
+            
+            {/* Conteúdo */}
+            <div className="p-6">
+              {relatorioNegocio.prestadores.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                    <FaUser className="text-gray-400" size={32} />
+                  </div>
+                  <p className="text-gray-500 font-medium">Nenhum prestador encontrado</p>
+                  <p className="text-sm text-gray-400 mt-1">Não há prestadores cadastrados neste negócio.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {relatorioNegocio.prestadores.map((prestador) => (
+                    <div
+                      key={prestador.id}
+                      className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg hover:border-purple-200 transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-purple-100 text-purple-600 rounded-full">
+                            <FaUser size={20} />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-800">{prestador.nome}</h3>
+                            <p className="text-xs text-gray-500 font-medium">ID #{prestador.id}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4 border-2 border-green-100 shadow-sm">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FaMoneyBillTrendUp className="text-green-600" size={16} />
+                            <p className="text-sm font-semibold text-gray-600">Ganhos</p>
+                          </div>
+                          <p className="text-2xl font-bold text-green-600">
+                            {ptBR(prestador.ganhos, true)}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 border-2 border-red-100 shadow-sm">
+                          <div className="flex items-center gap-2 mb-2">
+                            <HiOutlineXCircle className="text-red-600" size={16} />
+                            <p className="text-sm font-semibold text-gray-600">Taxa de Cancelamento</p>
+                          </div>
+                          <p className="text-2xl font-bold text-red-600">
+                            {prestador.taxaCancelamento.toFixed(1)}%
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Resumo total */}
+                  <div className="mt-6 pt-6 border-t-2 border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-sm">
+                    <div className="flex items-center gap-2 mb-4">
+                      <FaChartSimple className="text-purple-600" size={18} />
+                      <h3 className="text-lg font-bold text-purple-800">Resumo Geral</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm font-semibold text-gray-600 mb-1">Total de Ganhos</p>
+                        <p className="text-2xl font-bold text-purple-700">
+                          {ptBR(
+                            relatorioNegocio.prestadores.reduce((acc, p) => acc + p.ganhos, 0),
+                            true
+                          )}
+                        </p>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm font-semibold text-gray-600 mb-1">Taxa Média de Cancelamento</p>
+                        <p className="text-2xl font-bold text-purple-700">
+                          {relatorioNegocio.prestadores.length > 0
+                            ? (
+                                relatorioNegocio.prestadores.reduce((acc, p) => acc + p.taxaCancelamento, 0) /
+                                relatorioNegocio.prestadores.length
+                              ).toFixed(1)
+                            : "0.0"}
+                          %
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Footer */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+              <button
+                onClick={() => setModalPrestadores(false)}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg cursor-pointer"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

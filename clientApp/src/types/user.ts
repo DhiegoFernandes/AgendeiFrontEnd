@@ -60,6 +60,7 @@ export type MetricasAgendamento = {
   agendamentosPendentes: number;
   agendamentosPendentesSemana: number;
   agendamentosConcluidosMes: number;
+  agendamentosConcluidosHoje: number;
 };
 
 export type RelatorioFinanceiro = {
@@ -88,4 +89,19 @@ export type FotoNegocio = {
   id: number;
   nomeArquivo: string;
   url: string;
+};
+
+export type PrestadorRelatorio = {
+  id: number;
+  nome: string;
+  ganhos: number;
+  taxaCancelamento: number;
+};
+
+export type RelatorioNegocio = {
+  nomeNegocio: string;
+  mes: string; // formato "YYYY-MM"
+  ganhosTotais: number;
+  totalServicos: number;
+  prestadores: PrestadorRelatorio[];
 };

@@ -61,15 +61,15 @@ function AppRoutes(){
                 <Route path='/parceiro/avaliações' element={<AvaliacoesParceiro />} />
                 <Route path='/parceiro/gerenciar-negocio' element={<GerenciarNegocio />} />
                 <Route path='/parceiro/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
-                <Route path='/parceiro/gerenciarPerfilParceiro' element={<GerenciarPerfilParceiro />} />
+                <Route path='/parceiro/gerenciar-perfil' element={<GerenciarPerfilParceiro />} />
 
                 <Route path="/admin" element={<ADMNavBar />}>
-                <Route index element={<PainelADM />} />
-                <Route path="painelAdm" element={<PainelADM />} />
-                <Route path="clienteAdm" element={<ClienteADM />} />
-                <Route path="parceiroAdm" element={<ParceiroADM />} />
-                <Route path="servicosAdm" element={<ServicosADM />} />
-                <Route path="configuracaoAdm" element={<ConfiguracaoADM />} />
+                    <Route index element={<PainelADM />} />
+                    <Route path="painelAdm" element={<PainelADM />} />
+                    <Route path="clienteAdm" element={<ClienteADM />} />
+                    <Route path="parceiroAdm" element={<ParceiroADM />} />
+                    <Route path="servicosAdm" element={<ServicosADM />} />
+                    <Route path="configuracaoAdm" element={<ConfiguracaoADM />} />
                 </Route>
 
                 

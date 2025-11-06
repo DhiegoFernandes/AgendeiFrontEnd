@@ -100,10 +100,6 @@ export default function AgendaPrestador() {
       const dataFormatada = format(data, "yyyy-MM-dd");
       const url = `/servicos/${servicoId}/horarios-disponiveis-data?data=${dataFormatada}`;
       
-      console.log('Fazendo requisição para:', url);
-      console.log('ServicoId:', servicoId);
-      console.log('Data formatada:', dataFormatada);
-      
       const response = await api.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -111,24 +107,17 @@ export default function AgendaPrestador() {
         },
       });
 
-      console.log('Resposta completa da API:', response);
       const dados: HorariosDisponiveis = response.data;
       
-      console.log('Dados recebidos da API:', dados);
-      
       // A API já retorna os horários para a data específica consultada
-      // Se há diasDisponiveis, pega os horários do primeiro (e único) dia
       if (dados.diasDisponiveis && dados.diasDisponiveis.length > 0) {
         const horarios = dados.diasDisponiveis[0].horarios;
-        console.log('Horários encontrados:', horarios);
         setHorariosDisponiveis(horarios);
       } else {
-        console.log('Nenhum dia disponível encontrado');
         setHorariosDisponiveis([]);
       }
     } catch (error: any) {
       console.error("Erro ao buscar horários disponíveis:", error);
-      console.error("Detalhes do erro:", error.response?.data);
       setHorariosDisponiveis([]);
     } finally {
       setCarregandoHorarios(false);
@@ -139,10 +128,6 @@ export default function AgendaPrestador() {
     const dataAgendamento = new Date(ag.dataHora);
     const hora = format(dataAgendamento, "HH:mm");
     
-    console.log('Agendamento selecionado:', ag);
-    console.log('ServicoId:', ag.servicoId);
-    console.log('Data do agendamento:', dataAgendamento);
-    
     setModalEdit({
       id: ag.id,
       index: idx,
@@ -151,9 +136,8 @@ export default function AgendaPrestador() {
       servico: ag.servicoTitulo
     });
 
-    // Buscar horários disponíveis para o serviço na data selecionada
-    // Usar servicoId fixo para teste se não estiver sendo retornado pela API
-    const servicoIdParaBuscar = ag.servicoId || 1;
+    // Buscar horários disponíveis para o serviço na data do agendamento
+    const servicoIdParaBuscar = ag.servicoId;
     await buscarHorariosDisponiveis(servicoIdParaBuscar, dataAgendamento);
   }
 
@@ -172,11 +156,6 @@ export default function AgendaPrestador() {
       const dataSelecionada = format(modalEdit.date, "yyyy-MM-dd");
       const dataHoraCompleta = `${dataSelecionada}T${modalEdit.hora}:00`;
       
-      console.log('Atualizando agendamento:', {
-        id: modalEdit.id,
-        dataHora: dataHoraCompleta
-      });
-
       // Requisição PUT para atualizar o agendamento
       await api.put(`/agendamentos/${modalEdit.id}`, {
         dataHora: dataHoraCompleta
@@ -202,7 +181,6 @@ export default function AgendaPrestador() {
       
     } catch (error: any) {
       console.error("Erro ao atualizar agendamento:", error);
-      console.error("Detalhes do erro:", error.response?.data);
       setPopup("Erro ao atualizar agendamento. Tente novamente.");
     }
   }
@@ -426,7 +404,7 @@ export default function AgendaPrestador() {
                     // Buscar horários disponíveis para a nova data
                     const agendamentoAtual = agendamentos.find(ag => ag.id === modalEdit.id);
                     if (agendamentoAtual) {
-                      const servicoIdParaBuscar = agendamentoAtual.servicoId || 1;
+                      const servicoIdParaBuscar = agendamentoAtual.servicoId;
                       await buscarHorariosDisponiveis(servicoIdParaBuscar, d);
                     }
                   }

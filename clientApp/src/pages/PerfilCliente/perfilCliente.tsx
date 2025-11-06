@@ -1,8 +1,8 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { HiOutlineArrowLeft, HiOutlineLogout, HiOutlineUserCircle, HiOutlineMail, HiOutlineCog } from "react-icons/hi";
-import { AiFillStar } from "react-icons/ai";
-import { FiLock, FiHelpCircle } from "react-icons/fi";
-import { MdAssignment } from "react-icons/md";
+import { HiOutlineArrowLeft, HiOutlineLogout, HiOutlineUserCircle, HiOutlineMail } from "react-icons/hi";
+import { FiLock } from "react-icons/fi";
+import api from "../../services/api";
 
 function getInitials(nome: string) {
   const parts = nome.trim().split(" ");
@@ -11,18 +11,71 @@ function getInitials(nome: string) {
     : parts[0][0] ?? "";
 }
 
-// MOCK dados
-const user = {
-  nome: "João Paulo",
-  email: "joao.paulo@gmail.com",
-  cidade: "São Paulo, SP",
-  clienteDesde: "2022",
-  agendamentos: 12,
-  pendentes: 3,
-};
+interface UserData {
+  id: number;
+  nome: string;
+  email: string;
+  telefone: string;
+  perfil: string;
+  ativo: boolean;
+  cep: string;
+  endereco: string;
+  numero: string;
+}
 
 export default function PerfilCliente() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function buscarDadosUsuario() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await api.get("/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        setUser(response.data);
+        console.log("Dados do usuário carregados:", response.data);
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    buscarDadosUsuario();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f6f5fb] flex items-center justify-center">
+        <div className="text-purple-600 text-xl">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#f6f5fb] flex items-center justify-center">
+        <div className="text-red-600 text-xl">Erro ao carregar dados do usuário</div>
+      </div>
+    );
+  }
+
+  const formatarEndereco = () => {
+    const enderecoCompleto = [user.endereco, user.numero].filter(Boolean).join(", ");
+    return enderecoCompleto || "Endereço não informado";
+  };
 
   return (
     <div className="min-h-screen bg-[#f6f5fb]">
@@ -48,7 +101,7 @@ export default function PerfilCliente() {
               <span className="font-bold text-xl text-white">{user.nome}</span>
               <span className="text-white/80 font-medium">{user.email}</span>
               <span className="text-white/60 text-sm mt-1">
-                {user.cidade} • <span>Cliente desde {user.clienteDesde}</span>
+                {formatarEndereco()}
               </span>
             </div>
           </div>
@@ -73,35 +126,13 @@ export default function PerfilCliente() {
             </button>
           </div>
         </div>
-
-        {/* KPIs animadas */}
-        <div className="flex flex-col gap-5 mt-10 md:mt-0 md:items-end justify-center">
-          <div className="flex gap-5">
-            <article
-              className="bg-white/10 backdrop-blur border border-white/20 rounded-xl p-5 flex flex-col items-center min-w-[120px] shadow-lg animate-fadeIn">
-              <div className="flex items-center gap-1 mb-2 text-white/80">
-                <MdAssignment size={20} className="text-white/90" />
-                <span className="text-lg font-semibold">Agendamentos</span>
-              </div>
-              <span className="text-3xl font-extrabold text-white drop-shadow-lg">{user.agendamentos}</span>
-            </article>
-            <article
-              className="bg-white/10 backdrop-blur border border-white/20 rounded-xl p-5 flex flex-col items-center min-w-[120px] shadow-lg animate-fadeIn">
-              <div className="flex items-center gap-1 mb-2 text-white/80">
-                <AiFillStar size={18} className="text-yellow-300" />
-                <span className="text-lg font-semibold">Pendentes</span>
-              </div>
-              <span className="text-3xl font-extrabold text-yellow-100 drop-shadow-lg">{user.pendentes}</span>
-            </article>
-          </div>
-        </div>
       </header>
 
       {/* MENU GRID */}
       <main className="max-w-4xl mx-auto mt-10 px-2">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-7 mb-8">
+        <div className="flex justify-center mb-8">
           {/* CARD Conta */}
-          <section className="bg-white rounded-2xl shadow-xl p-0 overflow-hidden">
+          <section className="bg-white rounded-2xl shadow-xl p-0 overflow-hidden max-w-md w-full">
             <h3 className="bg-gray-50 px-8 py-4 font-bold text-lg border-b border-gray-100">
               Conta
             </h3>
@@ -119,57 +150,12 @@ export default function PerfilCliente() {
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/cliente/alterar-dados")}>
-                  <div className="flex items-center gap-4">
-                    <FiLock className="text-purple-600 text-xl" />
-                    <span className="flex flex-col items-start">
-                      <strong className="-mb-1">Alterar Dados</strong>
-                      <span className="text-xs text-gray-500">Mantenha sua conta segura</span>
-                    </span>
-                  </div>
-                  <span className="ml-3 text-purple-300 group-hover:text-purple-700 text-xl">›</span>
-                </button>
-              </li>
-            </ul>
-          </section>
-
-          {/* CARD Outros */}
-          <section className="bg-white rounded-2xl shadow-xl p-0 overflow-hidden">
-            <h3 className="bg-gray-50 px-8 py-4 font-bold text-lg border-b border-gray-100">
-              Outros
-            </h3>
-            <ul className="divide-y divide-gray-100">
-              <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/ajuda")}>
-                  <div className="flex items-center gap-4">
-                    <FiHelpCircle className="text-purple-600 text-xl" />
-                    <span className="flex flex-col items-start">
-                      <strong className="-mb-1">Ajuda e Suporte</strong>
-                      <span className="text-xs text-gray-500">Central de ajuda e contato</span>
-                    </span>
-                  </div>
-                  <span className="ml-3 text-purple-300 group-hover:text-purple-700 text-xl">›</span>
-                </button>
-              </li>
-              <li>
                 <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/politicaPrivacidade")}>
                   <div className="flex items-center gap-4">
                     <HiOutlineMail className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">
                       <strong className="-mb-1">Política de Privacidade</strong>
                       <span className="text-xs text-gray-500">Saiba como cuidamos dos seus dados</span>
-                    </span>
-                  </div>
-                  <span className="ml-3 text-purple-300 group-hover:text-purple-700 text-xl">›</span>
-                </button>
-              </li>
-              <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/sobre")}>
-                  <div className="flex items-center gap-4">
-                    <HiOutlineCog className="text-purple-600 text-xl" />
-                    <span className="flex flex-col items-start">
-                      <strong className="-mb-1">Sobre o Agendei</strong>
-                      <span className="text-xs text-gray-500">Quem somos e nossa missão</span>
                     </span>
                   </div>
                   <span className="ml-3 text-purple-300 group-hover:text-purple-700 text-xl">›</span>

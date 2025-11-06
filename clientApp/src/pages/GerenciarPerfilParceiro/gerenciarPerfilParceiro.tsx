@@ -40,13 +40,44 @@ export default function GerenciarPerfilParceiro() {
         setEmail(user.email || "");
         setTelefone(user.telefone || "");
         setParceiroId(user.id);
-        
-        // Se tiver foto de perfil, mostrar preview
-        if (user.fotoPerfil) {
-          setFotoPreview(user.fotoPerfil);
-        }
 
         console.log("Dados do parceiro carregados:", user);
+
+        // Buscar foto de perfil do prestador
+        try {
+          const fotoUrlResponse = await api.get(`/usuarios/${user.id}/foto-perfil-url`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          const fotoUrlData = fotoUrlResponse.data;
+          
+          // Se houver URL da foto, buscar a imagem
+          if (fotoUrlData && fotoUrlData.urlFoto) {
+            try {
+              const fotoBlobResponse = await api.get(fotoUrlData.urlFoto, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+                responseType: 'blob'
+              });
+
+              // Converter blob para URL para exibição
+              if (fotoBlobResponse.data && fotoBlobResponse.data.size > 0) {
+                const imageUrl = URL.createObjectURL(fotoBlobResponse.data);
+                setFotoPreview(imageUrl);
+                console.log("Foto do prestador carregada com sucesso");
+              }
+            } catch (fotoBlobError) {
+              console.log("Erro ao buscar foto do prestador:", fotoBlobError);
+            }
+          }
+        } catch (fotoUrlError) {
+          // Se não houver foto, simplesmente não definir fotoPreview (permanece null)
+          console.log("Foto de perfil do prestador não encontrada ou indisponível");
+        }
       } catch (error) {
         console.error("Erro ao buscar dados do parceiro:", error);
       }
@@ -217,9 +248,9 @@ export default function GerenciarPerfilParceiro() {
       const fotoComprimida = await comprimirImagem(foto);
       
       const formData = new FormData();
-      formData.append('foto', fotoComprimida);
+      formData.append('arquivo', fotoComprimida);
 
-      await api.post(`/usuarios/${parceiroId}/foto`, formData, {
+      await api.put(`/usuarios/foto-perfil`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -229,6 +260,36 @@ export default function GerenciarPerfilParceiro() {
       setPopupMessage("Foto de perfil atualizada com sucesso!");
       setPopup(true);
       console.log("Foto de perfil atualizada");
+      
+      // Recarregar a foto após atualização bem-sucedida
+      if (parceiroId) {
+        try {
+          const fotoUrlResponse = await api.get(`/usuarios/${parceiroId}/foto-perfil-url`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          const fotoUrlData = fotoUrlResponse.data;
+          
+          if (fotoUrlData && fotoUrlData.urlFoto) {
+            const fotoBlobResponse = await api.get(fotoUrlData.urlFoto, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              responseType: 'blob'
+            });
+
+            if (fotoBlobResponse.data && fotoBlobResponse.data.size > 0) {
+              const imageUrl = URL.createObjectURL(fotoBlobResponse.data);
+              setFotoPreview(imageUrl);
+            }
+          }
+        } catch (error) {
+          console.log("Erro ao recarregar foto após atualização:", error);
+        }
+      }
     } catch (error) {
       console.error("Erro ao enviar foto:", error);
       setPopupMessage("Erro ao atualizar foto de perfil. Tente novamente.");

@@ -41,7 +41,7 @@ export default function PerfilPrestador() {
   const [profissional, setProfissional] = useState("");
   const [categoria, setCategoria] = useState("");
   const [notaMedia, setNotaMedia] = useState<number | null>(null);
-  const [fotoNegocio, setFotoNegocio] = useState<string | null>(null);
+  const [fotoPrestador, setFotoPrestador] = useState<string | null>(null);
   
   // Estados para métricas dos agendamentos
   const [metricas, setMetricas] = useState<MetricasAgendamento>({
@@ -49,6 +49,7 @@ export default function PerfilPrestador() {
     agendamentosPendentes: 0,
     agendamentosPendentesSemana: 0,
     agendamentosConcluidosMes: 0,
+    agendamentosConcluidosHoje: 0,
   });
   const [carregandoMetricas, setCarregandoMetricas] = useState(true);
 
@@ -95,6 +96,48 @@ export default function PerfilPrestador() {
 
         console.log("Usuário carregado:", user);
 
+        // Buscar foto de perfil do prestador
+        try {
+          const fotoUrlResponse = await api.get(`/usuarios/${user.id}/foto-perfil-url`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          const fotoUrlData = fotoUrlResponse.data;
+          
+          // Se houver URL da foto, buscar a imagem
+          if (fotoUrlData && fotoUrlData.urlFoto) {
+            try {
+              const fotoBlobResponse = await api.get(fotoUrlData.urlFoto, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+                responseType: 'blob'
+              });
+
+              // Converter blob para URL para exibição
+              if (fotoBlobResponse.data && fotoBlobResponse.data.size > 0) {
+                const imageUrl = URL.createObjectURL(fotoBlobResponse.data);
+                setFotoPrestador(imageUrl);
+                console.log("Foto do prestador carregada com sucesso");
+              } else {
+                setFotoPrestador(null);
+              }
+            } catch (fotoBlobError) {
+              console.log("Erro ao buscar foto do prestador:", fotoBlobError);
+              setFotoPrestador(null);
+            }
+          } else {
+            setFotoPrestador(null);
+          }
+        } catch (fotoUrlError) {
+          // Se não houver foto, simplesmente não definir fotoPrestador (permanece null)
+          console.log("Foto de perfil do prestador não encontrada ou indisponível");
+          setFotoPrestador(null);
+        }
+
         // Segunda chamada para buscar dados do negócio incluindo nota média
         try {
           const negocioResponse = await api.get(`/negocios/${negocio.id}`, {
@@ -113,31 +156,6 @@ export default function PerfilPrestador() {
           // Continua mesmo se falhar
         }
 
-        // Buscar foto do negócio de forma independente (não bloqueia o resto se falhar)
-        // Esta busca é opcional e não deve travar a página se falhar
-        try {
-          const fotoResponse = await api.get(`/negocios/${negocio.id}/fotos/16`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            responseType: 'blob'
-          });
-
-          // Converter blob para URL para exibição
-          if (fotoResponse.data && fotoResponse.data.size > 0) {
-            const imageUrl = URL.createObjectURL(fotoResponse.data);
-            setFotoNegocio(imageUrl);
-            console.log("Foto do negócio carregada com sucesso");
-          } else {
-            console.log("Foto não encontrada ou vazia");
-            setFotoNegocio(null);
-          }
-        } catch (fotoError) {
-          // Se não houver foto, simplesmente não definir fotoNegocio (permanece null)
-          // Esta é uma operação opcional, então o erro não é crítico
-          console.log("Foto do negócio não encontrada ou indisponível - continuando sem foto");
-          setFotoNegocio(null);
-        }
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);
       }
@@ -227,7 +245,7 @@ export default function PerfilPrestador() {
       label: "Gerenciar Perfil", 
       desc: "Gerencie seu Perfil", 
       icon: <MdManageAccounts  size={24} className="text-blue-400" />,
-      onClick: () => navigate("/parceiro/gerenciarPerfilParceiro"), // <-- ALTERADO
+      onClick: () => navigate("/parceiro/gerenciar-perfil"), // <-- ALTERADO
     },
   ];
 
@@ -235,14 +253,14 @@ export default function PerfilPrestador() {
   const criarKPIs = () => {
     return [
       { 
-        label: "Hoje", 
-        value: carregandoMetricas ? "..." : metricas.agendamentosHoje, 
+        label: "Concluídos (hoje)", 
+        value: carregandoMetricas ? "..." : metricas.agendamentosConcluidosHoje, 
         subtitle: "Agendamentos", 
         icon: <HiOutlineCalendar size={26} className="text-purple-500" /> 
       },
       { 
-        label: "Pendentes (semana)", 
-        value: carregandoMetricas ? "..." : metricas.agendamentosPendentesSemana, 
+        label: "Pendentes (hoje)", 
+        value: carregandoMetricas ? "..." : metricas.agendamentosPendentes, 
         subtitle: "Agendamentos", 
         icon: <HiOutlineClock size={26} className="text-yellow-400" /> 
       },
@@ -264,10 +282,10 @@ export default function PerfilPrestador() {
             <h1 className="text-white font-extrabold text-3xl sm:text-4xl mb-2 drop-shadow-lg">{negocio}</h1>
             <div className="flex items-center gap-5 mt-2">
               <div className="w-14 h-14 rounded-full bg-white/25 text-2xl text-white font-extrabold flex items-center justify-center shadow ring-2 ring-white/20 select-none uppercase overflow-hidden">
-                {fotoNegocio ? (
+                {fotoPrestador ? (
                   <img 
-                    src={fotoNegocio} 
-                    alt="Foto do negócio" 
+                    src={fotoPrestador} 
+                    alt="Foto do prestador" 
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -296,7 +314,7 @@ export default function PerfilPrestador() {
       {/* KPIs */}
       <section className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-7 mt-10 px-2">
         {criarKPIs().map((kpi) => (
-          <article key={kpi.label} className="rounded-xl bg-white py-6 px-6 flex flex-col items-start shadow group hover:shadow-xl transition">
+          <article key={kpi.label} className="rounded-xl bg-white py-6 px-6 flex flex-col items-start shadow group">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-bold text-gray-600 text-base">{kpi.label}</span>{kpi.icon}
             </div>
