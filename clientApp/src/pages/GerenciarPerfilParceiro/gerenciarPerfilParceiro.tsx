@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import api from "../../services/api";
 import { CiImageOn } from "react-icons/ci";
+import ModalPlanos from "../../components/ModalPlanos";
+import type { TipoPlano } from "../../components/ModalPlanos";
 
 export default function GerenciarPerfilParceiro() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -18,6 +18,12 @@ export default function GerenciarPerfilParceiro() {
   // Estado para foto de perfil
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  
+  // Estados para modal de planos
+  const [modalPlanosAberto, setModalPlanosAberto] = useState(false);
+  const [planoAtual, setPlanoAtual] = useState<TipoPlano | undefined>(undefined);
+  const [carregandoPlano, setCarregandoPlano] = useState(false);
+  const [ehDono, setEhDono] = useState<boolean | null>(null);
   
   // useEffect para buscar dados do usuário
   useEffect(() => {
@@ -34,12 +40,41 @@ export default function GerenciarPerfilParceiro() {
         });
 
         const user = response.data;
+        const negocio = user.negocio;
         
         // Atualizar os dados do formulário com os dados reais
         setNome(user.nome || "");
         setEmail(user.email || "");
         setTelefone(user.telefone || "");
         setParceiroId(user.id);
+
+        // Verificar se é dono do negócio e buscar plano atual
+        if (negocio && negocio.id) {
+          // Tentar buscar informações do negócio para verificar se é dono
+          try {
+            const negocioResponse = await api.get(`/negocios/${negocio.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+            });
+            
+            // Se conseguir buscar, provavelmente é dono ou tem acesso
+            // O plano pode estar no negócio ou precisar buscar separadamente
+            if (negocioResponse.data && negocioResponse.data.plano) {
+              setPlanoAtual(negocioResponse.data.plano);
+            }
+            setEhDono(true);
+          } catch (error: any) {
+            // Se der erro 403 ou similar, não é dono
+            if (error?.response?.status === 403 || error?.response?.status === 401) {
+              setEhDono(false);
+            } else {
+              // Outro erro, tentar verificar de outra forma
+              setEhDono(true); // Assumir que é dono por padrão, o backend vai validar
+            }
+          }
+        }
 
         console.log("Dados do parceiro carregados:", user);
 
@@ -220,6 +255,64 @@ export default function GerenciarPerfilParceiro() {
     }
   }
 
+  // Função para atualizar plano
+  async function handleAtualizarPlano(novoPlano: TipoPlano) {
+    if (!parceiroId) {
+      setPopupMessage("Erro: ID do parceiro não encontrado!");
+      setPopup(true);
+      setModalPlanosAberto(false);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPopupMessage("Erro: Token de autenticação não encontrado!");
+      setPopup(true);
+      setModalPlanosAberto(false);
+      return;
+    }
+
+    setCarregandoPlano(true);
+
+    try {
+      await api.put(`/prestadores/${parceiroId}/plano?novoPlano=${novoPlano}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      setPlanoAtual(novoPlano);
+      setPopupMessage("Plano atualizado com sucesso!");
+      setPopup(true);
+      setModalPlanosAberto(false);
+      console.log("Plano atualizado para:", novoPlano);
+    } catch (error: any) {
+      console.error("Erro ao atualizar plano:", error);
+      const errorMessage = error?.response?.data?.errorMessage || error?.response?.data?.message || error?.message || "Erro ao atualizar plano.";
+      
+      // Verificar se o erro indica que não é dono
+      const errorMessageLower = errorMessage.toLowerCase();
+      if (
+        errorMessageLower.includes("dono") || 
+        errorMessageLower.includes("proprietário") ||
+        errorMessageLower.includes("owner") ||
+        errorMessageLower.includes("permissão") ||
+        errorMessageLower.includes("permissao") ||
+        error?.response?.status === 403 ||
+        error?.response?.status === 401
+      ) {
+        setEhDono(false);
+        setPopupMessage("Apenas o dono do negócio pode alterar o plano.");
+      } else {
+        setPopupMessage(errorMessage);
+      }
+      setPopup(true);
+    } finally {
+      setCarregandoPlano(false);
+    }
+  }
+
   // Função para atualizar foto
   async function handleSubmitFoto(e: React.FormEvent) {
     e.preventDefault();
@@ -356,6 +449,31 @@ export default function GerenciarPerfilParceiro() {
             <p className="text-xs text-gray-500 mt-1">Informe apenas números</p>
           </div>
           
+          {/* Botão de atualizar plano */}
+          {ehDono === false && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800 text-center">
+                ⚠️ Apenas o dono do negócio pode alterar o plano.
+              </p>
+            </div>
+          )}
+          
+          <button
+            type="button"
+            onClick={() => {
+              if (ehDono === false) {
+                setPopupMessage("Apenas o dono do negócio pode alterar o plano.");
+                setPopup(true);
+              } else {
+                setModalPlanosAberto(true);
+              }
+            }}
+            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-110 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={ehDono === false}
+          >
+            {planoAtual ? `Plano Atual: ${planoAtual === "BASICO" ? "Básico" : planoAtual === "INTERMEDIARIO" ? "Intermediário" : "Avançado"}` : "Mudar Plano"}
+          </button>
+          
           <button
             className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-110 transition cursor-pointer mt-auto"
             type="submit"
@@ -448,6 +566,15 @@ export default function GerenciarPerfilParceiro() {
           </div>
         </div>
       )}
+
+      {/* Modal de Planos */}
+      <ModalPlanos
+        isOpen={modalPlanosAberto}
+        onClose={() => setModalPlanosAberto(false)}
+        onSelecionarPlano={handleAtualizarPlano}
+        planoAtual={planoAtual}
+        carregando={carregandoPlano}
+      />
     </div>
   );
 }
