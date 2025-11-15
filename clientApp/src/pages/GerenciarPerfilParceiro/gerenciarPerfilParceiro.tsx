@@ -203,7 +203,7 @@ export default function GerenciarPerfilParceiro() {
         telefone: telefone
       };
 
-      await api.put(`/usuarios/${parceiroId}`, dadosAtualizacao, {
+      await api.put(`/usuarios/me/atualizar`, dadosAtualizacao, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
