@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import ClientNavbar from "../../components/ClientNavbar";
 
 // Mock dos dados (puxe da API/rota real)
 const estabelecimento = "Barbearia Estilo";
@@ -20,6 +21,7 @@ export default function AvaliarServico() {
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
+      <ClientNavbar />
       {/* Header */}
       <header className="w-full bg-gradient-to-r from-purple-600 to-purple-400 text-white py-7 shadow">
         <h1 className="text-2xl md:text-3xl font-bold text-center tracking-tight">Avaliar Serviço</h1>

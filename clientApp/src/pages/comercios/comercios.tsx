@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
-import salaoUm from "../../assets/salaoUm.png";
-import salaoDois from "../../assets/salaoDois.png"
-import salaoTres from "../../assets/salaoTres.png"
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
-
-// Imagens para os negócios (pode ser expandido conforme necessário)
-const imagensNegocios = [salaoUm, salaoDois, salaoTres];
+import CarrosselFotos from "../../components/CarrosselFotos";
+import ClientNavbar from "../../components/ClientNavbar";
 
 const categorias = [
   { nome: "Todos", tag: "todos" },
@@ -40,8 +36,6 @@ interface NegocioFormatado {
   rating: number;
   distancia: string;
   categoria: string;
-  img: string;
-  status: { texto: string; cor: string };
 }
 
 export default function Comercios() {
@@ -74,7 +68,7 @@ export default function Comercios() {
       });
       
       // Transformar dados da API para o formato local
-      const negociosFormatados: NegocioFormatado[] = response.data.map((negocio: Negocio, index: number) => ({
+      const negociosFormatados: NegocioFormatado[] = response.data.map((negocio: Negocio) => ({
         id: negocio.id,
         nome: negocio.nome,
         endereco: negocio.endereco,
@@ -82,11 +76,6 @@ export default function Comercios() {
         rating: negocio.notaMedia,
         distancia: `${negocio.distanciaKm.toFixed(1)} km`,
         categoria: negocio.categoria,
-        img: imagensNegocios[index % imagensNegocios.length], // Rotaciona as imagens
-        status: { 
-          texto: "Ajustar", 
-          cor: "yellow" 
-        }
       }));
       
       setNegocios(negociosFormatados);
@@ -127,12 +116,25 @@ export default function Comercios() {
         <div className="flex-1 flex justify-center mx-0">
           <div className="relative w-full max-w-md">
             <input
-              type="search"
+              type="text"
               placeholder="Buscar salões, barbearias..."
-              className="w-full py-2 pl-4 pr-12 rounded-full border border-gray-300 bg-gray-100 text-base shadow-md focus:outline-none focus:ring-2 focus:ring-purple-200"
+              className="w-full py-2 pl-4 pr-20 rounded-full border border-gray-300 bg-gray-100 text-base shadow-md focus:outline-none focus:ring-2 focus:ring-purple-200 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
               value={q}
               onChange={e => setQ(e.target.value)}
             />
+            {/* Botão de limpar pesquisa (X) */}
+            {q && (
+              <button
+                onClick={() => setQ("")}
+                className="absolute right-12 top-1/2 -translate-y-1/2 text-orange-500 hover:text-orange-600 transition cursor-pointer"
+                aria-label="Limpar pesquisa"
+              >
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+            {/* Ícone de lupa */}
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-purple-400">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="8.5" stroke="currentColor" strokeWidth="2"/>
@@ -187,25 +189,8 @@ export default function Comercios() {
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filtrar().map(c => (
             <div key={c.id} className="bg-white rounded-xl shadow-lg flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl">
-              {/* Banner Foto */}
-              <div className="relative h-44 w-full overflow-hidden">
-                <img
-                  src={c.img}
-                  alt={c.nome}
-                  className="w-full h-full object-cover"
-                />
-                {/* <span className={`
-                  absolute left-3 top-3 px-4 py-1 rounded-full text-xs font-extrabold
-                  ${c.destaque === "Premium"
-                    ? "bg-red-500 text-white"
-                    : c.destaque === "Destaque"
-                    ? "bg-blue-700 text-white"
-                    : "bg-gray-900 text-white"}
-                  shadow-sm
-                `}>
-                  {c.destaque}
-                </span> */}
-              </div>
+              {/* Banner Foto - Carrossel */}
+              <CarrosselFotos negocioId={c.id} />
               {/* Conteúdo */}
               <div className="flex-1 flex flex-col gap-2 px-5 pt-3 pb-6">
                 <div className="flex items-center justify-between mb-2">
@@ -218,18 +203,10 @@ export default function Comercios() {
                 <p className="text-gray-700 text-base leading-tight">{c.categoria}</p>
                 <p className="text-gray-400 text-sm">{c.distancia} · {c.endereco}</p>
                 <div className="flex flex-wrap gap-2 my-1">
-                  <span className={`
-                    rounded-full px-4 py-1 text-sm font-semibold border
-                    ${c.status.cor === "green"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-yellow-50 text-yellow-800 border-yellow-300"}
-                  `}>
-                    {c.status.texto}
-                  </span>
                 </div>
                 <div className="mt-auto flex justify-end">
                   <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-purple-700 transition cursor-pointer"
-                  onClick={() => navigate("/cliente/escolher-servico")}>
+                  onClick={() => navigate("/cliente/escolher-servico", { state: { negocioId: c.id } })}>
                     Agendar
                   </button>
                 </div>

@@ -64,62 +64,68 @@ export default function PoliticaPrivacidade() {
       {/* Main Content */}
       <main className="flex-1 container mx-auto max-w-4xl px-4 py-10">
         <h1 className="text-3xl md:text-4xl font-bold text-purple-600 mb-2 mt-5">
-          Política de Privacidade
+          Política de Privacidade - Agendei
         </h1>
         <p className="text-gray-500 text-sm mb-8">
-          Última atualização: 15 de Agosto de 2025
+          Última atualização: Janeiro de 2025
         </p>
 
         {/* Sections */}
         <div className="space-y-6">
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              1. Introdução
+              1. INTRODUÇÃO
             </h2>
             <div className="space-y-4 text-gray-700">
               <p>
-                Bem-vindo(a) à Política de Privacidade do Agendei. Nós valorizamos sua privacidade e estamos comprometidos em proteger suas informações pessoais.
+                A presente Política de Privacidade descreve como o Agendei coleta, utiliza, armazena e protege as informações pessoais dos usuários da nossa plataforma de agendamentos de serviços estéticos.
               </p>
               <p>
-                Esta Política de Privacidade descreve como coletamos, usamos, compartilhamos e protegemos suas informações quando você utiliza nosso aplicativo, site e serviços relacionados ("Serviços").
-              </p>
-              <p>
-                Ao utilizar nossos Serviços, você concorda com as práticas descritas nesta Política de Privacidade. Por favor, leia atentamente.
+                Esta política está em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018) e demais legislações aplicáveis à proteção de dados pessoais no Brasil.
               </p>
             </div>
           </section>
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              2. Informações que Coletamos
+              2. RESPONSÁVEL PELO TRATAMENTO DOS DADOS
+            </h2>
+            <div className="space-y-4 text-gray-700">
+              <p><strong>Agendei</strong></p>
+              <ul className="list-disc ml-6 space-y-1">
+                <li><strong>E-mail:</strong> contato@agendei.com.br</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              3. DADOS PESSOAIS COLETADOS
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  2.1 Informações Fornecidas por Você
+                  3.1 Dados Coletados de Clientes
                 </h3>
-                <p>Coletamos informações que você nos fornece diretamente, incluindo:</p>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
-                  <li>Dados de cadastro (nome, e-mail, telefone, endereço)</li>
-                  <li>Dados de perfil e preferências</li>
-                  <li>Informações de agendamento e histórico de serviços</li>
-                  <li>Comunicações com nossa equipe de suporte</li>
-                  <li>Avaliações e comentários sobre prestadores de serviços</li>
-                  <li>Informações de pagamento (processadas de forma segura por nossos parceiros de pagamento)</li>
+                  <li><strong>Dados de Identificação:</strong> Nome completo, e-mail, telefone</li>
+                  <li><strong>Dados de Localização:</strong> CEP, endereço completo</li>
+                  <li><strong>Dados de Uso:</strong> Histórico de agendamentos, avaliações realizadas</li>
+                  <li><strong>Dados Técnicos:</strong> Endereço IP, tipo de navegador (coletados automaticamente)</li>
                 </ul>
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  2.2 Informações Coletadas Automaticamente
+                  3.2 Dados Coletados de Prestadores
                 </h3>
-                <p>Quando você utiliza nossos Serviços, podemos coletar automaticamente:</p>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
-                  <li>Dados de dispositivo (modelo, sistema operacional, identificadores únicos)</li>
-                  <li>Dados de localização (com sua permissão)</li>
-                  <li>Dados de uso (páginas visitadas, serviços visualizados, tempo gasto)</li>
-                  <li>Informações de log e diagnóstico</li>
-                  <li>Cookies e tecnologias similares para melhorar sua experiência</li>
+                  <li><strong>Dados de Identificação:</strong> Nome completo, e-mail, telefone</li>
+                  <li><strong>Dados do Negócio:</strong> Nome do estabelecimento, CEP, endereço, categoria</li>
+                  <li><strong>Dados de Serviços:</strong> Descrição, preços, duração dos serviços oferecidos</li>
+                  <li><strong>Dados de Agenda:</strong> Horários disponíveis, agendamentos realizados</li>
+                  <li><strong>Dados de Avaliação:</strong> Avaliações recebidas de clientes</li>
+                  <li><strong>Dados Técnicos:</strong> Endereço IP, tipo de navegador (coletados automaticamente)</li>
                 </ul>
               </div>
             </div>
@@ -127,120 +133,406 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              3. Como Usamos Suas Informações
+              4. FINALIDADES DO TRATAMENTO
             </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>Utilizamos suas informações para:</p>
-              <ul className="list-disc ml-6 space-y-1">
-                <li>Fornecer, manter e melhorar nossos Serviços</li>
-                <li>Processar agendamentos e transações</li>
-                <li>Conectar clientes e prestadores de serviços</li>
-                <li>Enviar confirmações, lembretes e comunicações relacionadas ao serviço</li>
-                <li>Personalizar sua experiência e oferecer recomendações</li>
-                <li>Enviar informações sobre promoções e ofertas (você pode optar por não receber)</li>
-                <li>Analisar tendências e comportamentos para melhorar nossos Serviços</li>
-                <li>Detectar, investigar e prevenir atividades fraudulentas</li>
-                <li>Cumprir obrigações legais</li>
-              </ul>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  4.1 Finalidades Principais
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Prestação do Serviço:</strong> Conectar clientes e prestadores de serviços</li>
+                  <li><strong>Agendamentos:</strong> Facilitar o agendamento e gestão de horários</li>
+                  <li><strong>Comunicação:</strong> Enviar notificações sobre agendamentos</li>
+                  <li><strong>Avaliações:</strong> Permitir que usuários avaliem serviços prestados</li>
+                  <li><strong>Funcionamento da Plataforma:</strong> Garantir o correto funcionamento do sistema</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  4.2 Finalidades Secundárias
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Análise de Dados:</strong> Estatísticas agregadas e anonimizadas para melhorias</li>
+                  <li><strong>Segurança:</strong> Prevenir uso inadequado da plataforma</li>
+                  <li><strong>Suporte:</strong> Atender dúvidas e solicitações dos usuários</li>
+                </ul>
+              </div>
             </div>
           </section>
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              4. Compartilhamento de Informações
+              5. BASE LEGAL PARA O TRATAMENTO
             </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>Podemos compartilhar suas informações com:</p>
-              <ul className="list-disc ml-6 space-y-2">
-                <li>
-                  <span className="font-semibold text-purple-800">Prestadores de serviços:</span> Compartilhamos informações necessárias com os prestadores para viabilizar os agendamentos.
-                </li>
-                <li>
-                  <span className="font-semibold text-purple-800">Parceiros de negócios:</span> Fornecedores que nos ajudam a operar nossos Serviços, como processadores de pagamento e serviços de hospedagem.
-                </li>
-                <li>
-                  <span className="font-semibold text-purple-800">Quando exigido por lei:</span> Podemos divulgar suas informações para cumprir obrigações legais ou proteger direitos.
-                </li>
-                <li>
-                  <span className="font-semibold text-purple-800">Com seu consentimento:</span> Em outros casos, solicitaremos sua permissão antes de compartilhar.
-                </li>
-              </ul>
-              <p className="font-medium">Não vendemos suas informações pessoais a terceiros.</p>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  5.1 Execução de Contrato
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Dados necessários para prestação do serviço de agendamentos</li>
+                  <li>Dados para cumprimento de obrigações contratuais entre clientes e prestadores</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  5.2 Legítimo Interesse
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Análise de uso da plataforma para melhorias</li>
+                  <li>Prevenção de uso inadequado da plataforma</li>
+                  <li>Desenvolvimento de novas funcionalidades</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  5.3 Cumprimento de Obrigação Legal
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Dados para cumprimento de obrigações fiscais e contábeis</li>
+                  <li>Dados para atender solicitações de autoridades competentes</li>
+                </ul>
+              </div>
             </div>
           </section>
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              5. Seus Direitos e Escolhas
+              6. COMPARTILHAMENTO DE DADOS
             </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>Você tem o direito de:</p>
-              <ul className="list-disc ml-6 space-y-1">
-                <li>Acessar e baixar seus dados pessoais</li>
-                <li>Corrigir informações imprecisas</li>
-                <li>Solicitar a exclusão de seus dados (sujeito a obrigações legais)</li>
-                <li>Optar por não receber comunicações de marketing</li>
-                <li>Configurar preferências de cookies e rastreamento</li>
-              </ul>
-              <p>Para exercer esses direitos, acesse as configurações da sua conta ou entre em contato conosco.</p>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  6.1 Compartilhamento com Prestadores
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Dados do Cliente:</strong> Nome, telefone, e-mail (apenas para agendamentos específicos)</li>
+                  <li><strong>Finalidade:</strong> Permitir que prestadores entrem em contato e prestem serviços</li>
+                  <li><strong>Limitação:</strong> Apenas dados necessários para o agendamento específico</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  6.2 Compartilhamento com Serviços Externos
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>ViaCEP:</strong> CEP para busca automática de endereços</li>
+                  <li><strong>Google Maps:</strong> Endereços para localização e cálculo de rotas</li>
+                  <li><strong>Google Calendar:</strong> Horários de agendamentos (quando implementado)</li>
+                  <li><strong>EmailJS:</strong> Dados para envio de e-mails (quando implementado)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  6.3 Compartilhamento com Autoridades
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Quando exigido por lei ou ordem judicial</li>
+                  <li>Para investigação de atividades ilegais</li>
+                  <li>Para proteção de direitos e segurança</li>
+                </ul>
+              </div>
             </div>
           </section>
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              6. Segurança
+              7. ARMAZENAMENTO E SEGURANÇA
             </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  7.1 Período de Armazenamento
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Dados de Conta:</strong> Mantidos enquanto a conta estiver ativa</li>
+                  <li><strong>Dados de Agendamentos:</strong> Mantidos por 3 anos para fins contábeis</li>
+                  <li><strong>Dados de Avaliações:</strong> Mantidos indefinidamente (podem ser anonimizados)</li>
+                  <li><strong>Logs de Acesso:</strong> Mantidos por 6 meses</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  7.2 Medidas de Segurança
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Senhas:</strong> Senhas são protegidas com hash criptográfico</li>
+                  <li><strong>Acesso Restrito:</strong> Apenas pessoal autorizado tem acesso aos dados</li>
+                  <li><strong>Backup:</strong> Dados são copiados regularmente</li>
+                  <li><strong>Atualizações:</strong> Sistemas mantidos atualizados</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  7.3 Localização dos Dados
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Dados são armazenados em servidores no Brasil</li>
+                  <li>Backup pode ser realizado em servidores internacionais com proteção adequada</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              8. DIREITOS DOS TITULARES
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  8.1 Direitos Garantidos pela LGPD
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Confirmação e Acesso:</strong> Saber se seus dados são tratados e acessá-los</li>
+                  <li><strong>Correção:</strong> Corrigir dados incompletos, inexatos ou desatualizados</li>
+                  <li><strong>Anonimização, Bloqueio ou Eliminação:</strong> Remover dados desnecessários</li>
+                  <li><strong>Portabilidade:</strong> Transferir dados para outro prestador de serviço</li>
+                  <li><strong>Eliminação:</strong> Excluir dados tratados com consentimento</li>
+                  <li><strong>Informação:</strong> Saber sobre compartilhamento de dados</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  8.2 Como Exercer os Direitos
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>E-mail:</strong> contato@agendei.com.br</li>
+                  <li><strong>Prazo de Resposta:</strong> Até 15 dias úteis</li>
+                  <li><strong>Identificação:</strong> Necessária para verificar identidade</li>
+                  <li><strong>Gratuidade:</strong> Exercício de direitos é gratuito</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              9. MENORES DE IDADE
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  9.1 Proteção de Menores
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Não coletamos intencionalmente dados de menores de 18 anos</li>
+                  <li>Menores devem ter autorização de responsável legal</li>
+                  <li>Responsáveis podem solicitar exclusão de dados de menores</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  9.2 Responsabilidade
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Pais/responsáveis são responsáveis por menores em sua conta</li>
+                  <li>Devem supervisionar uso da plataforma por menores</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              10. ALTERAÇÕES NA POLÍTICA
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  10.1 Modificações
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Política pode ser atualizada periodicamente</li>
+                  <li>Alterações significativas serão comunicadas</li>
+                  <li>Versão atual sempre disponível na plataforma</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  10.2 Notificação de Mudanças
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>E-mail:</strong> Para mudanças significativas</li>
+                  <li><strong>Plataforma:</strong> Banner ou popup informativo</li>
+                  <li><strong>Prazo:</strong> 30 dias de antecedência para mudanças importantes</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              11. RESPONSABILIDADE E LIMITAÇÕES
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  11.1 Responsabilidade do Agendei
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Implementamos medidas de segurança adequadas para o nível de dados tratados</li>
+                  <li>Monitoramos o funcionamento da plataforma</li>
+                  <li>Notificamos sobre problemas de segurança quando aplicável</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  11.2 Limitações
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Não somos responsáveis por ações de terceiros</li>
+                  <li>Usuários são responsáveis por manter senhas seguras</li>
+                  <li>Não garantimos disponibilidade absoluta da plataforma</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              12. VIOLAÇÃO DE DADOS
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  12.1 O que é uma Violação
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Acesso não autorizado a dados pessoais</li>
+                  <li>Alteração, destruição ou perda de dados</li>
+                  <li>Divulgação não autorizada de dados</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  12.2 Nossa Resposta
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Investigação imediata do incidente</li>
+                  <li>Notificação às autoridades competentes (quando necessário)</li>
+                  <li>Comunicação aos titulares afetados (quando aplicável)</li>
+                  <li>Implementação de medidas corretivas</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              13. CONTATO E DÚVIDAS
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  13.1 Contato Principal
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>E-mail:</strong> contato@agendei.com.br</li>
+                  <li><strong>Horário:</strong> Segunda a sexta, 9h às 18h</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  13.2 Outros Contatos
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Suporte:</strong> contato@agendei.com.br</li>
+                  <li><strong>Reclamações:</strong> contato@agendei.com.br</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              14. LEGISLAÇÃO APLICÁVEL
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  14.1 Leis Aplicáveis
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</li>
+                  <li>Marco Civil da Internet (Lei nº 12.965/2014)</li>
+                  <li>Código de Defesa do Consumidor (Lei nº 8.078/1990)</li>
+                  <li>Demais legislações aplicáveis</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  14.2 Autoridade de Controle
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Autoridade Nacional de Proteção de Dados (ANPD)</li>
+                  <li>Procon (para questões consumeristas)</li>
+                  <li>Demais autoridades competentes</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
+              15. DISPOSIÇÕES FINAIS
+            </h2>
+            <div className="space-y-5 text-gray-700">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  15.1 Interpretação
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Esta política deve ser interpretada em conjunto com os Termos de Uso</li>
+                  <li>Em caso de conflito, prevalece a legislação aplicável</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  15.2 Vigência
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Política entra em vigor na data de publicação</li>
+                  <li>Versões anteriores ficam arquivadas para consulta</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                  15.3 Idioma
+                </h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Política redigida em português brasileiro</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <div className="space-y-4 text-gray-700">
-              <p>
-                Implementamos medidas técnicas e organizacionais para proteger suas informações contra acesso não autorizado, perda ou alteração. No entanto, nenhum sistema é completamente seguro, e não podemos garantir a segurança absoluta de suas informações.
+              <p className="font-semibold text-lg text-purple-800">
+                Ao utilizar a plataforma Agendei, você declara ter lido, compreendido e aceito integralmente esta Política de Privacidade.
               </p>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
-            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              7. Retenção de Dados
-            </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>
-                Mantemos suas informações pelo tempo necessário para fornecer nossos Serviços e cumprir obrigações legais. Quando não houver mais necessidade legítima de processamento, excluiremos ou anonimizaremos suas informações.
-              </p>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
-            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              8. Crianças
-            </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>
-                Nossos Serviços não são destinados a menores de 18 anos. Não coletamos intencionalmente informações de crianças. Se soubermos que coletamos informações de um menor, tomaremos medidas para excluí-las.
-              </p>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
-            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              9. Alterações nesta Política
-            </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>
-                Podemos atualizar esta política periodicamente. Notificaremos você sobre alterações significativas por e-mail ou por meio de nossos Serviços. A data de "Última atualização" no topo indica quando a política foi revisada pela última vez.
-              </p>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
-            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              10. Contato
-            </h2>
-            <div className="space-y-4 text-gray-700">
-              <p>
-                Se você tiver dúvidas ou preocupações, pode enviar email para{" "}
-                <a href="mailto:agendei@suporte.com.br" className="text-purple-600 font-medium hover:underline">
-                  agendei@suporte.com.br
-                </a>
-              </p>
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p><strong>Data de vigência:</strong> Janeiro de 2025</p>
+                <p><strong>Versão:</strong> 1.0</p>
+              </div>
             </div>
           </section>
         </div>

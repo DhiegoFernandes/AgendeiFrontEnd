@@ -1,6 +1,10 @@
-import { useState } from "react";
-import ComercioImg from "../../assets/salaoTres.png";
+import { useEffect, useState, useRef } from "react";
 import { FaCut } from "react-icons/fa";
+import { useLocation, useNavigate } from "react-router-dom";
+import api from "../../services/api";
+import { buscarFotosNegocio, buscarImagemFoto, construirUrlFoto } from "../../services/fotoService";
+import type { FotoNegocio } from "../../types/user";
+import ClientNavbar from "../../components/ClientNavbar";
 
 const categorias = [
   { tag: "todos", nome: "Todos" },
@@ -10,59 +14,191 @@ const categorias = [
   { tag: "combos", nome: "Combos" },
 ];
 
-const servicosDemo = [
-  {
-    nome: "Corte Masculino", desc: "Corte tradicional com tesoura e máquina", categoria: "cortes", tempo: "30 min", preco: 45,
-  },
-  {
-    nome: "Corte Degradê", desc: "Transição suave entre diferentes comprimentos", categoria: "cortes", tempo: "40 min", preco: 55,
-  },
-  {
-    nome: "Corte Navalhado", desc: "Acabamento com navalha para maior definição", categoria: "cortes", tempo: "45 min", preco: 60,
-  },
-  {
-    nome: "Corte Infantil", desc: "Para crianças até 12 anos", categoria: "cortes", tempo: "25 min", preco: 35,
-  },
-  {
-    nome: "Barba Completa", desc: "Aparar + modelar + toalha quente", categoria: "barbas", tempo: "25 min", preco: 35,
-  },
-  {
-    nome: "Corte + Barba", desc: "Combo completo com acabamento", categoria: "combos", tempo: "60 min", preco: 70,
-  },
-];
+// Interface para os dados do negócio
+interface NegocioData {
+  id: number;
+  nome: string;
+  endereco: string;
+  numero: string;
+  cep: string;
+  categoria: string;
+  ativo: boolean;
+  notaMedia: number;
+}
 
-// ENDEREÇO DO CABELEIREIRO DA SUA DEMO
-const ENDERECO_DESTINO = "Av. Paulista, 1000, São Paulo";
+// Interface para os serviços
+interface ServicoData {
+  id: number;
+  titulo: string;
+  descricao: string;
+  valor: number;
+  duracaoMinutos: number;
+  ativo: boolean;
+  prestadorId: number;
+  nomePrestador: string;
+  negocioId: number;
+  fotoPrestadorUrl: string;
+}
 
-// ==========================================
-// SUBSTITUA ESTA CHAVE PELA SUA PRÓPRIA CHAVE DE API DO GOOGLE MAPS
-// ==========================================
-const GOOGLE_MAPS_API_KEY = "SUA_CHAVE_DE_API_AQUI";
-// ==========================================
+// Função para formatar endereço completo
+function formatarEndereco(endereco: string, numero: string, cep: string): string {
+  const partes = [endereco, numero, cep].filter(Boolean);
+  return partes.join(", ");
+}
 
 export default function EscolherServico() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const negocioId = location.state?.negocioId as number | undefined;
+  
   const [categoria, setCategoria] = useState("todos");
   const [servicoSel, setServicoSel] = useState<number | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [busca, setBusca] = useState("");
   const [distancia, setDistancia] = useState<string | null>(null);
   const [tempo, setTempo] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [mapUrl, setMapUrl] = useState("");
   
-  const servicosFiltrados = servicosDemo.filter(
-    s => categoria === "todos" || s.categoria === categoria
-  );
+  // Estados para dados da API
+  const [negocio, setNegocio] = useState<NegocioData | null>(null);
+  const [servicos, setServicos] = useState<ServicoData[]>([]);
+  const [carregandoDados, setCarregandoDados] = useState(true);
+  
+  // Estados para foto do negócio
+  const [fotoNegocio, setFotoNegocio] = useState<string | null>(null);
+  const [carregandoFoto, setCarregandoFoto] = useState(true);
+  const fotoNegocioRef = useRef<string | null>(null);
+  
+  // Carregar dados do negócio e serviços
+  useEffect(() => {
+    async function carregarDados() {
+      if (!negocioId) {
+        setErro("ID do negócio não encontrado. Redirecionando...");
+        setTimeout(() => navigate("/cliente/comercios"), 2000);
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErro("Token não encontrado. Redirecionando...");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
+      }
+
+      try {
+        setCarregandoDados(true);
+        
+        // Primeira requisição: dados do negócio
+        const negocioResponse = await api.get(`/negocios/${negocioId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+        
+        setNegocio(negocioResponse.data);
+        
+        // Segunda requisição: serviços do negócio
+        const servicosResponse = await api.get(`/servicos/negocio/${negocioId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+        
+        // Filtrar apenas serviços ativos
+        const servicosAtivos = servicosResponse.data.filter((s: ServicoData) => s.ativo);
+        setServicos(servicosAtivos);
+        
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        setErro("Erro ao carregar dados do negócio. Tente novamente.");
+      } finally {
+        setCarregandoDados(false);
+      }
+    }
+
+    carregarDados();
+  }, [negocioId, navigate]);
+
+  // Carregar primeira foto do negócio
+  useEffect(() => {
+    async function carregarPrimeiraFoto() {
+      if (!negocioId) {
+        setCarregandoFoto(false);
+        return;
+      }
+
+      setCarregandoFoto(true);
+      setFotoNegocio(null);
+
+      try {
+        // Buscar lista de fotos
+        const fotosLista = await buscarFotosNegocio(negocioId);
+
+        if (fotosLista.length === 0) {
+          setCarregandoFoto(false);
+          return;
+        }
+
+        // Pegar a primeira foto
+        const primeiraFoto: FotoNegocio = fotosLista[0];
+
+        try {
+          // Buscar a imagem em blob
+          const blob = await buscarImagemFoto(negocioId, primeiraFoto.id);
+          const url = URL.createObjectURL(blob);
+          fotoNegocioRef.current = url;
+          setFotoNegocio(url);
+        } catch (error) {
+          console.error(`Erro ao carregar foto ${primeiraFoto.id}:`, error);
+          // Se falhar, usar a URL direta
+          const urlDireta = construirUrlFoto(primeiraFoto);
+          fotoNegocioRef.current = urlDireta;
+          setFotoNegocio(urlDireta);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar fotos do negócio:", error);
+        // Em caso de erro, não exibir foto (será mostrado placeholder)
+      } finally {
+        setCarregandoFoto(false);
+      }
+    }
+
+    carregarPrimeiraFoto();
+
+    // Cleanup: revogar URL do blob quando o componente desmontar ou negocioId mudar
+    return () => {
+      if (fotoNegocioRef.current && fotoNegocioRef.current.startsWith("blob:")) {
+        URL.revokeObjectURL(fotoNegocioRef.current);
+        fotoNegocioRef.current = null;
+      }
+    };
+  }, [negocioId]);
+  
+  const servicosFiltrados = servicos.filter(s => {
+    const matchCategoria = categoria === "todos" || true; // Remover filtro de categoria por enquanto, já que a API não retorna categoria
+    const matchBusca = !busca || 
+      s.titulo.toLowerCase().includes(busca.toLowerCase()) ||
+      s.descricao.toLowerCase().includes(busca.toLowerCase()) ||
+      s.nomePrestador.toLowerCase().includes(busca.toLowerCase());
+    return matchCategoria && matchBusca;
+  });
 
   async function handleVerMapa() {
+    if (!negocio) return;
+    
     setShowMap(true);
     setCarregando(true);
     setDistancia(null);
     setTempo(null);
     setErro(null);
     
-    // Sempre mostramos o mapa estático do endereço
-    const encodedAddress = encodeURIComponent(ENDERECO_DESTINO);
+    // Montar endereço completo do negócio
+    const enderecoCompleto = formatarEndereco(negocio.endereco, negocio.numero, negocio.cep);
+    const encodedAddress = encodeURIComponent(enderecoCompleto);
     setMapUrl(`https://www.google.com/maps?q=${encodedAddress}&output=embed`);
     
     if (navigator.geolocation) {
@@ -74,7 +210,8 @@ export default function EscolherServico() {
           try {
             // Tentar calcular distância usando a Distance Matrix API via proxy
             const origem = `${latitude},${longitude}`;
-            const destino = encodeURIComponent(ENDERECO_DESTINO);
+            const enderecoCompleto = negocio ? formatarEndereco(negocio.endereco, negocio.numero, negocio.cep) : "";
+            const destino = encodeURIComponent(enderecoCompleto);
             
             // Configuramos um URL padrão de direções
             setMapUrl(`https://www.google.com/maps?saddr=${origem}&daddr=${destino}&output=embed`);
@@ -126,89 +263,137 @@ export default function EscolherServico() {
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-24">
+      <ClientNavbar />
       {/* Cabeçalho */}
-      <header className="w-full bg-gradient-to-r from-purple-600 to-purple-400 py-4 px-8 flex items-center justify-between sticky top-0 z-20 shadow">
-        <h1 className="text-white font-bold text-xl">Escolher Serviços</h1>
-        <button className="text-2xl text-white opacity-70 hover:opacity-100 transition" title="Calendário">
-          <FaCut size={22} />
-        </button>
-      </header>
 
       {/* Card do barbeiro/comércio */}
       <section className="max-w-2xl mx-auto -mt-8 mt-3">
-        <div className="flex items-center bg-white rounded-2xl shadow-lg px-6 py-4 mt-8 gap-4 md:gap-6">
-          <img src={ComercioImg} alt="Imagem do comercio" className="w-16 h-16 object-cover rounded-xl border shadow bg-gray-50" />
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">Barbearia Estilo</h2>
-            <div className="flex items-center gap-2 flex-wrap text-sm text-gray-500 font-medium">
-              <span className="text-yellow-500 text-base">★ 4.9</span>
-              <span className="opacity-70">· Av. Paulista, 1000</span>
-            </div>
+        {carregandoDados ? (
+          <div className="flex items-center justify-center bg-white rounded-2xl shadow-lg px-6 py-8 mt-8">
+            <p className="text-gray-500">Carregando dados do negócio...</p>
           </div>
-          <button
-            onClick={handleVerMapa}
-            className="ml-auto px-4 py-2 font-semibold text-purple-600 border border-purple-300 rounded-lg shadow-sm hover:bg-purple-50 transition text-[16px] self-start"
-          >
-            Ver mapa
-          </button>
-        </div>
+        ) : negocio ? (
+          <div className="flex items-center bg-white rounded-2xl shadow-lg px-6 py-4 mt-8 gap-4 md:gap-6">
+            {carregandoFoto ? (
+              <div className="w-16 h-16 rounded-xl border shadow bg-gray-200 flex items-center justify-center">
+                <div className="text-gray-400 text-xs">Carregando...</div>
+              </div>
+            ) : fotoNegocio ? (
+              <img 
+                src={fotoNegocio} 
+                alt={`Imagem de ${negocio.nome}`} 
+                className="w-16 h-16 object-cover rounded-xl border shadow bg-gray-50"
+                onError={(e) => {
+                  // Fallback caso a imagem não carregue
+                  (e.target as HTMLImageElement).src =
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EImagem indisponível%3C/text%3E%3C/svg%3E";
+                }}
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-xl border shadow bg-gray-200 flex items-center justify-center">
+                <div className="text-gray-400 text-xs text-center px-1">Imagem indisponível</div>
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900">{negocio.nome}</h2>
+              <div className="flex items-center gap-2 flex-wrap text-sm text-gray-500 font-medium">
+                <span className="text-yellow-500 text-base">★ {negocio.notaMedia !== null && negocio.notaMedia !== undefined ? negocio.notaMedia.toFixed(1) : "N/A"}</span>
+                <span className="opacity-70">· {formatarEndereco(negocio.endereco, negocio.numero, negocio.cep)}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleVerMapa}
+              className="ml-auto px-4 py-2 font-semibold text-purple-600 border border-purple-300 rounded-lg shadow-sm hover:bg-purple-50 transition text-[16px] self-start"
+            >
+              Ver mapa
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center bg-white rounded-2xl shadow-lg px-6 py-8 mt-8">
+            <p className="text-red-500">{erro || "Erro ao carregar dados do negócio"}</p>
+          </div>
+        )}
       </section>
 
-      {/* Tabs de categorias */}
+      {/* Barra de pesquisa */}
       <nav className="w-full bg-white border-t border-b border-gray-100 sticky top-[60px] z-10 mt-6 shadow">
-        <div className="max-w-2xl mx-auto px-2 py-4 flex gap-2 overflow-x-auto">
-          {categorias.map(cat => (
-            <button
-              key={cat.tag}
-              onClick={() => setCategoria(cat.tag)}
-              className={`px-5 py-2 font-bold rounded-full transition
-                ${
-                  categoria === cat.tag
-                    ? "bg-purple-600 shadow text-white"
-                    : "bg-purple-50 text-purple-600 hover:bg-purple-100"
-                }
-              `}
-            >
-              {cat.nome}
-            </button>
-          ))}
+        <div className="max-w-2xl mx-auto px-4 py-4">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Buscar serviços..."
+              className="w-full py-2 pl-4 pr-20 rounded-full border border-gray-300 bg-gray-100 text-base shadow-md focus:outline-none focus:ring-2 focus:ring-purple-200 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+              value={busca}
+              onChange={e => setBusca(e.target.value)}
+            />
+            {/* Botão de limpar pesquisa (X) */}
+            {busca && (
+              <button
+                onClick={() => setBusca("")}
+                className="absolute right-12 top-1/2 -translate-y-1/2 text-orange-500 hover:text-orange-600 transition cursor-pointer"
+                aria-label="Limpar pesquisa"
+              >
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+            {/* Ícone de lupa */}
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-purple-400">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8.5" stroke="currentColor" strokeWidth="2"/>
+                <path d="M21 21l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </span>
+          </div>
         </div>
       </nav>
 
       {/* Lista de serviços */}
       <main className="max-w-2xl mx-auto py-8 px-3">
         <h3 className="text-xl font-bold mb-4">Serviços disponíveis</h3>
-        <div className="flex flex-col gap-6">
-          {servicosFiltrados.map((s, idx) => (
-            <label
-              key={idx}
-              className={`flex items-center px-6 py-5 rounded-2xl shadow-sm bg-white cursor-pointer border-2 transition-all
-                ${servicoSel === idx ? "border-purple-500 bg-purple-50" : "border-white hover:border-purple-300"}
-              `}
-            >
-              <input
-                type="radio"
-                checked={servicoSel === idx}
-                onChange={() => setServicoSel(idx)}
-                className="sr-only"
-                name="servico"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex gap-2 items-center">
-                  <span className={`font-bold text-lg text-gray-900 ${servicoSel === idx ? "text-purple-700" : ""}`}>{s.nome}</span>
+        {carregandoDados ? (
+          <div className="text-center text-gray-400 py-12">
+            Carregando serviços...
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {servicosFiltrados.map((s) => (
+              <label
+                key={s.id}
+                className={`flex items-center px-6 py-5 rounded-2xl shadow-sm bg-white cursor-pointer border-2 transition-all
+                  ${servicoSel === s.id ? "border-purple-500 bg-purple-50" : "border-white hover:border-purple-300"}
+                `}
+              >
+                <input
+                  type="radio"
+                  checked={servicoSel === s.id}
+                  onChange={() => setServicoSel(s.id)}
+                  className="sr-only"
+                  name="servico"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex gap-2 items-center">
+                    <span className={`font-bold text-lg text-gray-900 ${servicoSel === s.id ? "text-purple-700" : ""}`}>{s.titulo}</span>
+                  </div>
+                  <p className="text-gray-500 mt-1 mb-2 font-medium">{s.descricao}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block bg-indigo-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">{s.duracaoMinutos} min</span>
+                    {s.nomePrestador && (
+                      <span className="text-xs text-gray-500">por {s.nomePrestador}</span>
+                    )}
+                  </div>
                 </div>
-                <p className="text-gray-500 mt-1 mb-2 font-medium">{s.desc}</p>
-                <span className="inline-block bg-indigo-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">{s.tempo}</span>
+                <span className="font-bold text-lg text-purple-800 min-w-[80px] text-right">{`R$ ${s.valor.toFixed(2)}`}</span>
+              </label>
+            ))}
+            {servicosFiltrados.length === 0 && (
+              <div className="text-center text-gray-400 py-12">
+                Nenhum serviço disponível.
               </div>
-              <span className="font-bold text-lg text-purple-800 min-w-[80px] text-right">{`R$ ${s.preco.toFixed(2)}`}</span>
-            </label>
-          ))}
-          {servicosFiltrados.length === 0 && (
-            <div className="text-center text-gray-400 py-12">
-              Nenhum serviço nesta categoria.
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Botão fixo "Continuar" */}
@@ -220,13 +405,30 @@ export default function EscolherServico() {
           disabled={servicoSel === null}
           onClick={() => {
             if (servicoSel !== null) {
-              const s = servicosFiltrados[servicoSel];
-              alert(`Você selecionou: ${s.nome} - ${s.tempo} - R$${s.preco.toFixed(2)}`);
+              const servicoSelecionado = servicos.find(s => s.id === servicoSel);
+              if (servicoSelecionado) {
+                // Navegar para a página de agendar horário passando os dados necessários
+                navigate("/cliente/agendar-horario", {
+                  state: {
+                    servicoId: servicoSelecionado.id,
+                    negocioId: negocioId,
+                    servicoNome: servicoSelecionado.titulo,
+                    servicoValor: servicoSelecionado.valor,
+                    servicoDuracao: servicoSelecionado.duracaoMinutos,
+                    nomePrestador: servicoSelecionado.nomePrestador
+                  }
+                });
+              }
             }
           }}
         >
           {servicoSel !== null
-            ? `Continuar - ${servicosFiltrados[servicoSel].nome} (R$ ${servicosFiltrados[servicoSel].preco.toFixed(2)})`
+            ? (() => {
+                const servicoSelecionado = servicos.find(s => s.id === servicoSel);
+                return servicoSelecionado 
+                  ? `Continuar - ${servicoSelecionado.titulo} (R$ ${servicoSelecionado.valor.toFixed(2)})`
+                  : "Continuar";
+              })()
             : "Continuar"}
         </button>
       </footer>
@@ -243,7 +445,9 @@ export default function EscolherServico() {
             </button>
             
             <div className="p-4">
-              <h2 className="text-xl font-bold text-purple-700 mb-2">Localização da ...</h2>
+              <h2 className="text-xl font-bold text-purple-700 mb-2">
+                Localização {negocio ? `de ${negocio.nome}` : "do negócio"}
+              </h2>
             </div>
             
             {/* Mapa do Google - Usando iframe padrão */}
@@ -261,14 +465,16 @@ export default function EscolherServico() {
             </div>
             
             <div className="p-4 flex justify-center">
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ENDERECO_DESTINO)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-3 bg-purple-600 text-white rounded-lg font-bold shadow hover:bg-purple-700 transition"
-              >
-                Abrir no Google Maps
-              </a>
+              {negocio && (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatarEndereco(negocio.endereco, negocio.numero, negocio.cep))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-3 bg-purple-600 text-white rounded-lg font-bold shadow hover:bg-purple-700 transition"
+                >
+                  Abrir no Google Maps
+                </a>
+              )}
             </div>
           </div>
         </div>

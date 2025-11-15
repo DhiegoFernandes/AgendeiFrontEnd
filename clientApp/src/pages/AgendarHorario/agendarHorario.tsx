@@ -1,19 +1,34 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { format, formatISO, isToday, addMinutes, setHours, setMinutes, isBefore } from "date-fns";
+import { useNavigate, useLocation } from "react-router-dom";
+import { format, formatISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import salaoDois from "../../assets/salaoDois.png"
 import { HiOutlineCalendar, HiOutlineClock, HiOutlineCheck, HiOutlineX } from "react-icons/hi";
+import api from "../../services/api";
+import ClientNavbar from "../../components/ClientNavbar";
 
-// Configurações de funcionamento
-const HORARIO_INICIO = 9; // 9h
-const HORARIO_FIM = 18; // 18h
-const INTERVALO_MINUTOS = 30; // 30 minutos entre horários
+// Interface para os horários disponíveis da API
+interface HorariosDisponiveis {
+  servicoId: number;
+  diasDisponiveis: {
+    dia: string;
+    horarios: string[];
+  }[];
+}
 
 export default function AgendarHorario() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Dados vindos da navegação
+  const servicoId = location.state?.servicoId as number | undefined;
+  const negocioId = location.state?.negocioId as number | undefined;
+  const servicoNome = location.state?.servicoNome as string | undefined;
+  const servicoValor = location.state?.servicoValor as number | undefined;
+  const servicoDuracao = location.state?.servicoDuracao as number | undefined;
+  
   const [data, setData] = useState<Date>(new Date());
   const [horarios, setHorarios] = useState<string[]>([]);
   const [hora, setHora] = useState<string | null>(null);
@@ -21,122 +36,158 @@ export default function AgendarHorario() {
   const [erroHorarios, setErroHorarios] = useState<string | null>(null);
   const [showConfirmacao, setShowConfirmacao] = useState(false);
   
-  // Dados do profissional e serviço - Em uma aplicação real, esses dados viriam de uma API ou context
-  // TODO: Substituir por dados da API de profissionais e serviços
-  const profissional = {
-    nome: "Ricardo Almeida",
-    nota: 4.8,
-    funcao: "Cabeleireiro",
-    salao: "Salão Beleza Total",
-    servico: "Corte Masculino",
-    preco: 45,
-    duracao: 30,
-  };
-
-  // Gerar horários sempre que a data muda
+  // Validar se servicoId foi passado
   useEffect(() => {
-    function gerarHorarios() {
+    if (!servicoId) {
+      setErroHorarios("Serviço não selecionado. Redirecionando...");
+      setTimeout(() => navigate("/cliente/escolher-servico", { state: { negocioId } }), 2000);
+    }
+  }, [servicoId, negocioId, navigate]);
+  
+  // Dados do negócio e prestador (serão buscados da API)
+  const [negocioNome, setNegocioNome] = useState<string>("");
+  const [prestadorNome, setPrestadorNome] = useState<string>(location.state?.nomePrestador || "");
+  const [notaMedia, setNotaMedia] = useState<number | null>(null);
+
+  // Buscar dados do negócio ao carregar
+  useEffect(() => {
+    async function carregarDadosNegocio() {
+      if (!negocioId) {
+        setErroHorarios("ID do negócio não encontrado. Redirecionando...");
+        setTimeout(() => navigate("/cliente/comercios"), 2000);
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErroHorarios("Token não encontrado. Redirecionando...");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
+      }
+
+      try {
+        const response = await api.get(`/negocios/${negocioId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        setNegocioNome(response.data.nome || "");
+        setNotaMedia(response.data.notaMedia || null);
+      } catch (error) {
+        console.error("Erro ao carregar dados do negócio:", error);
+      }
+    }
+
+    carregarDadosNegocio();
+  }, [negocioId, navigate]);
+
+  // Buscar horários disponíveis sempre que a data ou serviço mudar
+  useEffect(() => {
+    async function buscarHorariosDisponiveis() {
+      if (!servicoId) {
+        setHorarios([]);
+        return;
+      }
+
       setLoadingHorarios(true);
       setErroHorarios(null);
       setHora(null);
 
-      // Domingo: fecha
-      if (data.getDay() === 0) {
-        setHorarios([]);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErroHorarios("Token não encontrado");
         setLoadingHorarios(false);
         return;
       }
 
       try {
-        // TODO: Substituir esta lógica pela chamada à API de horários disponíveis
-        // const response = await fetch(`/api/horarios?profissional=${profissionalId}&data=${formattedDate}`);
-        // const horariosDisponiveis = await response.json();
-
-        // Enquanto não temos a API, gerar horários das 9h às 18h com intervalos de 30 minutos
-        const horariosDisponiveis: string[] = [];
-        const agora = new Date();
-        const diaAtual = isToday(data);
-
-        // Hora de início do dia
-        let horarioAtual = setHours(setMinutes(new Date(data), 0), HORARIO_INICIO);
+        const dataFormatada = format(data, "yyyy-MM-dd");
+        const url = `/servicos/${servicoId}/horarios-disponiveis-data?data=${dataFormatada}`;
         
-        // Hora de término do dia
-        const horarioFim = setHours(setMinutes(new Date(data), 0), HORARIO_FIM);
+        const response = await api.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        const dados: HorariosDisponiveis = response.data;
         
-        // Gerar horários em intervalos
-        while (isBefore(horarioAtual, horarioFim)) {
-          // Se for o dia atual, só mostrar horários futuros
-          if (!diaAtual || (diaAtual && isBefore(agora, horarioAtual))) {
-            horariosDisponiveis.push(format(horarioAtual, "HH:mm"));
-          }
-          
-          // Avança para o próximo horário
-          horarioAtual = addMinutes(horarioAtual, INTERVALO_MINUTOS);
+        // A API já retorna os horários para a data específica consultada
+        if (dados.diasDisponiveis && dados.diasDisponiveis.length > 0) {
+          const horariosDisponiveis = dados.diasDisponiveis[0].horarios;
+          setHorarios(horariosDisponiveis);
+        } else {
+          setHorarios([]);
         }
-
-        // Simular horários já agendados (para demonstração)
-        // TODO: Remover essa lógica quando integrar com a API real
-        const horariosFinais = horariosDisponiveis.filter(() => Math.random() > 0.3);
-        
-        setHorarios(horariosFinais);
-      } catch (e) {
+      } catch (error: any) {
+        console.error("Erro ao buscar horários disponíveis:", error);
+        setErroHorarios("Erro ao buscar horários disponíveis");
         setHorarios([]);
-        setErroHorarios("Não foi possível gerar horários.");
+      } finally {
+        setLoadingHorarios(false);
       }
-      setLoadingHorarios(false);
     }
-    
-    // Pequeno atraso para simular carregamento
-    const timeout = setTimeout(() => {
-      gerarHorarios();
-    }, 300);
 
-    return () => clearTimeout(timeout);
-  }, [data]);
+    buscarHorariosDisponiveis();
+  }, [data, servicoId]);
 
   // Função para confirmar o agendamento
   async function handleAgendar() {
-    try {
-      // TODO: Substituir por chamada à API de agendamento
-      // const response = await fetch('/api/agendamentos', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     profissionalId: profissional.id,
-      //     servicoId: profissional.servicoId,
-      //     data: formatISO(data),
-      //     hora: hora
-      //   })
-      // });
-      
-      // Simular um tempo de resposta do servidor
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Fechamos o modal e redirecionamos para outra página
+    if (!servicoId) {
+      setErroHorarios("Serviço não selecionado. Por favor, volte e selecione um serviço.");
       setShowConfirmacao(false);
+      return;
+    }
+
+    if (!hora) {
+      setErroHorarios("Por favor, selecione um horário.");
+      setShowConfirmacao(false);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setErroHorarios("Token não encontrado. Por favor, faça login novamente.");
+      setShowConfirmacao(false);
+      return;
+    }
+
+    try {
+      // Combinar data e hora selecionados
+      const dataFormatada = format(data, "yyyy-MM-dd");
+      const dataHoraCompleta = `${dataFormatada}T${hora}:00`;
       
-      // TODO: Redirecionar para página de sucesso ou histórico de agendamentos
-      navigate("/agendamentoconcluido");
-    } catch (error) {
+      console.log("Criando agendamento:", { servicoId, dataHora: dataHoraCompleta });
+      
+      // Requisição POST para criar o agendamento
+      await api.post("/agendamentos", {
+        servicoId: servicoId,
+        dataHora: dataHoraCompleta
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      
+      // Fechamos o modal e redirecionamos
+      setShowConfirmacao(false);
+      navigate("/cliente/agendamento");
+    } catch (error: any) {
       console.error("Erro ao realizar agendamento:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Erro ao confirmar agendamento. Tente novamente.";
+      setErroHorarios(errorMessage);
+      setShowConfirmacao(false);
     }
   }
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-24">
+      <ClientNavbar />
       {/* TOPBAR GRADIENTE */}
-      <header className="w-full bg-gradient-to-r from-purple-600 to-purple-400 py-4 px-8 flex items-center justify-between sticky top-0 z-20 shadow">
-        <button onClick={() => navigate(-1)} className="mr-2 text-2xl text-white font-bold hover:opacity-80">
-          &#8592;
-        </button>
-        <h2 className="text-white font-bold text-2xl text-center flex-1">Agendar Horário</h2>
-        <button className="text-2xl text-white opacity-80 hover:opacity-100 transition">
-          <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-            <rect x="4" y="5" width="16" height="16" rx="4" fill="#fff" opacity=".3"/>
-            <rect x="7" y="8" width="10" height="10" rx="2" fill="#fff"/>
-          </svg>
-        </button>
-      </header>
 
       {/* CARD PROFISSIONAL */}
       <section className="max-w-2xl mx-auto mt-8 flex flex-col gap-6 px-4">
@@ -148,19 +199,23 @@ export default function AgendarHorario() {
               className="w-20 h-20 object-cover rounded-xl border bg-gray-50"
             />
             <div className="flex flex-col flex-1">
-              <h3 className="font-extrabold text-2xl text-gray-900">{profissional.nome}</h3>
+              <h3 className="font-extrabold text-2xl text-gray-900">{prestadorNome || "Prestador"}</h3>
               <p className="text-gray-600 flex items-center gap-2 font-semibold mt-1">
-                <span className="text-yellow-500 text-lg">★ {profissional.nota}</span>
-                {profissional.funcao} · {profissional.salao}
+                {notaMedia !== null && notaMedia !== undefined && (
+                  <span className="text-yellow-500 text-lg">★ {notaMedia.toFixed(1)}</span>
+                )}
+                {negocioNome && <span>{negocioNome}</span>}
               </p>
-              <p className="text-gray-700 mt-1">
-                {profissional.servico} — R$ {profissional.preco.toFixed(2)} · {profissional.duracao} min
-              </p>
+              {servicoNome && servicoValor && servicoDuracao && (
+                <p className="text-gray-700 mt-1">
+                  {servicoNome} — R$ {servicoValor.toFixed(2)} · {servicoDuracao} min
+                </p>
+              )}
             </div>
           </div>
           <button
             className="ml-0 md:ml-4 px-4 py-2 font-bold text-purple-600 border-2 border-purple-200 bg-white rounded-lg shadow hover:bg-purple-50 transition whitespace-nowrap mt-4 md:mt-0"
-            onClick={() => navigate("/cliente/escolher-servico")}
+            onClick={() => navigate("/cliente/escolher-servico", { state: { negocioId } })}
           >
             Trocar serviço
           </button>
@@ -169,22 +224,26 @@ export default function AgendarHorario() {
         {/* CARD CALENDÁRIO */}
         <div className="bg-white mt-2 rounded-2xl shadow px-8 py-6">
           <label className="block font-bold text-lg mb-4">Selecione uma data</label>
-          <DayPicker
-            mode="single"
-            selected={data}
-            onSelect={d => d && setData(d)}
-            locale={ptBR}
-            weekStartsOn={0}
-            fromDate={new Date()}
-            modifiersClassNames={{
-              selected: "bg-purple-500 text-white !rounded-lg",
-              today: "text-purple-600 font-bold",
-            }}
-            className="w-full max-w-md"
-            classNames={{
-              head_row: "text-gray-500 font-bold",
-            }}
-          />
+          <div className="flex justify-center items-center">
+            <DayPicker
+              mode="single"
+              selected={data}
+              onSelect={d => d && setData(d)}
+              locale={ptBR}
+              weekStartsOn={0}
+              fromDate={new Date()}
+              modifiersClassNames={{
+                selected: "bg-purple-500 text-white !rounded-lg",
+                today: "text-purple-600 font-bold",
+              }}
+              className="mx-auto"
+              classNames={{
+                head_row: "text-gray-500 font-bold",
+                month: "mx-auto",
+                caption: "flex justify-center",
+              }}
+            />
+          </div>
         </div>
 
         {/* CARD horários */}
@@ -229,8 +288,12 @@ export default function AgendarHorario() {
         <div className="bg-white mt-2 rounded-2xl shadow px-8 py-6">
           <h3 className="font-extrabold text-xl mb-4">Resumo</h3>
           <div className="flex flex-col gap-2 text-base">
-            <span>Serviço: <span className="font-extrabold">{profissional.servico}</span></span>
-            <span>Profissional: <span className="font-extrabold">{profissional.nome}</span></span>
+            {servicoNome && (
+              <span>Serviço: <span className="font-extrabold">{servicoNome}</span></span>
+            )}
+            {prestadorNome && (
+              <span>Profissional: <span className="font-extrabold">{prestadorNome}</span></span>
+            )}
             <span>
               Data:{" "}
               <span className="font-extrabold">
@@ -243,12 +306,14 @@ export default function AgendarHorario() {
                 {hora || "—"}
               </span>
             </span>
-            <div className="flex justify-between mt-2 text-xl font-extrabold">
-              <span className="text-purple-700">Valor total:</span>
-              <span className="text-purple-700">
-                R$ {profissional.preco.toFixed(2)}
-              </span>
-            </div>
+            {servicoValor && (
+              <div className="flex justify-between mt-2 text-xl font-extrabold">
+                <span className="text-purple-700">Valor total:</span>
+                <span className="text-purple-700">
+                  R$ {servicoValor.toFixed(2)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -285,17 +350,21 @@ export default function AgendarHorario() {
                 <div className="p-2 bg-purple-100 rounded-full">
                   <img 
                     src={salaoDois} 
-                    alt={profissional.nome} 
+                    alt={prestadorNome || "Prestador"} 
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800">{profissional.servico}</h4>
-                  <p className="text-gray-600 text-sm">Com {profissional.nome}</p>
-                </div>
+                <h4 className="font-bold text-gray-800">{servicoNome || "Serviço"}</h4>
+                {prestadorNome && (
+                  <p className="text-gray-600 text-sm">Com {prestadorNome}</p>
+                )}
+              </div>
+              {servicoValor && (
                 <div className="ml-auto">
-                  <p className="font-bold text-purple-700">R$ {profissional.preco.toFixed(2)}</p>
+                  <p className="font-bold text-purple-700">R$ {servicoValor.toFixed(2)}</p>
                 </div>
+              )}
               </div>
               
               <div className="flex flex-col gap-2 text-sm">
