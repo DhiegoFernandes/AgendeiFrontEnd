@@ -9,8 +9,8 @@ type MetodoPagamento = "PIX" | "CARTAO" | "BOLETO";
 interface Plano {
   tipo: TipoPlano;
   nome: string;
-  valor: string;
-  valorNumero: number;
+  valorMensal: number;
+  valorAnual: number;
   descricao: string;
   features: string[];
 }
@@ -19,8 +19,8 @@ const PLANOS: Plano[] = [
   {
     tipo: "BASICO",
     nome: "Básico",
-    valor: "R$ 49,90",
-    valorNumero: 49.90,
+    valorMensal: 49.90,
+    valorAnual: 49.90 * 0.82,
     descricao: "Ideal para começar",
     features: [
       "Até 2 prestadores (incluindo o dono)",
@@ -32,8 +32,8 @@ const PLANOS: Plano[] = [
   {
     tipo: "INTERMEDIARIO",
     nome: "Intermediário",
-    valor: "R$ 79,90",
-    valorNumero: 79.90,
+    valorMensal: 79.90,
+    valorAnual: 79.90 * 0.82,
     descricao: "Para negócios em crescimento",
     features: [
       "Até 4 prestadores (incluindo o dono)",
@@ -46,8 +46,8 @@ const PLANOS: Plano[] = [
   {
     tipo: "AVANCADO",
     nome: "Avançado",
-    valor: "R$ 119,90",
-    valorNumero: 119.90,
+    valorMensal: 119.90,
+    valorAnual: 119.90 * 0.82,
     descricao: "Máxima performance",
     features: [
       "Até 6 prestadores (incluindo o dono)",
@@ -63,11 +63,13 @@ const PLANOS: Plano[] = [
 export default function AssinaturaPlano() {
   const navigate = useNavigate();
   const [planoSelecionado, setPlanoSelecionado] = useState<TipoPlano>("INTERMEDIARIO");
+  const [periodoAnual, setPeriodoAnual] = useState(false);
   const [metodoPagamento, setMetodoPagamento] = useState<MetodoPagamento>("PIX");
   const [processando, setProcessando] = useState(false);
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
 
   const plano = PLANOS.find(p => p.tipo === planoSelecionado)!;
+  const valorAtual = periodoAnual ? plano.valorAnual : plano.valorMensal;
 
   function handleConfirmarAssinatura() {
     setProcessando(true);
@@ -97,6 +99,35 @@ export default function AssinaturaPlano() {
           </p>
         </div>
 
+        {/* Toggle Período */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex items-center gap-3 bg-white rounded-full p-1 shadow-sm border border-gray-200">
+            <button
+              onClick={() => setPeriodoAnual(false)}
+              className={`px-6 py-2 rounded-full font-semibold transition-all cursor-pointer ${
+                !periodoAnual 
+                  ? "bg-purple-600 text-white shadow" 
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Mensal
+            </button>
+            <button
+              onClick={() => setPeriodoAnual(true)}
+              className={`px-6 py-2 rounded-full font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                periodoAnual 
+                  ? "bg-purple-600 text-white shadow" 
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Anual
+              <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                -18%
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Cards de Planos */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {PLANOS.map((p) => {
@@ -123,8 +154,15 @@ export default function AssinaturaPlano() {
                   <h3 className="text-xl font-bold text-purple-700 mb-2">{p.nome}</h3>
                   <p className="text-sm text-gray-500 mb-3">{p.descricao}</p>
                   <div className="mb-2">
-                    <span className="text-3xl font-extrabold text-purple-600">{p.valor}</span>
+                    <span className="text-3xl font-extrabold text-purple-600">
+                      R$ {(periodoAnual ? p.valorAnual : p.valorMensal).toFixed(2).replace('.', ',')}
+                    </span>
                     <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                    {periodoAnual && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        <span className="line-through">R$ {p.valorMensal.toFixed(2).replace('.', ',')}</span> /mês
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -302,7 +340,7 @@ export default function AssinaturaPlano() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Valor mensal:</span>
-              <span className="font-bold text-gray-800">{plano.valor}</span>
+              <span className="font-bold text-gray-800">R$ {valorAtual.toFixed(2).replace('.', ',')}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Método de pagamento:</span>
@@ -311,7 +349,7 @@ export default function AssinaturaPlano() {
             <div className="border-t pt-3 mt-3">
               <div className="flex justify-between">
                 <span className="text-lg font-bold text-gray-800">Total:</span>
-                <span className="text-2xl font-extrabold text-purple-600">{plano.valor}</span>
+                <span className="text-2xl font-extrabold text-purple-600">R$ {valorAtual.toFixed(2).replace('.', ',')}</span>
               </div>
             </div>
           </div>

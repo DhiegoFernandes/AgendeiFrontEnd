@@ -49,7 +49,7 @@ export default function EscolhaPrestador() {
   }
 
   function handleCriarNegocio() {
-    navigate("/prestador/assinatura");
+    navigate("/prestador/criar-negocio");
   }
 
   if (carregando) {

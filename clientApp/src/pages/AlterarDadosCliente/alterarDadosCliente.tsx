@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import ClientNavbar from "../../components/ClientNavbar";
 import api from "../../services/api";
@@ -26,13 +25,10 @@ export default function AlterarDadosCliente() {
   const [celular, setCelular] = useState("");
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirmaSenha, setConfirmaSenha] = useState("");
-  const [senhaVisivel, setSenhaVisivel] = useState(false);
-  const [confirmaVisivel, setConfirmaVisivel] = useState(false);
-  const [erroSenha, setErroSenha] = useState("");
+  const [numero, setNumero] = useState("");
   const [popup, setPopup] = useState<null | PopupType>(null);
   const [loading, setLoading] = useState(true);
+  const [salvando, setSalvando] = useState(false);
 
   const enderecoRef = useRef<HTMLInputElement>(null);
 
@@ -66,9 +62,9 @@ export default function AlterarDadosCliente() {
         const cepFormatado = formatarCep(userData.cep || "");
         setCep(cepFormatado);
         
-        // Combinar endereço e número
-        const enderecoCompleto = [userData.endereco, userData.numero].filter(Boolean).join(", ");
-        setEndereco(enderecoCompleto || "");
+        // Separar endereço e número
+        setEndereco(userData.endereco || "");
+        setNumero(userData.numero || "");
         
         console.log("Dados do usuário carregados:", userData);
       } catch (error) {
@@ -137,29 +133,62 @@ export default function AlterarDadosCliente() {
     }
   }
 
-  // Avaliação de senha igual
-  function checkSenha(s: string, c: string) {
-    if (s && c && s !== c) {
-      setErroSenha("As senhas não conferem");
-      return false;
-    }
-    setErroSenha("");
-    return true;
-  }
-
   // Botão submit
-  function onSalvar(e: React.FormEvent) {
+  async function onSalvar(e: React.FormEvent) {
     e.preventDefault();
-    if (!checkSenha(senha, confirmaSenha)) return;
+    
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPopup({
+        mensagem: "Erro: Token de autenticação não encontrado!",
+        soOk: true
+      });
+      return;
+    }
+
     setPopup({
       mensagem: "Deseja salvar as alterações?",
-      acaoSim: () => {
-        // Aqui faz a chamada para a API
-        setPopup({
-          mensagem: "Alterações salvas com sucesso!",
-          acaoSim: () => navigate("/perfilCliente"),
-          soOk: true // Aqui mostra só o botão Ok!
-        });
+      acaoSim: async () => {
+        setSalvando(true);
+        try {
+          // Remover formatação do telefone e CEP
+          const telefoneLimpo = celular.replace(/\D/g, "");
+          const cepLimpo = cep.replace(/\D/g, "");
+
+          const dataToPatch = {
+            nome,
+            email,
+            telefone: telefoneLimpo,
+            cep: cepLimpo,
+            endereco,
+            numero
+          };
+
+          await api.patch("/usuarios/cliente", dataToPatch, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          setPopup({
+            mensagem: "Alterações salvas com sucesso!",
+            acaoSim: () => navigate("/cliente/perfil"),
+            soOk: true
+          });
+        } catch (error: any) {
+          console.error("Erro ao atualizar dados:", error);
+          const errorMessage = error?.response?.data?.errorMessage || 
+                              error?.response?.data?.message || 
+                              error?.message || 
+                              "Erro ao atualizar dados. Tente novamente.";
+          setPopup({
+            mensagem: errorMessage,
+            soOk: true
+          });
+        } finally {
+          setSalvando(false);
+        }
       }
     });
   }
@@ -260,69 +289,30 @@ export default function AlterarDadosCliente() {
                 required
               />
             </div>
-            {/* Senha */}
+            {/* Número */}
             <div>
-              <label className="block font-bold text-gray-700 mb-1" htmlFor="password">Senha</label>
-              <div className="relative">
-                <input
-                  type={senhaVisivel ? "text" : "password"}
-                  id="password"
-                  value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300 pr-10"
-                  autoComplete="new-password"
-                  onBlur={() => checkSenha(senha, confirmaSenha)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400"
-                  tabIndex={-1}
-                  onClick={() => setSenhaVisivel(v => !v)}
-                  aria-label="Mostrar/ocultar senha"
-                >
-                  {senhaVisivel ? <HiOutlineEyeOff size={22} /> : <HiOutlineEye size={22} />}
-                </button>
-              </div>
-            </div>
-            {/* Confirmar senha */}
-            <div>
-              <label className="block font-bold text-gray-700 mb-1" htmlFor="confirm-password">Confirma a senha</label>
-              <div className="relative">
-                <input
-                  type={confirmaVisivel ? "text" : "password"}
-                  id="confirm-password"
-                  value={confirmaSenha}
-                  onChange={e => {
-                    setConfirmaSenha(e.target.value);
-                    checkSenha(senha, e.target.value);
-                  }}
-                  className={`w-full border ${erroSenha ? "border-red-400" : "border-gray-300"} rounded-lg px-4 py-2 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300 pr-10`}
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400"
-                  tabIndex={-1}
-                  onClick={() => setConfirmaVisivel(v => !v)}
-                  aria-label="Mostrar/ocultar senha"
-                >
-                  {confirmaVisivel ? <HiOutlineEyeOff size={22} /> : <HiOutlineEye size={22} />}
-                </button>
-              </div>
-              <span className="text-red-500 text-sm mt-1 block min-h-[20px]">{erroSenha}</span>
+              <label className="block font-bold text-gray-700 mb-1" htmlFor="numero">Número</label>
+              <input
+                type="text"
+                id="numero"
+                value={numero}
+                onChange={e => setNumero(e.target.value)}
+                autoComplete="off"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                required
+              />
             </div>
 
             {/* BOTÕES */}
             <div className="flex sm:flex-row justify-center gap-3">
               <button
                 type="submit"
+                disabled={salvando}
                 className="w-full sm:w-auto px-8 py-3 rounded-lg 
                 bg-gradient-to-r from-purple-600 to-purple-500
-                  hover:brightness-105 text-white font-bold transition shadow cursor-pointer"
+                  hover:brightness-105 text-white font-bold transition shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Salvar alterações
+                {salvando ? "Salvando..." : "Salvar alterações"}
               </button>
             </div>
           </form>

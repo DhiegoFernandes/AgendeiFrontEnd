@@ -23,9 +23,17 @@ function Home() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [periodoAnual, setPeriodoAnual] = useState(false);
   
   // Array com as imagens para o slideshow
   const backgroundImages = [salaoUm, salaoDois, salaoTres];
+  
+  // Preços dos planos
+  const precos = {
+    basico: { mensal: 49.90, anual: 49.90 * 0.82 },
+    intermediario: { mensal: 79.90, anual: 79.90 * 0.82 },
+    avancado: { mensal: 119.90, anual: 119.90 * 0.82 }
+  };
 
   function handleToggle() {
     setMenuOpen(open => !open);
@@ -78,7 +86,7 @@ function Home() {
             } transition-all duration-200 md:static md:shadow-none`}
             aria-label="Principal"
           >
-            <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base mt-16 md:mt-0">
+            <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base mt-16 md:mt-16">
               <li className="w-full md:w-auto"><a href="#inicio" className="block py-3.5 px-5 md:p-0 text-purple-800 font-bold">Início</a></li>
               <li className="w-full md:w-auto"><a href="#cliente" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Ser Cliente</a></li>
               <li className="w-full md:w-auto"><a href="#prestador" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Ser Prestador</a></li>
@@ -281,6 +289,35 @@ function Home() {
               <p className="text-gray-500 max-w-2xl mx-auto">Planos flexíveis que crescem junto com você. Escolha o que melhor se adequa ao tamanho da sua equipe.</p>
             </header>
 
+            {/* Toggle Período */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex items-center gap-3 bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                <button
+                  onClick={() => setPeriodoAnual(false)}
+                  className={`px-6 py-2 rounded-full font-semibold transition-all cursor-pointer ${
+                    !periodoAnual 
+                      ? "bg-purple-600 text-white shadow" 
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Mensal
+                </button>
+                <button
+                  onClick={() => setPeriodoAnual(true)}
+                  className={`px-6 py-2 rounded-full font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                    periodoAnual 
+                      ? "bg-purple-600 text-white shadow" 
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Anual
+                  <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                    -18%
+                  </span>
+                </button>
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {/* Plano Básico */}
               <article className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border-2 border-gray-100">
@@ -288,8 +325,15 @@ function Home() {
                   <h3 className="text-2xl font-bold text-purple-700 mb-2">Básico</h3>
                   <p className="text-sm text-gray-500 mb-4">Ideal para começar</p>
                   <div className="mb-2">
-                    <span className="text-4xl font-extrabold text-purple-600">R$ 49,90</span>
+                    <span className="text-4xl font-extrabold text-purple-600">
+                      R$ {periodoAnual ? precos.basico.anual.toFixed(2).replace('.', ',') : precos.basico.mensal.toFixed(2).replace('.', ',')}
+                    </span>
                     <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                    {periodoAnual && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        <span className="line-through">R$ {precos.basico.mensal.toFixed(2).replace('.', ',')}</span> /mês
+                      </p>
+                    )}
                   </div>
                 </div>
                 <ul className="space-y-3 mb-6">
@@ -317,8 +361,15 @@ function Home() {
                   <h3 className="text-2xl font-bold text-purple-700 mb-2">Intermediário</h3>
                   <p className="text-sm text-gray-500 mb-4">Para negócios em crescimento</p>
                   <div className="mb-2">
-                    <span className="text-4xl font-extrabold text-purple-600">R$ 79,90</span>
+                    <span className="text-4xl font-extrabold text-purple-600">
+                      R$ {periodoAnual ? precos.intermediario.anual.toFixed(2).replace('.', ',') : precos.intermediario.mensal.toFixed(2).replace('.', ',')}
+                    </span>
                     <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                    {periodoAnual && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        <span className="line-through">R$ {precos.intermediario.mensal.toFixed(2).replace('.', ',')}</span> /mês
+                      </p>
+                    )}
                   </div>
                 </div>
                 <ul className="space-y-3 mb-6">
@@ -343,8 +394,15 @@ function Home() {
                   <h3 className="text-2xl font-bold text-purple-700 mb-2">Avançado</h3>
                   <p className="text-sm text-gray-500 mb-4">Máxima performance</p>
                   <div className="mb-2">
-                    <span className="text-4xl font-extrabold text-purple-600">R$ 119,90</span>
+                    <span className="text-4xl font-extrabold text-purple-600">
+                      R$ {periodoAnual ? precos.avancado.anual.toFixed(2).replace('.', ',') : precos.avancado.mensal.toFixed(2).replace('.', ',')}
+                    </span>
                     <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                    {periodoAnual && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        <span className="line-through">R$ {precos.avancado.mensal.toFixed(2).replace('.', ',')}</span> /mês
+                      </p>
+                    )}
                   </div>
                 </div>
                 <ul className="space-y-3 mb-6">
@@ -372,6 +430,49 @@ function Home() {
               >
                 Começar Agora
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-white" aria-labelledby="ttl-faq">
+          <div className="container mx-auto px-5">
+            <div className="max-w-3xl mx-auto">
+              <h2 id="ttl-faq" className="text-3xl font-bold text-center text-gray-900 mb-12">
+                Perguntas Frequentes
+              </h2>
+              
+              <div className="space-y-4">
+                <details className="bg-white rounded-xl p-6 shadow-sm group border border-gray-200">
+                  <summary className="font-semibold text-gray-900 cursor-pointer flex items-center justify-between">
+                    Posso mudar de plano depois?
+                    <span className="text-purple-600 group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <p className="mt-3 text-gray-600">
+                    Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. As alterações são aplicadas imediatamente.
+                  </p>
+                </details>
+
+                <details className="bg-white rounded-xl p-6 shadow-sm group border border-gray-200">
+                  <summary className="font-semibold text-gray-900 cursor-pointer flex items-center justify-between">
+                    Posso cancelar a qualquer momento?
+                    <span className="text-purple-600 group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <p className="mt-3 text-gray-600">
+                    Sim! Não há contratos ou multas por cancelamento. Você pode cancelar sua assinatura a qualquer momento.
+                  </p>
+                </details>
+
+                <details className="bg-white rounded-xl p-6 shadow-sm group border border-gray-200">
+                  <summary className="font-semibold text-gray-900 cursor-pointer flex items-center justify-between">
+                    O que acontece se eu precisar de mais parceiros?
+                    <span className="text-purple-600 group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <p className="mt-3 text-gray-600">
+                    Você pode fazer upgrade para um plano superior ou entrar em contato para soluções personalizadas para grandes equipes.
+                  </p>
+                </details>
+              </div>
             </div>
           </div>
         </section>

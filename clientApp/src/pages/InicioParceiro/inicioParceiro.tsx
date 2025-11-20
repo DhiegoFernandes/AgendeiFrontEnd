@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import ModalPlanos from "../../components/ModalPlanos";
+import type { TipoPlano } from "../../components/ModalPlanos";
 
 const PRESTADOR_NOME = localStorage.getItem("nome");
 const CATEGORIAS_FIXAS = [
@@ -24,7 +26,15 @@ export default function PrimeiroAcessoNegocio() {
   const [numero, setNumero] = useState("");
   const [categoria, setCategoria] = useState(CATEGORIAS_FIXAS[0]);
   const [popup, setPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [negocioCriado, setNegocioCriado] = useState(false);
+  const [parceiroId, setParceiroId] = useState<number | null>(null);
+  
+  // Estados para modal de planos
+  const [modalPlanosAberto, setModalPlanosAberto] = useState(false);
+  const [planoAtual, setPlanoAtual] = useState<TipoPlano | undefined>(undefined);
+  const [carregandoPlano, setCarregandoPlano] = useState(false);
 
   useEffect(() => {
     async function buscarDadosUsuario() {
@@ -40,6 +50,7 @@ export default function PrimeiroAcessoNegocio() {
         });
 
         const dados = response.data;
+        setParceiroId(dados.id);
 
         if (dados.negocio) {
           navigate("/parceiro/perfil")
@@ -103,11 +114,62 @@ export default function PrimeiroAcessoNegocio() {
           }
         })
 
-      navigate("/parceiro/perfil")
+      // Após criar o negócio, abrir modal de planos
+      setNegocioCriado(true);
+      setModalPlanosAberto(true);
 
       console.log(response)
     } catch (error){
       console.log(error)
+      setPopupMessage("Erro ao criar negócio. Tente novamente.");
+      setPopup(true);
+    }
+  }
+
+  // Função para atualizar plano (similar ao gerenciarPerfilParceiro)
+  async function handleAtualizarPlano(novoPlano: TipoPlano) {
+    if (!parceiroId) {
+      setPopupMessage("Erro: ID do parceiro não encontrado!");
+      setPopup(true);
+      setModalPlanosAberto(false);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPopupMessage("Erro: Token de autenticação não encontrado!");
+      setPopup(true);
+      setModalPlanosAberto(false);
+      return;
+    }
+
+    setCarregandoPlano(true);
+
+    try {
+      await api.put(`/prestadores/${parceiroId}/plano?novoPlano=${novoPlano}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      setPlanoAtual(novoPlano);
+      setPopupMessage("Plano atualizado com sucesso!");
+      setPopup(true);
+      setModalPlanosAberto(false);
+      console.log("Plano atualizado para:", novoPlano);
+      
+      // Redirecionar para o perfil após escolher o plano
+      setTimeout(() => {
+        navigate("/parceiro/perfil");
+      }, 1500);
+    } catch (error: any) {
+      console.error("Erro ao atualizar plano:", error);
+      const errorMessage = error?.response?.data?.errorMessage || error?.response?.data?.message || error?.message || "Erro ao atualizar plano.";
+      setPopupMessage(errorMessage);
+      setPopup(true);
+    } finally {
+      setCarregandoPlano(false);
     }
   }
 
@@ -245,19 +307,40 @@ export default function PrimeiroAcessoNegocio() {
         </div>
       )}
 
-      {/* Popup sucesso */}
+      {/* Popup mensagem */}
       {popup && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
           <div className="bg-white px-9 py-10 rounded-2xl shadow-lg flex flex-col items-center animate-fadeIn">
-            <span className="text-xl font-bold text-purple-700 mb-5 text-center">Negócio cadastrado com sucesso!</span>
+            <span className="text-xl font-bold text-purple-700 mb-5 text-center">{popupMessage || "Negócio cadastrado com sucesso!"}</span>
             <button
               className="mt-2 px-10 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold shadow hover:brightness-105 transition cursor-pointer"
-              onClick={() => setPopup(false)}
+              onClick={() => {
+                setPopup(false);
+                if (negocioCriado && !modalPlanosAberto) {
+                  // Se o negócio foi criado mas o modal não está aberto, redirecionar
+                  navigate("/parceiro/perfil");
+                }
+              }}
             >
               Ok
             </button>
           </div>
         </div>
+      )}
+
+      {/* Modal de Planos - aparece após criar o negócio */}
+      {negocioCriado && (
+        <ModalPlanos
+          isOpen={modalPlanosAberto}
+          onClose={() => {
+            setModalPlanosAberto(false);
+            // Se fechar sem escolher, redirecionar mesmo assim
+            navigate("/parceiro/perfil");
+          }}
+          onSelecionarPlano={handleAtualizarPlano}
+          planoAtual={planoAtual}
+          carregando={carregandoPlano}
+        />
       )}
     </div>
   );
