@@ -62,9 +62,11 @@ export default function Cadastro() {
                 telefone: celular,
                 senha,
                 perfil: tipo,
-                cep,
-                endereco,
-                numero
+                ...(tipo === "CLIENTE" && {
+                    cep,
+                    endereco,
+                    numero
+                })
             }
 
             const response = await api.post("/usuarios/registrar", dataToSend)

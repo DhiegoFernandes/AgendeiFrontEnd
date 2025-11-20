@@ -139,7 +139,7 @@ function Dashboard() {
                         <p className="text-xs text-gray-500">ID: #{comercio.id}</p>
                       </div>
                     </div>
-                    <button className="p-2 text-gray-400 rounded-full hover:bg-gray-100">
+                    <button className="p-2 text-gray-400 rounded-full hover:bg-gray-100 cursor-pointer">
                       <FaEllipsisV size={16} />
                     </button>
                   </div>

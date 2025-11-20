@@ -9,6 +9,7 @@ import { PiScissorsDuotone } from "react-icons/pi";
 import { FaChartColumn } from "react-icons/fa6";
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { MdManageAccounts } from "react-icons/md";
+import { FaUserSlash } from "react-icons/fa";
 import api from "../../services/api";
 import { obterMetricasAgendamentos } from "../../services/metricasService";
 import type { MetricasAgendamento } from "../../types/user";
@@ -188,13 +189,16 @@ export default function PerfilPrestador() {
         }
       });
       console.log(response)
-    } catch (error) {
+      setModalConvite(false);
+      setConvitePopup("Convite enviado!");
+      setEmailConvite("");
+    } catch (error: any) {
       console.error("Erro ao enviar convite:", error);
+      const errorMessage = error?.response?.data?.errorMessage || "Erro ao enviar convite. Tente novamente.";
+      setModalConvite(false);
+      setConvitePopup(errorMessage);
+      setEmailConvite("");
     }
-
-    setModalConvite(false);
-    setConvitePopup("Convite enviado!");
-    setEmailConvite("");
   }
 
   const shortcuts = [
@@ -246,6 +250,12 @@ export default function PerfilPrestador() {
       desc: "Gerencie seu Perfil", 
       icon: <MdManageAccounts  size={24} className="text-blue-400" />,
       onClick: () => navigate("/parceiro/gerenciar-perfil"), // <-- ALTERADO
+    },
+    {
+      label: "Usuários Bloqueados",
+      desc: "Gerencie bloqueios de clientes",
+      icon: <FaUserSlash size={24} className="text-red-500" />,
+      onClick: () => navigate("/parceiro/usuarios-bloqueados"),
     },
   ];
 

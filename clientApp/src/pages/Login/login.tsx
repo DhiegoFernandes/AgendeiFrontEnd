@@ -27,7 +27,7 @@ export default function Login() {
         if (response.data.perfil === "cliente") {  
           navigate(`/${response.data.perfil}/comercios`)
         } else {
-          navigate(`/${response.data.perfil}/criar-negocio`)
+          navigate(`/prestador/escolha`)
         }
     } catch (error) {
         console.log(error)

@@ -138,7 +138,7 @@ export default function PerfilCliente() {
             </h3>
             <ul className="divide-y divide-gray-100">
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/cliente/dados")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition cursor-pointer" onClick={() => navigate("/cliente/dados")}>
                   <div className="flex items-center gap-4">
                     <HiOutlineUserCircle className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">
@@ -150,7 +150,7 @@ export default function PerfilCliente() {
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition" onClick={() => navigate("/politicaPrivacidade")}>
+                <button className="w-full flex items-center justify-between group px-8 py-4 hover:bg-purple-50 transition cursor-pointer" onClick={() => navigate("/politicaPrivacidade")}>
                   <div className="flex items-center gap-4">
                     <HiOutlineMail className="text-purple-600 text-xl" />
                     <span className="flex flex-col items-start">

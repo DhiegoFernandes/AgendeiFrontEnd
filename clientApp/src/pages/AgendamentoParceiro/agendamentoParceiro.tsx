@@ -348,23 +348,38 @@ export default function AgendaPrestador() {
                     </span>
                     <div className="flex gap-2 mt-0">
                       <button
-                        className="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-400 text-white font-bold shadow hover:brightness-105 transition cursor-pointer flex items-center justify-center"
-                        title="Atualizar"
-                        onClick={() => handleEditar(ag, idx)}
+                        disabled={ag.status === 'CANCELADO'}
+                        className={`px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-400 text-white font-bold shadow transition flex items-center justify-center ${
+                          ag.status === 'CANCELADO' 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:brightness-105 cursor-pointer'
+                        }`}
+                        title={ag.status === 'CANCELADO' ? 'Agendamento cancelado' : 'Atualizar'}
+                        onClick={() => ag.status !== 'CANCELADO' && handleEditar(ag, idx)}
                       >
                         <FaPen size={14} />
                       </button>
                       <button
-                        className="px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-green-500 text-white font-bold shadow hover:brightness-105 transition cursor-pointer flex items-center justify-center"
-                        title="Concluir agendamento"
-                        onClick={() => handleConcluirAgendamento(ag)}
+                        disabled={ag.status === 'CANCELADO'}
+                        className={`px-3 py-2 rounded-lg bg-gradient-to-r from-green-600 to-green-500 text-white font-bold shadow transition flex items-center justify-center ${
+                          ag.status === 'CANCELADO' 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:brightness-105 cursor-pointer'
+                        }`}
+                        title={ag.status === 'CANCELADO' ? 'Agendamento cancelado' : 'Concluir agendamento'}
+                        onClick={() => ag.status !== 'CANCELADO' && handleConcluirAgendamento(ag)}
                       >
                         <FaCalendarCheck size={14} />
                       </button>
                       <button
-                        className="px-2 py-2 w-[90px] rounded-lg bg-red-500 text-white font-bold shadow hover:bg-red-600 transition cursor-pointer"
-                        title="Cancelar"
-                        onClick={() => handleCancelarAgendamento(ag)}
+                        disabled={ag.status === 'CANCELADO'}
+                        className={`px-2 py-2 w-[90px] rounded-lg bg-red-500 text-white font-bold shadow transition ${
+                          ag.status === 'CANCELADO' 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:bg-red-600 cursor-pointer'
+                        }`}
+                        title={ag.status === 'CANCELADO' ? 'Agendamento cancelado' : 'Cancelar'}
+                        onClick={() => ag.status !== 'CANCELADO' && handleCancelarAgendamento(ag)}
                       >
                         Cancelar
                       </button>
@@ -469,13 +484,13 @@ export default function AgendaPrestador() {
             </span>
             <div className="flex gap-5 mt-2">
               <button
-                className="px-7 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold shadow hover:brightness-105 transition"
+                className="px-7 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold shadow hover:brightness-105 transition cursor-pointer"
                 onClick={confirmarConclusao}
               >
                 Sim
               </button>
               <button
-                className="px-7 py-2 bg-gray-50 border border-gray-300 text-gray-600 rounded-lg font-bold shadow hover:bg-gray-100 transition"
+                className="px-7 py-2 bg-gray-50 border border-gray-300 text-gray-600 rounded-lg font-bold shadow hover:bg-gray-100 transition cursor-pointer"
                 onClick={() => setModalConcluir(null)}
               >
                 Não
@@ -494,13 +509,13 @@ export default function AgendaPrestador() {
             </span>
             <div className="flex gap-5 mt-2">
               <button
-                className="px-7 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold shadow hover:brightness-105 transition"
+                className="px-7 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-bold shadow hover:brightness-105 transition cursor-pointer"
                 onClick={confirmarCancelamento}
               >
                 Sim
               </button>
               <button
-                className="px-7 py-2 bg-gray-50 border border-gray-300 text-gray-600 rounded-lg font-bold shadow hover:bg-gray-100 transition"
+                className="px-7 py-2 bg-gray-50 border border-gray-300 text-gray-600 rounded-lg font-bold shadow hover:bg-gray-100 transition cursor-pointer"
                 onClick={() => setModalCancelar(null)}
               >
                 Não

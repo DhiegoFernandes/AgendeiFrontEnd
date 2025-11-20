@@ -323,7 +323,7 @@ export default function AgendarHorario() {
         <button
           className={`pointer-events-auto w-full max-w-2xl bg-purple-600 h-14 text-white text-lg font-bold rounded-xl shadow-lg mb-4 mx-2
                       transition focus:ring-4 ring-purple-300
-                      ${!hora ? "opacity-60 cursor-not-allowed" : "hover:bg-purple-700"}`}
+                      ${!hora ? "opacity-60 cursor-not-allowed" : "hover:bg-purple-700 cursor-pointer"}`}
           disabled={!hora}
           onClick={() => setShowConfirmacao(true)}
         >
@@ -382,13 +382,13 @@ export default function AgendarHorario() {
             <div className="flex gap-3">
               <button 
                 onClick={() => setShowConfirmacao(false)}
-                className="flex-1 py-3 px-4 border border-gray-300 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition flex items-center justify-center gap-1"
+                className="flex-1 py-3 px-4 border border-gray-300 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition flex items-center justify-center gap-1 cursor-pointer"
               >
                 <HiOutlineX /> Cancelar
               </button>
               <button 
                 onClick={handleAgendar}
-                className="flex-1 py-3 px-4 bg-purple-600 rounded-xl font-semibold text-white hover:bg-purple-700 transition flex items-center justify-center gap-1"
+                className="flex-1 py-3 px-4 bg-purple-600 rounded-xl font-semibold text-white hover:bg-purple-700 transition flex items-center justify-center gap-1 cursor-pointer"
               >
                 <HiOutlineCheck /> Confirmar
               </button>

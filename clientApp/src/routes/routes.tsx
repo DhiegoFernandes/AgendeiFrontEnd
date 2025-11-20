@@ -28,6 +28,9 @@ import ParceiroADM from '../pages/ADM/ParceiroADM/parceiroAdm';
 import ServicosADM from '../pages/ADM/ServicosADM/servicosAdm';
 import PoliticaPrivacidade from '../pages/PoliticaPrivacidade/politicaPrivacidade';
 import GerenciarPerfilParceiro from '../pages/GerenciarPerfilParceiro/gerenciarPerfilParceiro';
+import EscolhaPrestador from '../pages/EscolhaPrestador/escolhaPrestador';
+import AssinaturaPlano from '../pages/AssinaturaPlano/assinaturaPlano';
+import UsuariosBloqueados from '../pages/UsuariosBloqueados/usuariosBloqueados';
 
 
 
@@ -51,6 +54,8 @@ function AppRoutes(){
                 <Route path='/cliente/fazer-avaliacao' element={<FazerAvaliacao />} />
                 <Route path='/cliente/alterar-dados' element={<AlterarDadosCliente />} />
 
+                <Route path='/prestador/escolha' element={<EscolhaPrestador />} />
+                <Route path='/prestador/assinatura' element={<AssinaturaPlano />} />
                 <Route path='/prestador/criar-negocio' element={<InicioParceiro />} />
                 <Route path='/parceiro/perfil' element={<PerfilParceiro />} />
                 <Route path='/parceiro/agendamento' element={<AgendamentoParceiro />} />
@@ -62,6 +67,7 @@ function AppRoutes(){
                 <Route path='/parceiro/gerenciar-negocio' element={<GerenciarNegocio />} />
                 <Route path='/parceiro/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
                 <Route path='/parceiro/gerenciar-perfil' element={<GerenciarPerfilParceiro />} />
+                <Route path='/parceiro/usuarios-bloqueados' element={<UsuariosBloqueados />} />
 
                 <Route path="/admin" element={<ADMNavBar />}>
                     <Route index element={<PainelADM />} />

@@ -95,7 +95,7 @@ export default function AvaliarServico() {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg font-bold text-lg bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:brightness-105 shadow-xl transition tracking-wide disabled:opacity-60"
+            className="w-full py-3 rounded-lg font-bold text-lg bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:brightness-105 shadow-xl transition tracking-wide disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
             disabled={stars === 0 && comentario.trim().length < 5}
           >
             Enviar Avaliação

@@ -51,21 +51,21 @@ function Home() {
   return (
     <div className="font-sans text-slate-900 bg-gray-50">
       <header className="sticky top-0 z-10 bg-white shadow-sm">
-        <div className="container mx-auto px-5 flex items-center justify-between h-[72px]">
+        <div className="container mx-auto px-5 flex items-center justify-between h-[72px] relative">
           {/* Logo */}
-          <a href="#inicio" className="flex items-center gap-2.5" aria-label="Agendei - Início">
+          <a href="#inicio" className="flex items-center gap-2.5 flex-shrink-0" aria-label="Agendei - Início">
             <img src={LogoAgendeiHori} alt="Logo agendei" className="w-[150px] md:w-[200px]" />
           </a>
 
-          {/* Menu Hamburger - Ajustado para melhor visualização em telas menores */}
+          {/* Menu Hamburger - Mobile (sempre visível em mobile, posicionado à direita) */}
           <button 
             onClick={handleToggle} 
-            className="md:hidden flex items-center justify-center w-10 h-10 bg-indigo-50 text-indigo-700 rounded-lg"
+            className="md:hidden flex items-center justify-center w-10 h-10 bg-indigo-50 text-indigo-700 rounded-lg cursor-pointer absolute right-5"
             aria-expanded={menuOpen}
             aria-controls="nav"
             aria-label="Abrir menu"
           >
-            <HiOutlineMenu className="text-xl flex" />
+            <HiOutlineMenu className="text-xl" />
           </button>
 
           {/* Menu de navegação */}
@@ -73,15 +73,16 @@ function Home() {
             onClick={handleNavClick} 
             id="nav" 
             className={`${menuOpen 
-              ? "fixed inset-x-0 top-[72px] bg-white shadow-lg transform translate-y-0 opacity-100" 
+              ? "fixed inset-x-0 top-[72px] bg-white shadow-lg transform translate-y-0 opacity-100 z-50" 
               : "transform -translate-y-8 opacity-0 pointer-events-none md:transform-none md:opacity-100 md:pointer-events-auto"
             } transition-all duration-200 md:static md:shadow-none`}
             aria-label="Principal"
           >
-            <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base mt-16">
+            <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base mt-16 md:mt-0">
               <li className="w-full md:w-auto"><a href="#inicio" className="block py-3.5 px-5 md:p-0 text-purple-800 font-bold">Início</a></li>
               <li className="w-full md:w-auto"><a href="#cliente" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Ser Cliente</a></li>
               <li className="w-full md:w-auto"><a href="#prestador" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Ser Prestador</a></li>
+              <li className="w-full md:w-auto"><a href="#planos" className="block py-3.5 px-5 md:p-0 hover:text-purple-600 transition-colors">Planos</a></li>
               <li className="hidden md:block w-px h-5 bg-gray-200" aria-hidden="true"></li>
               <li className="w-full md:w-auto">
                 <a onClick={() => navigate('/login')} className="block py-3.5 px-5 md:p-0 text-purple-700 cursor-pointer hover:text-purple-800 transition-colors">
@@ -269,6 +270,108 @@ function Home() {
                 <h3 className="text-xl font-bold mb-2">Relatórios e Desempenho</h3>
                 <p className="text-gray-600">Acompanhe seus resultados com relatórios de serviços e agendamentos. Entenda o que está funcionando e otimize seu atendimento.</p>
               </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="planos" className="py-16 bg-gray-50" aria-labelledby="ttl-planos">
+          <div className="container mx-auto px-5">
+            <header className="text-center mb-10">
+              <h2 id="ttl-planos" className="text-3xl font-bold mb-2">Escolha o Plano Ideal para Seu Negócio</h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">Planos flexíveis que crescem junto com você. Escolha o que melhor se adequa ao tamanho da sua equipe.</p>
+            </header>
+
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {/* Plano Básico */}
+              <article className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border-2 border-gray-100">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-purple-700 mb-2">Básico</h3>
+                  <p className="text-sm text-gray-500 mb-4">Ideal para começar</p>
+                  <div className="mb-2">
+                    <span className="text-4xl font-extrabold text-purple-600">R$ 49,90</span>
+                    <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                  </div>
+                </div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>Até 2 prestadores (incluindo o dono)</span>
+                  </li>
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>1 convite disponível</span>
+                  </li>
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>Todos os recursos básicos</span>
+                  </li>
+                </ul>
+              </article>
+
+              {/* Plano Intermediário */}
+              <article className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border-2 border-purple-500 relative">
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-600 to-purple-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                  Mais Popular
+                </div>
+                <div className="text-center mb-6 mt-2">
+                  <h3 className="text-2xl font-bold text-purple-700 mb-2">Intermediário</h3>
+                  <p className="text-sm text-gray-500 mb-4">Para negócios em crescimento</p>
+                  <div className="mb-2">
+                    <span className="text-4xl font-extrabold text-purple-600">R$ 79,90</span>
+                    <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                  </div>
+                </div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>Até 4 prestadores (incluindo o dono)</span>
+                  </li>
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>3 convites disponíveis</span>
+                  </li>
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>Todos os recursos básicos</span>
+                  </li>
+                </ul>
+              </article>
+
+              {/* Plano Avançado */}
+              <article className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border-2 border-gray-100">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-purple-700 mb-2">Avançado</h3>
+                  <p className="text-sm text-gray-500 mb-4">Máxima performance</p>
+                  <div className="mb-2">
+                    <span className="text-4xl font-extrabold text-purple-600">R$ 119,90</span>
+                    <span className="text-gray-500 text-sm block mt-1">por mês</span>
+                  </div>
+                </div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>Até 6 prestadores (incluindo o dono)</span>
+                  </li>
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>5 convites disponíveis</span>
+                  </li>
+                  <li className="flex items-start text-gray-700">
+                    <span className="text-green-500 mr-2 font-bold">✓</span>
+                    <span>Todos os recursos básicos</span>
+                  </li>
+                </ul>
+              </article>
+            </div>
+
+            <div className="text-center mt-10">
+              <p className="text-gray-600 mb-4">Todos os planos incluem gestão completa de agendamentos, relatórios e muito mais!</p>
+              <a 
+                onClick={() => navigate('/cadastro')} 
+                className="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-bold rounded-xl hover:brightness-110 transition cursor-pointer shadow-lg"
+              >
+                Começar Agora
+              </a>
             </div>
           </div>
         </section>
