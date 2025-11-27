@@ -15,7 +15,7 @@ function currencyMask(value: string) {
   v = (Number(v) / 100).toFixed(2) + "";
   v = v.replace(".", ",");
   return "R$ " + v;
-}  
+}
 
 export default function ServicosParceiro() {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ export default function ServicosParceiro() {
   // Função para carregar serviços da API
   async function carregarServicos() {
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
       setPopup({ msg: "Token de autenticação não encontrado!" });
       return;
@@ -77,7 +77,8 @@ export default function ServicosParceiro() {
         descricao: servico.descricao,
         preco: `R$ ${servico.valor.toFixed(2).replace('.', ',')}`,
         duracao: servico.duracaoMinutos,
-        ativo: servico.ativo
+        ativo: servico.ativo,
+        nomePrestador: servico.nomePrestador
       }));
 
       setServicos(servicosFormatados);
@@ -121,9 +122,56 @@ export default function ServicosParceiro() {
     e.preventDefault();
 
     if (!form.nome.trim() || !form.preco) {
-      setPopup({ msg: "Preencha os campos obrigatórios!" }); 
+      setPopup({ msg: "Preencha os campos obrigatórios!" });
       return;
     }
+
+    // Validar descrição
+    if (!form.descricao.trim()) {
+      setPopup({ msg: "A descrição do serviço é obrigatória. Por favor, preencha este campo." });
+      return;
+    }
+
+
+    // Validar duração
+    if (!form.duracao || Number(form.duracao) <= 0) {
+      setPopup({ msg: "Informe a duração do serviço." });
+      return;
+    }
+
+    // Validar duração mínima
+    const duracaoNum = Number(form.duracao);
+    if (isNaN(duracaoNum) || duracaoNum < 5) {
+      setPopup({ msg: "A duração do serviço deve ser de no mínimo 5 minutos." });
+      return;
+    }
+
+    // Validar duração máxima
+    if (duracaoNum > 480) {
+      setPopup({ msg: "A duração máxima de um serviço é de 8 horas (480 minutos)." });
+      return;
+    }
+
+
+    // Validar preço
+    const valor = parseFloat(
+      form.preco
+        .replace("R$", "")
+        .replace(/\./g, "")
+        .replace(",", ".")
+        .trim()
+    );
+
+    if (isNaN(valor) || valor <= 0) {
+      setPopup({ msg: "Informe um valor válido para o serviço." });
+      return;
+    }
+
+    if (valor > 5000) {
+      setPopup({ msg: "O valor máximo permitido para um serviço é de R$ 5000,00." });
+      return;
+    }
+
 
     // Preparar dados para envio
     const dataToPost = {
@@ -149,7 +197,7 @@ export default function ServicosParceiro() {
 
     try {
       let response;
-      
+
       if (form.id !== null && form.id !== undefined) {
         // Atualizar serviço existente
         response = await api.put(`/servicos/${form.id}`, dataToPost, {
@@ -176,16 +224,59 @@ export default function ServicosParceiro() {
       closeForm();
       setTimeout(() => setPopup({ msg: `Serviço ${form.id ? "atualizado" : "cadastrado"} com sucesso!` }), 100);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar serviço:', error);
+
+      const backendMessage = error?.response?.data?.errorMessage
+        || error?.response?.data?.message
+        || "";
+
+      if (backendMessage.includes("Você não tem permissão para editar")) {
+        setPopup({ msg: "Apenas o dono do serviço pode estar alterando o serviço." });
+        return;
+      }
+
+      if (backendMessage.includes("Prestador não está associado a um negócio")) {
+        setPopup({ msg: "Você não está associado a um negócio. Crie ou entre para um negócio antes de cadastrar serviços." });
+        return;
+      }
+
+      if (backendMessage.includes("duração máxima")) {
+        setPopup({ msg: "A duração máxima de um serviço é de 8 horas (480 minutos)." });
+        return;
+      }
+
+      if (backendMessage.includes("valor máximo")) {
+        setPopup({ msg: "O valor máximo permitido é de R$ 5000,00." });
+        return;
+      }
+
+      if (backendMessage.includes("Já existe um serviço com esse título")) {
+        setPopup({ msg: "Já existe um serviço com esse nome no seu negócio." });
+        return;
+      }
+
+      if (backendMessage.includes("não está associado a um negócio")) {
+        setPopup({ msg: "Você precisa estar em um negócio para criar serviços." });
+        return;
+      }
+
+      if (backendMessage.includes("Não é possível alterar a duração deste serviço pois")) {
+        setPopup({ msg: "Não é possível alterar a duração deste serviço pois existem agendamentos pendentes." });
+        return;
+      }
+
+
+      // fallback
       setPopup({ msg: "Erro ao salvar serviço. Tente novamente." });
     }
+
   }
 
 
   async function toggleAtivoServico(id: number) {
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
       setPopup({ msg: "Token de autenticação não encontrado!" });
       return;
@@ -217,7 +308,7 @@ export default function ServicosParceiro() {
       });
 
       console.log('Status do serviço atualizado com sucesso');
-      
+
       // Recarregar lista de serviços da API
       await carregarServicos();
     } catch (error) {
@@ -244,9 +335,9 @@ export default function ServicosParceiro() {
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-14">
       {/* Navbar moderna */}
-        <
-          Header
-        />
+      <
+        Header
+      />
 
       <div className="max-w-2xl mx-auto flex justify-end mb-4 px-2 mt-5">
         <button
@@ -287,7 +378,7 @@ export default function ServicosParceiro() {
             </div>
 
             <div>
-              <label className="font-bold text-gray-700" htmlFor="descricao">Descrição (opcional)</label>
+              <label className="font-bold text-gray-700" htmlFor="descricao">Descrição</label>
               <textarea
                 id="descricao"
                 name="descricao"
@@ -436,12 +527,33 @@ export default function ServicosParceiro() {
                   />
                 </button>
               </div>
-              <div className="text-gray-500 font-medium text-base mt-1">{serv.descricao}</div>
-              <div className="flex flex-wrap gap-3 mt-2">
-                <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-base font-bold">{serv.preco}</span>
-                <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200 text-gray-800 text-base font-bold">
-                  <AiOutlineClockCircle /> {serv.duracao} min
-                </span>
+              <div className="mt-2 flex flex-col gap-2">
+                {/* Descrição do serviço */}
+                <p className="text-gray-700 text-base font-medium line-clamp-2">
+                  {serv.descricao}
+                </p>
+
+                {/* Prestador */}
+                <div className="flex items-center gap-2 text-purple-700 font-semibold text-sm">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.121 17.804A9.002 9.002 0 0112 15a9.002 9.002 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span>{serv.nomePrestador}</span>
+                </div>
+
+                {/* Informações adicionais */}
+                <div className="flex flex-wrap gap-3 mt-1">
+                  <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-bold">
+                    {serv.preco}
+                  </span>
+                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200 text-gray-800 text-sm font-bold">
+                    <AiOutlineClockCircle /> {serv.duracao} min
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3 mt-2 sm:mt-0">
@@ -449,7 +561,7 @@ export default function ServicosParceiro() {
                 title="Atualizar"
                 onClick={() => openForm(serv)}
               >
-                <FiEdit size={18}/> Atualizar
+                <FiEdit size={18} /> Atualizar
               </button>
             </div>
           </div>

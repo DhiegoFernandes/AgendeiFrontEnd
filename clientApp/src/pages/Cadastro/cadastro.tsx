@@ -5,6 +5,7 @@ import type { User } from "../../types/user";
 import api from "../../services/api";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { FiCheck, FiX } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function Cadastro() {
   const [tipo, setTipo] = useState("CLIENTE");
@@ -68,36 +69,67 @@ export default function Cadastro() {
   const requisitos = validarSenha(senha);
   const senhaValida = Object.values(requisitos).every(v => v);
 
-   const handleRegister = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const nomeRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ ]{3,}$/; // mínimo 3 letras
 
-        // Validações
-        if (!senhaValida) {
-            alert("A senha não atende aos requisitos de segurança");
-            return;
-        }
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        try{
-            const dataToSend:User = {
-                nome,
-                email,  
-                telefone: celular,
-                senha,
-                perfil: tipo,
-                ...(tipo === "CLIENTE" && {
-                    cep,
-                    endereco,
-                    numero
-                })
-            }
-
-            const response = await api.post("/usuarios/registrar", dataToSend)
-            console.log(response)
-            navigate("/login")
-        } catch (error) {
-            console.log(error)
-        }
+    // --- Valida nome ---
+    if (!nomeRegex.test(nome.trim())) {
+      toast.error("O nome deve conter pelo menos 3 letras.");
+      return;
     }
+
+    // --- Valida email ---
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Digite um e-mail válido.");
+      return;
+    }
+
+    // --- Valida celular ---
+    const celularNumerico = celular.replace(/\D/g, "");
+    if (celularNumerico.length < 10 || celularNumerico.length > 11) {
+      toast.error("Digite um número de celular válido.");
+      return;
+    }
+
+    // --- Valida senha ---
+    if (!senhaValida) {
+      toast.error("A senha não atende aos requisitos de segurança.");
+      return;
+    }
+
+    try {
+      const dataToSend: User = {
+        nome,
+        email,
+        telefone: celular,
+        senha,
+        perfil: tipo,
+        ...(tipo === "CLIENTE" && {
+          cep,
+          endereco,
+          numero
+        })
+      }
+
+      const response = await api.post("/usuarios/registrar", dataToSend)
+      console.log(response)
+      navigate("/login")
+    } catch (error: any) {
+      console.log(error);
+
+      const backendMessage = error?.response?.data?.errorMessage;
+
+      if (backendMessage === "E-mail já está em uso.") {
+        toast.error("Este e-mail já está cadastrado, utilize outro.");
+        return;
+      }
+
+      toast.error("Por favor, verifique os campos.");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col items-center">
@@ -256,7 +288,7 @@ export default function Cadastro() {
                 {showSenha ? <HiOutlineEyeOff size={20} /> : <HiOutlineEye size={20} />}
               </button>
             </div>
-            
+
             {/* Requisitos de senha */}
             {senha && (
               <div className="mt-3 bg-gray-50 rounded-lg p-4">
@@ -288,7 +320,7 @@ export default function Cadastro() {
               </div>
             )}
           </div>
-          
+
           <div className="flex items-center gap-2 mb-6">
             <input
               type="checkbox"
@@ -315,6 +347,6 @@ export default function Cadastro() {
           </div>
         </form>
       </main>
- </div>
-);
+    </div>
+  );
 }
