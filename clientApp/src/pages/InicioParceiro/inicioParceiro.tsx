@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import ModalPlanos from "../../components/ModalPlanos";
 import type { TipoPlano } from "../../components/ModalPlanos";
+import { toast } from "react-toastify";
 
 const PRESTADOR_NOME = localStorage.getItem("nome");
 const CATEGORIAS_FIXAS = [
@@ -103,14 +104,14 @@ export default function PrimeiroAcessoNegocio() {
 
       if (data.erro) {
         setEndereco("");
-        alert("CEP não encontrado!");
+        toast.error("CEP não encontrado!");
       } else {
         setEndereco(data.logradouro || "");
         setTimeout(() => enderecoRef.current?.focus(), 180);
       }
     } catch {
       setEndereco("");
-      alert("Erro ao buscar CEP!");
+      toast.error("Erro a buscar o CEP!");
     } finally {
       setBuscandoCep(false);
     }

@@ -77,7 +77,7 @@ export default function Cadastro() {
 
     // --- Valida nome ---
     if (!nomeRegex.test(nome.trim())) {
-      toast.error("O nome deve conter pelo menos 3 letras.");
+      toast.error("O nome deve conter pelo menos 3 letras, e não conter caracteres especiais.");
       return;
     }
 
