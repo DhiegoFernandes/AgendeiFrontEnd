@@ -6,15 +6,15 @@ import type { TipoPlano } from "../../components/ModalPlanos";
 
 const PRESTADOR_NOME = localStorage.getItem("nome");
 const CATEGORIAS_FIXAS = [
-    "BELEZA",
-    "ESTETICA",
-    "SAUDE",
-    "FITNESS",
-    "BARBEARIA",
-    "MAQUIAGEM",
-    "MANICURE",
-    "SPA",
-    "OUTROS"
+  "BELEZA",
+  "ESTETICA",
+  "SAUDE",
+  "FITNESS",
+  "BARBEARIA",
+  "MAQUIAGEM",
+  "MANICURE",
+  "SPA",
+  "OUTROS"
 ];
 
 export default function PrimeiroAcessoNegocio() {
@@ -30,7 +30,7 @@ export default function PrimeiroAcessoNegocio() {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [negocioCriado, setNegocioCriado] = useState(false);
   const [parceiroId, setParceiroId] = useState<number | null>(null);
-  
+
   // Estados para modal de planos
   const [modalPlanosAberto, setModalPlanosAberto] = useState(false);
   const [planoAtual, setPlanoAtual] = useState<TipoPlano | undefined>(undefined);
@@ -96,9 +96,9 @@ export default function PrimeiroAcessoNegocio() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const token = localStorage.getItem("token")
-    
-    try{
-      const dataToPost ={
+
+    try {
+      const dataToPost = {
         nome,
         cep,
         endereco,
@@ -119,9 +119,28 @@ export default function PrimeiroAcessoNegocio() {
       setModalPlanosAberto(true);
 
       console.log(response)
-    } catch (error){
-      console.log(error)
-      setPopupMessage("Erro ao criar negócio. Tente novamente.");
+    } catch (error: any) {
+      console.log("Erro ao criar negócio:", error);
+
+      const backendMessage =
+        error?.response?.data?.errorMessage ||
+        error?.response?.data?.message ||
+        error?.message;
+
+      if (backendMessage === "Você já está vinculado a um negócio. Saia do atual antes de criar outro.") {
+        setPopupMessage("Você já está vinculado a um negócio. Saia do atual antes de criar outro.");
+        setPopup(true);
+        return;
+      }
+
+      if (backendMessage === "Nome do negócio já está em uso.") {
+        setPopupMessage("Este nome de comércio já está cadastrado. Tente outro nome.");
+        setPopup(true);
+        return;
+      }
+
+      // Erro genérico
+      setPopupMessage("Erro ao criar negócio. Verifique os dados e tente novamente.");
       setPopup(true);
     }
   }
@@ -158,7 +177,7 @@ export default function PrimeiroAcessoNegocio() {
       setPopup(true);
       setModalPlanosAberto(false);
       console.log("Plano atualizado para:", novoPlano);
-      
+
       // Redirecionar para o perfil após escolher o plano
       setTimeout(() => {
         navigate("/parceiro/perfil");

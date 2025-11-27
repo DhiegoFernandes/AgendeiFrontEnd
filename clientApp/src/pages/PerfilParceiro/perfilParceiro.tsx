@@ -19,9 +19,9 @@ function getInitials(name: string) {
   if (!name || typeof name !== 'string') {
     return null;
   }
-  
+
   const n = name.trim().split(" ").filter(word => word.length > 0);
-  
+
   if (n.length >= 2) {
     return (n[0][0] + n[1][0]).toUpperCase();
   } else if (n.length === 1) {
@@ -44,7 +44,7 @@ export default function PerfilPrestador() {
   const [categoria, setCategoria] = useState("");
   const [notaMedia, setNotaMedia] = useState<number | null>(null);
   const [fotoPrestador, setFotoPrestador] = useState<string | null>(null);
-  
+
   // Estados para métricas dos agendamentos
   const [metricas, setMetricas] = useState<MetricasAgendamento>({
     agendamentosHoje: 0,
@@ -108,7 +108,7 @@ export default function PerfilPrestador() {
           });
 
           const fotoUrlData = fotoUrlResponse.data;
-          
+
           // Se houver URL da foto, buscar a imagem
           if (fotoUrlData && fotoUrlData.urlFoto) {
             try {
@@ -151,7 +151,7 @@ export default function PerfilPrestador() {
 
           const negocioData = negocioResponse.data;
           setNotaMedia(negocioData.notaMedia || null);
-          
+
           console.log("Dados do negócio carregados:", negocioData);
         } catch (negocioError) {
           console.error("Erro ao buscar dados do negócio:", negocioError);
@@ -183,7 +183,7 @@ export default function PerfilPrestador() {
     if (!token) return;
 
     try {
-      const response = await api.post("/negocios/convidar", { emailPrestador: emailConvite } , {
+      const response = await api.post("/negocios/convidar", { emailPrestador: emailConvite }, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -247,9 +247,9 @@ export default function PerfilPrestador() {
       onClick: () => navigate("/parceiro/gerenciar-negocio"), // <-- ALTERADO
     },
     {
-      label: "Gerenciar Perfil", 
-      desc: "Gerencie seu Perfil", 
-      icon: <MdManageAccounts  size={24} className="text-blue-400" />,
+      label: "Gerenciar Perfil",
+      desc: "Gerencie seu Perfil",
+      icon: <MdManageAccounts size={24} className="text-blue-400" />,
       onClick: () => navigate("/parceiro/gerenciar-perfil"), // <-- ALTERADO
     },
     {
@@ -263,23 +263,23 @@ export default function PerfilPrestador() {
   // Função para criar KPIs dinamicamente baseado nas métricas
   const criarKPIs = () => {
     return [
-      { 
-        label: "Concluídos (hoje)", 
-        value: carregandoMetricas ? "..." : metricas.agendamentosConcluidosHoje, 
-        subtitle: "Agendamentos", 
-        icon: <HiOutlineCalendar size={26} className="text-purple-500" /> 
+      {
+        label: "Concluídos (hoje)",
+        value: carregandoMetricas ? "..." : metricas.agendamentosConcluidosHoje,
+        subtitle: "Agendamentos",
+        icon: <HiOutlineCalendar size={26} className="text-purple-500" />
       },
-      { 
-        label: "Pendentes (hoje)", 
-        value: carregandoMetricas ? "..." : metricas.agendamentosPendentes, 
-        subtitle: "Agendamentos", 
-        icon: <HiOutlineClock size={26} className="text-yellow-400" /> 
+      {
+        label: "Pendentes (hoje)",
+        value: carregandoMetricas ? "..." : metricas.agendamentosPendentes,
+        subtitle: "Agendamentos",
+        icon: <HiOutlineClock size={26} className="text-yellow-400" />
       },
-      { 
-        label: "Este mês", 
-        value: carregandoMetricas ? "..." : metricas.agendamentosConcluidosMes, 
-        subtitle: "Concluídos", 
-        icon: <HiOutlineTrendingUp size={26} className="text-green-500" /> 
+      {
+        label: "Este mês",
+        value: carregandoMetricas ? "..." : metricas.agendamentosConcluidosMes,
+        subtitle: "Concluídos",
+        icon: <HiOutlineTrendingUp size={26} className="text-green-500" />
       },
     ];
   };
@@ -292,17 +292,22 @@ export default function PerfilPrestador() {
           <div className="flex-1">
             <h1 className="text-white font-extrabold text-3xl sm:text-4xl mb-2 drop-shadow-lg">{negocio}</h1>
             <div className="flex items-center gap-5 mt-2">
-              <div className="w-14 h-14 rounded-full bg-white/25 text-2xl text-white font-extrabold flex items-center justify-center shadow ring-2 ring-white/20 select-none uppercase overflow-hidden">
+              <div
+                className="w-14 h-14 rounded-full bg-white/25 text-2xl text-white font-extrabold flex items-center justify-center shadow ring-2 ring-white/20 select-none uppercase overflow-hidden cursor-pointer 
+             transition-transform transform hover:scale-105 hover:shadow-2xl"
+                onClick={() => navigate("/parceiro/gerenciar-perfil")}
+              >
                 {fotoPrestador ? (
-                  <img 
-                    src={fotoPrestador} 
-                    alt="Foto do prestador" 
+                  <img
+                    src={fotoPrestador}
+                    alt="Foto do prestador"
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   getInitials(profissional)
                 )}
               </div>
+
               <div>
                 <span className="font-bold text-lg text-white">{profissional}</span>
                 <span className="block text-white/80 text-sm">{categoria}</span>
@@ -317,8 +322,8 @@ export default function PerfilPrestador() {
               </span>
             </div>
             <div className="flex gap-3">
-              <LogoutButton 
-                variant="default" 
+              <LogoutButton
+                variant="default"
                 className="bg-white/20 hover:bg-white/30 text-white border-white/30 border backdrop-blur shadow-lg"
                 showIcon={true}
                 showText={true}

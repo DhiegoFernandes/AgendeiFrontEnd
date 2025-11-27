@@ -19,17 +19,17 @@ export default function GerenciarNegocio() {
   const [popup, setPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [negocioId, setNegocioId] = useState<number | null>(null);
-  
+
   // Estado para modal de confirmação de sair do negócio
   const [modalSairNegocio, setModalSairNegocio] = useState(false);
-  
+
   // Estado para modal de erro com opção de tentar outra rota
   const [modalErroRota, setModalErroRota] = useState(false);
   const [mensagemErroRota, setMensagemErroRota] = useState("");
 
   // Estados para fotos
   const [fotos, setFotos] = useState<File[]>([]);
-  
+
   // Estado para modal de visualizar fotos
   const [modalVisualizarFotos, setModalVisualizarFotos] = useState(false);
 
@@ -74,7 +74,7 @@ export default function GerenciarNegocio() {
     if (fotos.length + newFiles.length > 10) newFiles = newFiles.slice(0, 10 - fotos.length);
     setFotos(prev => [...prev, ...newFiles]);
   }
-  
+
   function removeFoto(idx: number) {
     setFotos(list => list.filter((_, i) => i !== idx));
   }
@@ -89,7 +89,7 @@ export default function GerenciarNegocio() {
       img.onload = () => {
         // Calcular novas dimensões mantendo proporção
         let { width, height } = img;
-        
+
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
@@ -128,7 +128,7 @@ export default function GerenciarNegocio() {
   // Função para atualizar dados do negócio
   async function handleSubmitDados(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!negocioId) {
       setPopupMessage("Erro: ID do negócio não encontrado!");
       setPopup(true);
@@ -158,9 +158,24 @@ export default function GerenciarNegocio() {
       setPopupMessage("Dados do negócio atualizados com sucesso!");
       setPopup(true);
       console.log("Dados do negócio atualizados:", dadosAtualizacao);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao atualizar dados do negócio:", error);
-      setPopupMessage("Erro ao atualizar dados do negócio. Tente novamente.");
+
+      const backendMessage = error?.response?.data?.errorMessage || error?.message || "";
+
+      // Tratar mensagens específicas do backend
+      if (backendMessage.includes("Você não tem permissão")) {
+        setPopupMessage("Apenas o dono pode alterar informações do negócio.");
+      } else if (backendMessage.includes("Não é possível atualizar um negócio inativo")) {
+        setPopupMessage("Não é possível atualizar um negócio inativo.");
+      } else if (backendMessage.includes("Nome do negócio já está em uso")) {
+        setPopupMessage("Este nome de negócio já está em uso. Escolha outro.");
+      } else if (backendMessage.includes("Prestadores só podem alterar o nome e a categoria")) {
+        setPopupMessage("Você só pode alterar o nome e a categoria do negócio.");
+      } else {
+        setPopupMessage("Erro ao atualizar dados do negócio. Tente novamente.");
+      }
+
       setPopup(true);
     }
   }
@@ -196,7 +211,7 @@ export default function GerenciarNegocio() {
       // Sucesso na rota do dono
       setPopupMessage("Você saiu do negócio com sucesso!");
       setPopup(true);
-      
+
       // Redirecionar após um tempo
       setTimeout(() => {
         navigate("/prestador/criar-negocio");
@@ -205,12 +220,12 @@ export default function GerenciarNegocio() {
       // Verificar se o erro indica que não é o dono
       const errorMessage = error?.response?.data?.errorMessage || error?.message || "";
       const errorMessageLower = errorMessage.toLowerCase();
-      
+
       // Se a mensagem de erro indica que precisa usar a rota de convidado
       // Verifica várias possíveis variações da mensagem
       if (
-        errorMessageLower.includes("dono") || 
-        errorMessageLower.includes("excluí-lo") || 
+        errorMessageLower.includes("dono") ||
+        errorMessageLower.includes("excluí-lo") ||
         errorMessageLower.includes("proprietário") ||
         errorMessageLower.includes("owner") ||
         errorMessageLower.includes("não pode excluir") ||
@@ -252,7 +267,7 @@ export default function GerenciarNegocio() {
       setModalErroRota(false);
       setPopupMessage("Você saiu do negócio com sucesso!");
       setPopup(true);
-      
+
       // Redirecionar após um tempo
       setTimeout(() => {
         navigate("/prestador/criar-negocio");
@@ -269,7 +284,7 @@ export default function GerenciarNegocio() {
   // Função para atualizar fotos
   async function handleSubmitFotos(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!negocioId) {
       setPopupMessage("Erro: ID do negócio não encontrado!");
       setPopup(true);
@@ -294,7 +309,7 @@ export default function GerenciarNegocio() {
       const uploadPromises = fotos.map(async (foto) => {
         // Comprimir a imagem antes de enviar
         const fotoComprimida = await comprimirImagem(foto);
-        
+
         const formData = new FormData();
         formData.append('arquivo', fotoComprimida);
 
@@ -313,14 +328,23 @@ export default function GerenciarNegocio() {
 
       setPopupMessage(`${fotos.length} foto(s) adicionada(s) com sucesso!`);
       setPopup(true);
-      
+
       // Limpar as fotos após upload bem-sucedido
       setFotos([]);
-      
+
       console.log(`${fotos.length} fotos enviadas com sucesso`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao enviar fotos:", error);
-      setPopupMessage("Erro ao enviar fotos. Tente novamente.");
+
+      const backendMessage = error?.response?.data?.errorMessage || error?.message || "";
+
+      // Verifica as mensagens que você enviou do backend
+      if (backendMessage.includes("Apenas o dono do negócio pode adicionar fotos")) {
+        setPopupMessage("Apenas o dono do negócio pode adicionar fotos.");
+      } else {
+        setPopupMessage("Erro ao enviar fotos. Tente novamente.");
+      }
+
       setPopup(true);
     }
   }
@@ -333,13 +357,13 @@ export default function GerenciarNegocio() {
       {/* Container dos Cards */}
       <div className="flex flex-col lg:flex-row gap-6 mt-10 px-4 w-full max-w-6xl mx-auto">
         {/* Card de Atualizar Dados do Negócio */}
-        <form 
+        <form
           className="bg-white w-full lg:w-1/2 rounded-3xl shadow-2xl px-8 py-10 flex flex-col gap-6"
-          onSubmit={handleSubmitDados} 
+          onSubmit={handleSubmitDados}
           autoComplete="off"
         >
           <h2 className="text-2xl font-bold text-purple-700 mb-2">Dados do Negócio</h2>
-          
+
           <div>
             <label className="block font-bold text-gray-700 mb-1" htmlFor="nomeNegocio">
               Nome do negócio
@@ -353,7 +377,7 @@ export default function GerenciarNegocio() {
               required
             />
           </div>
-          
+
           <div>
             <label className="block font-bold text-gray-700 mb-1" htmlFor="cepNegocio">
               CEP
@@ -367,7 +391,7 @@ export default function GerenciarNegocio() {
             />
             <p className="text-xs text-gray-500 mt-1">O CEP não pode ser alterado</p>
           </div>
-          
+
           <div>
             <label className="block font-bold text-gray-700 mb-1" htmlFor="enderecoNegocio">
               Endereço
@@ -380,7 +404,7 @@ export default function GerenciarNegocio() {
             />
             <p className="text-xs text-gray-500 mt-1">O endereço não pode ser alterado</p>
           </div>
-          
+
           <div>
             <label className="block font-bold text-gray-700 mb-1" htmlFor="categoriaNegocio">
               Categoria
@@ -397,7 +421,7 @@ export default function GerenciarNegocio() {
               ))}
             </select>
           </div>
-          
+
           <button
             className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-110 transition cursor-pointer mt-auto"
             type="submit"
@@ -405,15 +429,15 @@ export default function GerenciarNegocio() {
             Atualizar dados
           </button>
         </form>
-        
+
         {/* Card de Atualizar Fotos */}
-        <form 
+        <form
           className="bg-white w-full lg:w-1/2 rounded-3xl shadow-2xl px-8 py-10 flex flex-col gap-6"
-          onSubmit={handleSubmitFotos} 
+          onSubmit={handleSubmitFotos}
           autoComplete="off"
         >
           <h2 className="text-2xl font-bold text-purple-700 mb-2">Fotos do Negócio</h2>
-          
+
           <div className="flex-1">
             <label className="block font-bold text-gray-700 mb-1" htmlFor="fotosNegocio">
               Adicionar novas fotos <span className="text-gray-400 font-normal text-xs">(máx. 10)</span>
@@ -429,7 +453,7 @@ export default function GerenciarNegocio() {
               className="w-full rounded-lg border-2 border-purple-200 bg-white py-1.5 px-2.5 shadow-sm cursor-pointer text-base mb-2"
               disabled={fotos.length >= 10}
             />
-            
+
             {fotos.length === 0 ? (
               <div className="mt-4 bg-gray-50 rounded-lg p-8 text-center">
                 <p className="text-gray-500">Nenhuma foto selecionada</p>
@@ -446,7 +470,7 @@ export default function GerenciarNegocio() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => removeFoto(idx)}
                       className="absolute -top-2 -right-2 bg-purple-600 text-white rounded-full p-1 hover:bg-red-500 transition shadow cursor-pointer text-xs"
@@ -458,13 +482,13 @@ export default function GerenciarNegocio() {
                 )}
               </div>
             )}
-            
+
             {fotos.length >= 10 && (
               <p className="text-xs text-red-500 font-bold mt-2">
                 Limite de 10 fotos atingido.
               </p>
             )}
-            
+
             <div className="mt-4 p-4 bg-purple-50 rounded-lg">
               <h3 className="text-sm font-bold text-purple-800">Dicas para fotos:</h3>
               <ul className="text-xs text-purple-700 mt-1 list-disc pl-5">
@@ -474,7 +498,7 @@ export default function GerenciarNegocio() {
               </ul>
             </div>
           </div>
-          
+
           <div className="flex gap-3 mt-auto">
             <button
               className="flex-1 bg-gray-600 text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-110 transition cursor-pointer"
@@ -504,7 +528,7 @@ export default function GerenciarNegocio() {
           Sair do negócio
         </button>
       </div>
-      
+
       {/* Modal de confirmação para sair do negócio */}
       {modalSairNegocio && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
@@ -570,7 +594,7 @@ export default function GerenciarNegocio() {
         isOpen={modalVisualizarFotos}
         onClose={() => setModalVisualizarFotos(false)}
       />
-      
+
       {/* Popup personalizado */}
       {popup && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
