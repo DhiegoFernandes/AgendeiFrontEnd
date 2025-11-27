@@ -17,6 +17,19 @@ const CATEGORIAS_FIXAS = [
   "OUTROS"
 ];
 
+function validarNomeNegocio(nome: string) {
+  return nome.trim().length >= 3;
+}
+
+function validarCep(cep: string) {
+  return /^\d{5}-?\d{3}$/.test(cep);
+}
+
+function validarEndereco(endereco: string) {
+  return endereco.trim().length >= 3;
+}
+
+
 export default function PrimeiroAcessoNegocio() {
   const navigate = useNavigate();
 
@@ -35,6 +48,9 @@ export default function PrimeiroAcessoNegocio() {
   const [modalPlanosAberto, setModalPlanosAberto] = useState(false);
   const [planoAtual, setPlanoAtual] = useState<TipoPlano | undefined>(undefined);
   const [carregandoPlano, setCarregandoPlano] = useState(false);
+
+  //validação
+  const [buscandoCep, setBuscandoCep] = useState(false);
 
   useEffect(() => {
     async function buscarDadosUsuario() {
@@ -75,11 +91,16 @@ export default function PrimeiroAcessoNegocio() {
 
   async function buscarEnderecoPorCep() {
     const soNumeros = cep.replace(/\D/g, "");
+
     if (soNumeros.length !== 8) return;
+
+    setBuscandoCep(true);
     setEndereco("Buscando...");
+
     try {
       const resp = await fetch(`https://viacep.com.br/ws/${soNumeros}/json/`);
       const data = await resp.json();
+
       if (data.erro) {
         setEndereco("");
         alert("CEP não encontrado!");
@@ -90,8 +111,11 @@ export default function PrimeiroAcessoNegocio() {
     } catch {
       setEndereco("");
       alert("Erro ao buscar CEP!");
+    } finally {
+      setBuscandoCep(false);
     }
   }
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -105,6 +129,38 @@ export default function PrimeiroAcessoNegocio() {
         numero,
         categoria
       }
+
+      if (!validarNomeNegocio(nome)) {
+        setPopupMessage("O nome do comércio deve ter pelo menos 3 caracteres.");
+        setPopup(true);
+        return;
+      }
+
+      if (!validarCep(cep)) {
+        setPopupMessage("Digite um CEP válido.");
+        setPopup(true);
+        return;
+      }
+
+      if (!validarEndereco(endereco)) {
+        setPopupMessage("O endereço deve ter pelo menos 3 caracteres.");
+        setPopup(true);
+        return;
+      }
+
+      if (endereco === "Buscando...") {
+        setPopupMessage("Aguarde o CEP ser carregado antes de continuar.");
+        setPopup(true);
+        return;
+      }
+
+      if (!validarEndereco(endereco) || endereco === "") {
+        setPopupMessage("O endereço é obrigatório. Verifique o CEP informado.");
+        setPopup(true);
+        return;
+      }
+
+
 
       const response = await api.post("/negocios", dataToPost,
         {

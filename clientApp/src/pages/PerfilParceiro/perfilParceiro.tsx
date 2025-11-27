@@ -253,7 +253,7 @@ export default function PerfilPrestador() {
       onClick: () => navigate("/parceiro/gerenciar-perfil"), // <-- ALTERADO
     },
     {
-      label: "Usuários Bloqueados",
+      label: "Usuários do Negócio",
       desc: "Gerencie bloqueios de clientes",
       icon: <FaUserSlash size={24} className="text-red-500" />,
       onClick: () => navigate("/parceiro/usuarios-bloqueados"),
@@ -373,34 +373,54 @@ export default function PerfilPrestador() {
         </div>
       </section>
 
-      {/* MODAL: Convidar parceiro */}
+      {/* MODAL: Convidar Parceiro */}
       {modalConvite && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4">
           <form
-            className="bg-white max-w-sm w-full rounded-2xl shadow-2xl px-8 py-8 flex flex-col gap-5 items-center"
+            className="bg-white w-full max-w-md rounded-3xl shadow-2xl px-8 py-10 flex flex-col gap-6 animate-fade-in"
             onSubmit={handleEnviarConvite}
             autoComplete="off"
           >
-            <input
-              type="email"
-              className="w-full rounded-lg border-2 border-purple-200 px-4 py-3 text-base shadow focus:ring-2 focus:ring-purple-400 outline-none font-semibold bg-white transition-colors"
-              placeholder="E-mail do parceiro"
-              value={emailConvite}
-              onChange={e => setEmailConvite(e.target.value)}
-              required
-              autoFocus
-            />
-            <div className="flex gap-4 w-full mt-2">
+            {/* Título */}
+            <h2 className="text-2xl font-extrabold text-purple-700 text-center">
+              Convidar Parceiro
+            </h2>
+
+            {/* Subtítulo */}
+            <p className="text-gray-600 text-center -mt-3 mb-2 text-sm">
+              Envie um convite para outro prestador se juntar ao seu negócio.
+            </p>
+
+            {/* Campo de e-mail */}
+            <div className="w-full">
+              <label className="text-gray-700 font-semibold text-sm mb-1 block">
+                Informe o e-mail do parceiro:
+              </label>
+
+              <input
+                type="email"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-base shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none bg-gray-50 transition-all placeholder-gray-400"
+                placeholder="exemplo@email.com"
+                value={emailConvite}
+                onChange={e => setEmailConvite(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+
+            {/* Botões */}
+            <div className="flex gap-4 w-full pt-2">
               <button
                 type="submit"
-                className="w-1/2 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold hover:brightness-110 shadow transition cursor-pointer"
+                className="flex-1 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-md hover:shadow-lg transition-all"
               >
                 Enviar convite
               </button>
+
               <button
                 type="button"
                 onClick={() => setModalConvite(false)}
-                className="w-1/2 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-red-300 hover:text-white transition cursor-pointer"
+                className="flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm"
               >
                 Cancelar
               </button>
@@ -408,6 +428,7 @@ export default function PerfilPrestador() {
           </form>
         </div>
       )}
+
 
       {/* Popup central para feedback */}
       {convitePopup && (

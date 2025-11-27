@@ -199,7 +199,7 @@ export default function UsuariosBloqueados() {
             <HiOutlineArrowLeft size={24} className="text-gray-700" />
           </button>
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-800">Usuários Bloqueados</h1>
+            <h1 className="text-3xl font-extrabold text-gray-800">Usuários do negócio</h1>
             <p className="text-gray-600 mt-1">Gerencie o bloqueio e desbloqueio de clientes do negócio</p>
           </div>
         </div>

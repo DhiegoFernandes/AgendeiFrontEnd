@@ -17,6 +17,15 @@ interface UserData {
 
 type PopupType = { mensagem: string; acaoSim?: () => void; soOk?: boolean };
 
+function validarNome(nome: string) {
+  return /^[A-Za-zÀ-ÖØ-öø-ÿ ]{3,}$/.test(nome.trim());
+}
+
+function validarEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+
 export default function AlterarDadosCliente() {
   const navigate = useNavigate();
   // States dos campos
@@ -29,6 +38,13 @@ export default function AlterarDadosCliente() {
   const [popup, setPopup] = useState<null | PopupType>(null);
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
+
+  //validacao
+  const [cepValido, setCepValido] = useState(true);
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [nomeValido, setNomeValido] = useState(true);
+  const [emailValido, setEmailValido] = useState(true);
+
 
   const enderecoRef = useRef<HTMLInputElement>(null);
 
@@ -49,23 +65,23 @@ export default function AlterarDadosCliente() {
         });
 
         const userData: UserData = response.data;
-        
+
         // Preencher os campos com os dados do usuário
         setNome(userData.nome || "");
         setEmail(userData.email || "");
-        
+
         // Formatar telefone
         const telefoneFormatado = formatarTelefone(userData.telefone || "");
         setCelular(telefoneFormatado);
-        
+
         // Formatar CEP
         const cepFormatado = formatarCep(userData.cep || "");
         setCep(cepFormatado);
-        
+
         // Separar endereço e número
         setEndereco(userData.endereco || "");
         setNumero(userData.numero || "");
-        
+
         console.log("Dados do usuário carregados:", userData);
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);
@@ -109,38 +125,106 @@ export default function AlterarDadosCliente() {
   function handleCep(e: React.ChangeEvent<HTMLInputElement>) {
     let v = e.target.value.replace(/\D/g, "");
     if (v.length > 5) v = v.replace(/^(\d{5})(\d)/, "$1-$2");
-    setCep(v.slice(0,9));
+    setCep(v.slice(0, 9));
   }
 
   // Busca ViaCEP
   async function buscarCep() {
-    const apenasNum = cep.replace(/\D/g,"");
-    if (apenasNum.length !== 8) return;
+    const apenasNum = cep.replace(/\D/g, "");
+
+    // Só busca se tiver 8 dígitos
+    if (apenasNum.length !== 8) {
+      setCepValido(false);
+      return;
+    }
+
+    setBuscandoCep(true);
+    setCepValido(true);
     setEndereco("Buscando...");
+
     try {
       const resp = await fetch(`https://viacep.com.br/ws/${apenasNum}/json/`);
       const data = await resp.json();
+
       if (data.erro) {
         setEndereco("");
-        alert("CEP não encontrado.");
+        setCepValido(false);
+        setPopup({
+          mensagem: "CEP não encontrado.",
+          soOk: true
+        });
+
       } else {
         setEndereco(data.logradouro || "");
+        setCepValido(true);
+
+        // Focar para permitir complemento
         setTimeout(() => enderecoRef.current?.focus(), 100);
       }
     } catch {
       setEndereco("");
-      alert("Erro ao buscar CEP.");
+      setCepValido(false);
+      setPopup({
+        mensagem: "Erro ao buscar CEP. Tente novamente.",
+        soOk: true
+      });
+
     }
+
+    setBuscandoCep(false);
   }
+
 
   // Botão submit
   async function onSalvar(e: React.FormEvent) {
     e.preventDefault();
-    
+
+
     const token = localStorage.getItem("token");
     if (!token) {
       setPopup({
         mensagem: "Erro: Token de autenticação não encontrado!",
+        soOk: true
+      });
+      return;
+    }
+
+
+    if (!validarNome(nome)) {
+      setPopup({
+        mensagem: "Nome inválido. Use pelo menos 3 letras e sem números.",
+        soOk: true
+      });
+      return;
+    }
+
+    if (!validarEmail(email)) {
+      setPopup({
+        mensagem: "E-mail inválido. Digite um e-mail válido.",
+        soOk: true
+      });
+      return;
+    }
+
+    if (buscandoCep) {
+      setPopup({
+        mensagem: "Aguarde a busca do CEP finalizar.",
+        soOk: true
+      });
+      return;
+    }
+
+    if (!cepValido) {
+      setPopup({
+        mensagem: "CEP inválido. Corrija antes de salvar.",
+        soOk: true
+      });
+      return;
+    }
+
+    if (endereco.trim() === "" || endereco === "Buscando...") {
+      setPopup({
+        mensagem: "Endereço inválido. Preencha um endereço válido.",
         soOk: true
       });
       return;
@@ -178,10 +262,10 @@ export default function AlterarDadosCliente() {
           });
         } catch (error: any) {
           console.error("Erro ao atualizar dados:", error);
-          const errorMessage = error?.response?.data?.errorMessage || 
-                              error?.response?.data?.message || 
-                              error?.message || 
-                              "Erro ao atualizar dados. Tente novamente.";
+          const errorMessage = error?.response?.data?.errorMessage ||
+            error?.response?.data?.message ||
+            error?.message ||
+            "Erro ao atualizar dados. Tente novamente.";
           setPopup({
             mensagem: errorMessage,
             soOk: true
@@ -228,11 +312,20 @@ export default function AlterarDadosCliente() {
                 type="text"
                 id="full-name"
                 value={nome}
-                onChange={e => setNome(e.target.value)}
-                autoComplete="name"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                onChange={(e) => {
+                  setNome(e.target.value);
+                  setNomeValido(validarNome(e.target.value));
+                }}
+                className={`w-full border rounded-lg px-4 py-2 text-base shadow-sm 
+    ${nomeValido ? "border-gray-300" : "border-red-500"}`}
                 required
               />
+              {!nomeValido && (
+                <p className="text-red-500 text-sm mt-1">
+                  O nome deve ter pelo menos 3 letras e não conter números.
+                </p>
+              )}
+
             </div>
             {/* Email */}
             <div>
@@ -241,11 +334,20 @@ export default function AlterarDadosCliente() {
                 type="email"
                 id="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                autoComplete="email"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailValido(validarEmail(e.target.value));
+                }}
+                className={`w-full border rounded-lg px-4 py-2 text-base shadow-sm 
+    ${emailValido ? "border-gray-300" : "border-red-500"}`}
                 required
               />
+              {!emailValido && (
+                <p className="text-red-500 text-sm mt-1">
+                  Digite um e-mail válido.
+                </p>
+              )}
+
             </div>
             {/* Celular */}
             <div>
