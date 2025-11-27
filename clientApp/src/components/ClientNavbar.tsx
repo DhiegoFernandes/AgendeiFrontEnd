@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LogoAgendei from "../assets/LogoAgendei.png"; // Ajuste o caminho conforme necessário
+import LogoutButton from "./LogoutButton";
 
 // Importações dos ícones
 import { 
@@ -58,7 +59,7 @@ const ClientNavbar = () => {
           </nav>
           
           {/* Desktop User Menu */}
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center gap-4">
             {/* User Menu */}
             <button 
               className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition-colors cursor-pointer"
@@ -69,6 +70,8 @@ const ClientNavbar = () => {
               </div>
               <span className="font-medium text-sm">Meu Perfil</span>
             </button>
+            {/* Logout Button */}
+            <LogoutButton variant="default" />
           </div>
           
           {/* Mobile Menu Button */}
@@ -121,6 +124,12 @@ const ClientNavbar = () => {
               <FiUser size={20} />
               <span>Meu Perfil</span>
             </button>
+            
+            <div className="w-full border-t my-2 border-gray-100"></div>
+            
+            <div className="px-4">
+              <LogoutButton variant="default" />
+            </div>
           </div>
         </div>
       </div>

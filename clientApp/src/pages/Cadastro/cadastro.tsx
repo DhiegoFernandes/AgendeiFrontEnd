@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import type { User } from "../../types/user";
 import api from "../../services/api";
+import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
+import { FiCheck, FiX } from "react-icons/fi";
 
 export default function Cadastro() {
   const [tipo, setTipo] = useState("CLIENTE");
@@ -52,8 +54,28 @@ export default function Cadastro() {
     }
   }
 
+  // Validação de requisitos de senha
+  const validarSenha = (senha: string) => {
+    return {
+      tamanho: senha.length >= 8,
+      maiuscula: /[A-Z]/.test(senha),
+      minuscula: /[a-z]/.test(senha),
+      numero: /[0-9]/.test(senha),
+      especial: /[!@#$%^&*(),.?":{}|<>]/.test(senha)
+    };
+  };
+
+  const requisitos = validarSenha(senha);
+  const senhaValida = Object.values(requisitos).every(v => v);
+
    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validações
+        if (!senhaValida) {
+            alert("A senha não atende aos requisitos de segurança");
+            return;
+        }
 
         try{
             const dataToSend:User = {
@@ -220,7 +242,7 @@ export default function Cadastro() {
                 value={senha}
                 required
                 onChange={e => setSenha(e.target.value)}
-                placeholder=""
+                placeholder="Digite sua senha"
                 className="w-full border border-gray-300 rounded p-2 pr-10 outline-purple-400"
                 type={showSenha ? "text" : "password"}
                 autoComplete="new-password"
@@ -231,26 +253,42 @@ export default function Cadastro() {
                 tabIndex={-1}
                 onClick={() => setShowSenha(s => !s)}
               >
-                {showSenha ? (
-                  <svg width="22" height="22" fill="none" viewBox="0 0 20 20">
-                    <path d="M2 2l16 16" stroke="#7c4eff" strokeWidth={2}/>
-                    <path d="M1 10s4-6 9-6 9 6 9 6-4 6-9 6-9-6-9-6Z" stroke="#7c4eff" strokeWidth={2}/>
-                    <circle cx="10" cy="10" r="3" stroke="#7c4eff" strokeWidth={2}/>
-                  </svg>
-                ) : (
-                  <svg width="22" height="22" fill="none" viewBox="0 0 20 20">
-                    <path d="M1 10s4-6 9-6 9 6 9 6-4 6-9 6-9-6-9-6Z" stroke="#7c4eff" strokeWidth={2}/>
-                    <circle cx="10" cy="10" r="3" stroke="#7c4eff" strokeWidth={2}/>
-                  </svg>
-                )}
+                {showSenha ? <HiOutlineEyeOff size={20} /> : <HiOutlineEye size={20} />}
               </button>
             </div>
+            
+            {/* Requisitos de senha */}
+            {senha && (
+              <div className="mt-3 bg-gray-50 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  Requisitos da senha:
+                </h3>
+                <ul className="space-y-1">
+                  <li className={`text-xs flex items-center ${requisitos.tamanho ? 'text-green-600' : 'text-gray-500'}`}>
+                    {requisitos.tamanho ? <FiCheck className="mr-2" /> : <FiX className="mr-2" />}
+                    Mínimo de 8 caracteres
+                  </li>
+                  <li className={`text-xs flex items-center ${requisitos.maiuscula ? 'text-green-600' : 'text-gray-500'}`}>
+                    {requisitos.maiuscula ? <FiCheck className="mr-2" /> : <FiX className="mr-2" />}
+                    Pelo menos uma letra maiúscula
+                  </li>
+                  <li className={`text-xs flex items-center ${requisitos.minuscula ? 'text-green-600' : 'text-gray-500'}`}>
+                    {requisitos.minuscula ? <FiCheck className="mr-2" /> : <FiX className="mr-2" />}
+                    Pelo menos uma letra minúscula
+                  </li>
+                  <li className={`text-xs flex items-center ${requisitos.numero ? 'text-green-600' : 'text-gray-500'}`}>
+                    {requisitos.numero ? <FiCheck className="mr-2" /> : <FiX className="mr-2" />}
+                    Pelo menos um número
+                  </li>
+                  <li className={`text-xs flex items-center ${requisitos.especial ? 'text-green-600' : 'text-gray-500'}`}>
+                    {requisitos.especial ? <FiCheck className="mr-2" /> : <FiX className="mr-2" />}
+                    Pelo menos um caractere especial
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
-          <div className="mb-4">
-            <label className="block font-bold mb-1">
-              Confirma a senha <span className="text-red-500">*</span>
-            </label>
-          </div>
+          
           <div className="flex items-center gap-2 mb-6">
             <input
               type="checkbox"
@@ -269,7 +307,8 @@ export default function Cadastro() {
           <div className="flex gap-4">
             <button
               type="submit"
-              className="w-48 h-11 rounded font-bold bg-purple-600 text-white hover:bg-purple-700 transition cursor-pointer"
+              disabled={!senhaValida || !termos}
+              className={`w-48 h-11 rounded font-bold bg-purple-600 text-white hover:bg-purple-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Criar Conta
             </button>

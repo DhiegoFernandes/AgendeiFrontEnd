@@ -48,11 +48,16 @@ export default function GerenciarPerfilParceiro() {
         setTelefone(user.telefone || "");
         setParceiroId(user.id);
 
-        // Verificar se é dono do negócio e buscar plano atual
+        // Buscar plano atual diretamente da resposta
+        if (user.plano) {
+          setPlanoAtual(user.plano as TipoPlano);
+        }
+
+        // Verificar se é dono do negócio
         if (negocio && negocio.id) {
           // Tentar buscar informações do negócio para verificar se é dono
           try {
-            const negocioResponse = await api.get(`/negocios/${negocio.id}`, {
+            await api.get(`/negocios/${negocio.id}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -60,10 +65,6 @@ export default function GerenciarPerfilParceiro() {
             });
             
             // Se conseguir buscar, provavelmente é dono ou tem acesso
-            // O plano pode estar no negócio ou precisar buscar separadamente
-            if (negocioResponse.data && negocioResponse.data.plano) {
-              setPlanoAtual(negocioResponse.data.plano);
-            }
             setEhDono(true);
           } catch (error: any) {
             // Se der erro 403 ou similar, não é dono

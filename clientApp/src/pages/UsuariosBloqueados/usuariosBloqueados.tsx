@@ -23,8 +23,9 @@ export default function UsuariosBloqueados() {
   const [processando, setProcessando] = useState<number | null>(null);
   const [filtro, setFiltro] = useState<"todos" | "bloqueados">("todos");
   const [popup, setPopup] = useState<string | false>(false);
+  const [prestadorId, setPrestadorId] = useState<number | null>(null);
 
-  // Carregar todos os clientes
+  // Carregar todos os clientes do negócio
   async function carregarClientes() {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -43,14 +44,14 @@ export default function UsuariosBloqueados() {
 
       setClientes(response.data);
     } catch (error) {
-      console.error("Erro ao carregar clientes:", error);
-      setPopup("Erro ao carregar clientes. Tente novamente.");
+      console.error("Erro ao carregar clientes do negócio:", error);
+      setPopup("Erro ao carregar clientes do negócio. Tente novamente.");
     } finally {
       setCarregando(false);
     }
   }
 
-  // Carregar clientes bloqueados
+  // Carregar clientes bloqueados do negócio
   async function carregarClientesBloqueados() {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -69,8 +70,8 @@ export default function UsuariosBloqueados() {
 
       setClientesBloqueados(response.data);
     } catch (error) {
-      console.error("Erro ao carregar clientes bloqueados:", error);
-      setPopup("Erro ao carregar clientes bloqueados. Tente novamente.");
+      console.error("Erro ao carregar clientes bloqueados do negócio:", error);
+      setPopup("Erro ao carregar clientes bloqueados do negócio. Tente novamente.");
     } finally {
       setCarregandoBloqueados(false);
     }
@@ -84,9 +85,16 @@ export default function UsuariosBloqueados() {
       return;
     }
 
+    if (!prestadorId) {
+      setPopup("Erro: ID do prestador não encontrado!");
+      return;
+    }
+
     try {
       setProcessando(clienteId);
-      await api.put(`/agendamentos/clientes/${clienteId}/bloquear`, {}, {
+      await api.put(`/agendamentos/clientes/${clienteId}/bloquear`, {
+        prestadorId: prestadorId
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -114,9 +122,16 @@ export default function UsuariosBloqueados() {
       return;
     }
 
+    if (!prestadorId) {
+      setPopup("Erro: ID do prestador não encontrado!");
+      return;
+    }
+
     try {
       setProcessando(clienteId);
-      await api.put(`/agendamentos/clientes/${clienteId}/desbloquear`, {}, {
+      await api.put(`/agendamentos/clientes/${clienteId}/desbloquear`, {
+        prestadorId: prestadorId
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -136,7 +151,32 @@ export default function UsuariosBloqueados() {
     }
   }
 
+  // Buscar ID do prestador ao carregar a página
   useEffect(() => {
+    async function buscarPrestadorId() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const response = await api.get("/usuarios/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        if (response.data && response.data.id) {
+          setPrestadorId(response.data.id);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar ID do prestador:", error);
+      }
+    }
+
+    buscarPrestadorId();
     carregarClientes();
     carregarClientesBloqueados();
   }, []);
@@ -160,13 +200,13 @@ export default function UsuariosBloqueados() {
           </button>
           <div>
             <h1 className="text-3xl font-extrabold text-gray-800">Usuários Bloqueados</h1>
-            <p className="text-gray-600 mt-1">Gerencie o bloqueio e desbloqueio de clientes</p>
+            <p className="text-gray-600 mt-1">Gerencie o bloqueio e desbloqueio de clientes do negócio</p>
           </div>
         </div>
 
         {/* Filtros */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex gap-4">
+          <div className="flex gap-4">  
             <button
               onClick={() => setFiltro("todos")}
               className={`flex-1 py-3 px-6 rounded-xl font-bold transition cursor-pointer ${
@@ -177,7 +217,7 @@ export default function UsuariosBloqueados() {
             >
               <div className="flex items-center justify-center gap-2">
                 <FaUsers size={18} />
-                <span>Todos os Clientes ({clientes.length})</span>
+                <span>Todos os Clientes do Negócio ({clientes.length})</span>
               </div>
             </button>
             <button
@@ -190,7 +230,7 @@ export default function UsuariosBloqueados() {
             >
               <div className="flex items-center justify-center gap-2">
                 <FaBan size={18} />
-                <span>Bloqueados ({clientesBloqueados.length})</span>
+                <span>Bloqueados do Negócio ({clientesBloqueados.length})</span>
               </div>
             </button>
           </div>

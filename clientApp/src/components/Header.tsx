@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({
         <img 
           src={LogoAgendei} 
           alt="Agendei" 
-          className="w-20 sm:w-20 select-none" 
+          className="w-20 sm:w-20 select-none cursor-pointer" 
           onClick={() => navigate("/")}
         />
         

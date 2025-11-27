@@ -7,10 +7,14 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErro("");
+    setCarregando(true);
 
     try {
         const dataToLogin ={
@@ -24,13 +28,23 @@ export default function Login() {
         localStorage.setItem("perfil", response.data.perfil)
         localStorage.setItem("nome", response.data.nome)
 
-        if (response.data.perfil === "cliente") {  
-          navigate(`/${response.data.perfil}/comercios`)
+        const perfil = response.data.perfil?.toLowerCase();
+        
+        if (perfil === "admin") {
+          navigate("/admin/painelAdm");
+        } else if (perfil === "cliente") {
+          navigate(`/cliente/comercios`);
         } else {
-          navigate(`/prestador/escolha`)
+          navigate(`/prestador/escolha`);
         }
-    } catch (error) {
-        console.log(error)
+    } catch (error: any) {
+        const mensagemErro = error?.response?.data?.message || 
+                            error?.response?.data?.errorMessage || 
+                            error?.response?.data?.error ||
+                            "Email ou senha incorretos. Tente novamente.";
+        setErro(mensagemErro);
+    } finally {
+        setCarregando(false);
     }
   }
 
@@ -61,7 +75,10 @@ export default function Login() {
               type="email"
               value={email}
               autoComplete="email"
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => {
+                setEmail(e.target.value);
+                if (erro) setErro("");
+              }}
               placeholder="Digite o email"
               className="w-full p-2 rounded border border-gray-300 bg-gray-100 outline-purple-400"
               required
@@ -74,7 +91,10 @@ export default function Login() {
               type={showSenha ? "text" : "password"}
               value={senha}
               autoComplete="current-password"
-              onChange={e => setSenha(e.target.value)}
+              onChange={e => {
+                setSenha(e.target.value);
+                if (erro) setErro("");
+              }}
               placeholder="Digite a senha"
               className="w-full p-2 rounded border border-gray-300 bg-gray-100 outline-purple-400 pr-10"
               required
@@ -102,17 +122,24 @@ export default function Login() {
             </button>
           </div>
           {/* Link esqueceu senha */}
-          <div className="w-full mb-6 text-right">
+          <div className="w-full mb-4 text-right">
             <a href="#" className="text-purple-700 text-sm font-medium hover:underline">
               Esqueceu a senha?
             </a>
           </div>
+          {/* Mensagem de erro */}
+          {erro && (
+            <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm text-center">{erro}</p>
+            </div>
+          )}
           {/* Botão Entrar */}
           <button
             type="submit"
-            className="w-full h-12 rounded-lg bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition cursor-pointer"
+            disabled={carregando}
+            className="w-full h-12 rounded-lg bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Entrar
+            {carregando ? "Entrando..." : "Entrar"}
           </button>
         </form>
         {/* Cadastro */}

@@ -31,8 +31,8 @@ import GerenciarPerfilParceiro from '../pages/GerenciarPerfilParceiro/gerenciarP
 import EscolhaPrestador from '../pages/EscolhaPrestador/escolhaPrestador';
 import AssinaturaPlano from '../pages/AssinaturaPlano/assinaturaPlano';
 import UsuariosBloqueados from '../pages/UsuariosBloqueados/usuariosBloqueados';
-
-
+import EsqueceuSenha from '../pages/EsqueceuSenha/esqueceuSenha';
+import RedefinirSenha from '../pages/RedefinirSenha/redefinirSenha';
 
 // import { PrivateRoute } from './privateRoute';
 
@@ -44,6 +44,8 @@ function AppRoutes(){
                 <Route path="/login" element={<Login />} />
                 <Route path='/cadastro' element={<Cadastro />} />
                 <Route path='/politicaPrivacidade' element={<PoliticaPrivacidade />} />
+                <Route path='/esqueceuSenha' element={<EsqueceuSenha />} />
+                <Route path='/redefinirSenha' element={<RedefinirSenha />} />
 
                 <Route path="/cliente/comercios" element={<Comercios />} />
                 <Route path='/cliente/escolher-servico' element={<EscolherServico />} />

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { HiOutlineClock, HiOutlineCheck } from "react-icons/hi";
 import api from "../../services/api";
-import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 
 /* Dias utilitários */
@@ -47,11 +46,11 @@ const DISPONIBILIDADE_INICIAL: DisponibilidadeDia[] = NOMES_DIAS.map(dia => ({
 export default function DisponibilidadePrestador() {
   const [dias, setDias] = useState<DisponibilidadeDia[]>(DISPONIBILIDADE_INICIAL);
   const [popup, setPopup] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingDay, setSavingDay] = useState<number | null>(null);
-  const navigate = useNavigate();
+  const [horarioAlmoco, setHorarioAlmoco] = useState<string>("12:00");
+  const [salvandoAlmoco, setSalvandoAlmoco] = useState(false);
 
   // Função para carregar disponibilidades da API
   const carregarDisponibilidades = async () => {
@@ -98,6 +97,24 @@ export default function DisponibilidadePrestador() {
       });
 
       setDias(diasAtualizados);
+      
+      // Carregar horário de almoço
+      try {
+        const almocoResponse = await api.get('/disponibilidades/almoco', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (almocoResponse.data && almocoResponse.data.horaInicio) {
+          const horaInicio = almocoResponse.data.horaInicio.substring(0, 5); // Remove segundos
+          setHorarioAlmoco(horaInicio);
+        }
+      } catch (almocoErr) {
+        console.log('Horário de almoço não configurado ainda ou erro ao carregar:', almocoErr);
+        // Se não houver horário configurado, mantém o padrão
+      }
     } catch (err) {
       console.error('Erro ao carregar disponibilidades:', err);
       setError('Erro ao carregar disponibilidades. Usando configurações padrão.');
@@ -247,6 +264,43 @@ export default function DisponibilidadePrestador() {
     ));
   }
 
+  // Função para salvar horário de almoço
+  async function salvarHorarioAlmoco() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Token de autenticação não encontrado!");
+      return;
+    }
+
+    if (!horarioAlmoco || horarioAlmoco === "00:00") {
+      setError("Defina um horário de almoço válido.");
+      return;
+    }
+
+    setSalvandoAlmoco(true);
+    setError(null);
+
+    try {
+      await api.patch(`/disponibilidades/almoco?horaInicio=${horarioAlmoco}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      setPopup(true);
+      setTimeout(() => {
+        setPopup(false);
+      }, 2000);
+    } catch (err: any) {
+      console.error('Erro ao salvar horário de almoço:', err);
+      const errorMessage = err?.response?.data?.message || err?.response?.data?.errorMessage || "Erro ao salvar horário de almoço. Tente novamente.";
+      setError(errorMessage);
+    } finally {
+      setSalvandoAlmoco(false);
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
@@ -276,6 +330,54 @@ export default function DisponibilidadePrestador() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
           </div>
         ) : (
+          <>
+          {/* Card de Horário de Almoço */}
+          <section className="w-full bg-white rounded-xl shadow px-6 py-6 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Horário de Almoço</h3>
+                <p className="text-sm text-gray-600">
+                  Defina o horário de início do seu almoço. O horário de almoço tem duração de 1 hora e indisponibiliza esse período para agendamentos.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex flex-col">
+                  <label className="text-sm font-semibold text-gray-700 mb-1">Início do Almoço</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="time"
+                      value={horarioAlmoco}
+                      onChange={e => setHorarioAlmoco(e.target.value)}
+                      className="border-2 border-purple-200 rounded-lg px-4 py-2 text-base focus:ring-2 focus:ring-purple-400 outline-none"
+                      min="05:00"
+                      max="20:00"
+                    />
+                    <HiOutlineClock className="text-gray-400 text-xl" />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={salvarHorarioAlmoco}
+                  disabled={salvandoAlmoco}
+                  className="bg-orange-500 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-orange-600 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {salvandoAlmoco ? "Salvando..." : "Salvar Almoço"}
+                </button>
+              </div>
+            </div>
+            {horarioAlmoco && horarioAlmoco !== "00:00" && (
+              <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <p className="text-sm text-orange-800">
+                  <strong>Horário configurado:</strong> {horarioAlmoco} às {(() => {
+                    const [hora, minuto] = horarioAlmoco.split(':');
+                    const horaFim = String(parseInt(hora) + 1).padStart(2, '0');
+                    return `${horaFim}:${minuto}`;
+                  })()}
+                </p>
+              </div>
+            )}
+          </section>
+
           <section className="availability w-full bg-white rounded-xl shadow px-2 sm:px-6 py-8 flex flex-col gap-4 mb-10">
             {dias.map((dia, idx) => (
               <div key={dia.nome} className="day flex items-center justify-between bg-[#f9f9f9] rounded-xl py-4 px-4 mb-1 shadow-sm gap-4 flex-wrap transition hover:translate-x-1">
@@ -357,6 +459,7 @@ export default function DisponibilidadePrestador() {
               </div>
             ))}
           </section>
+          </>
         )}
       </div>
       {/* Popup */}

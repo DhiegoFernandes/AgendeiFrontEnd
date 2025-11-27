@@ -13,6 +13,7 @@ import { FaUserSlash } from "react-icons/fa";
 import api from "../../services/api";
 import { obterMetricasAgendamentos } from "../../services/metricasService";
 import type { MetricasAgendamento } from "../../types/user";
+import LogoutButton from "../../components/LogoutButton";
 
 function getInitials(name: string) {
   if (!name || typeof name !== 'string') {
@@ -316,6 +317,12 @@ export default function PerfilPrestador() {
               </span>
             </div>
             <div className="flex gap-3">
+              <LogoutButton 
+                variant="default" 
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 border backdrop-blur shadow-lg"
+                showIcon={true}
+                showText={true}
+              />
             </div>
           </div>
         </div>
