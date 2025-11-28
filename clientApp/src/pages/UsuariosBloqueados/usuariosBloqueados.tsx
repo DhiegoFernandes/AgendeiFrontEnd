@@ -87,7 +87,7 @@ export default function UsuariosBloqueados() {
 
     try {
       setProcessando(clienteId);
-      await api.put(`/agendamentos/clientes/${clienteId}/bloquear`, {}, {
+      await api.put(`/agendamentos/clientes/${clienteId}/bloquear`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -117,7 +117,7 @@ export default function UsuariosBloqueados() {
 
     try {
       setProcessando(clienteId);
-      await api.put(`/agendamentos/clientes/${clienteId}/desbloquear`, {}, {
+      await api.put(`/agendamentos/clientes/${clienteId}/desbloquear`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

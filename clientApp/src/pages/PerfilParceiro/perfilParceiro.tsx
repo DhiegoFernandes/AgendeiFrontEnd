@@ -88,6 +88,13 @@ export default function PerfilPrestador() {
         // Validar se o negócio existe
         if (!negocio || !negocio.id) {
           console.error("Negócio não encontrado para o usuário");
+          navigate("/prestador/escolha");
+          return;
+        }
+
+        // Se o negócio está desativado, redirecionar para escolher plano
+        if (!negocio.ativo) {
+          navigate("/prestador/criar-negocio?escolherPlano=true");
           return;
         }
 

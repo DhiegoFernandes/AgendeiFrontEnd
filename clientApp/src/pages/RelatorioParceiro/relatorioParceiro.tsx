@@ -351,7 +351,7 @@ export default function RelatorioParceiro() {
         {/* Divisor visual entre os grupos de cards */}
         {relatorioNegocio && (
           <div className="mb-8 pt-8 border-t-2 border-gray-300">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Relatório Financeiro Mensal</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-6">Relatório financeiro deste mês</h2>
           </div>
         )}
         

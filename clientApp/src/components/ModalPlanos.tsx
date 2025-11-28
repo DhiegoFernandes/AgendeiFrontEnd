@@ -50,6 +50,8 @@ interface ModalPlanosProps {
   onSelecionarPlano: (plano: TipoPlano) => void;
   planoAtual?: TipoPlano;
   carregando?: boolean;
+  permitirCancelar?: boolean; // Se false, não permite cancelar sem escolher plano
+  mensagemCancelar?: string; // Mensagem ao tentar cancelar sem escolher
 }
 
 export default function ModalPlanos({
@@ -57,9 +59,12 @@ export default function ModalPlanos({
   onClose,
   onSelecionarPlano,
   planoAtual,
-  carregando = false
+  carregando = false,
+  permitirCancelar = true,
+  mensagemCancelar = "Você precisa escolher um plano para continuar."
 }: ModalPlanosProps) {
   const [planoSelecionado, setPlanoSelecionado] = useState<TipoPlano | null>(null);
+  const [mostrarMensagem, setMostrarMensagem] = useState(false);
 
   if (!isOpen) return null;
 
@@ -69,19 +74,29 @@ export default function ModalPlanos({
     }
   };
 
+  const handleCancelar = () => {
+    if (!permitirCancelar && !planoSelecionado) {
+      setMostrarMensagem(true);
+      return;
+    }
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-2xl font-bold text-purple-700">Escolher Plano</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition cursor-pointer p-1"
-            disabled={carregando}
-          >
-            <HiX size={24} />
-          </button>
+          {permitirCancelar && (
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 transition cursor-pointer p-1"
+              disabled={carregando}
+            >
+              <HiX size={24} />
+            </button>
+          )}
         </div>
 
         {/* Conteúdo */}
@@ -143,10 +158,17 @@ export default function ModalPlanos({
             })}
           </div>
 
+          {/* Mensagem de aviso ao cancelar */}
+          {mostrarMensagem && (
+            <div className="mb-4 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+              <p className="text-yellow-800 font-semibold text-center">{mensagemCancelar}</p>
+            </div>
+          )}
+
           {/* Botões */}
           <div className="flex gap-4 justify-end pt-4 border-t border-gray-200">
             <button
-              onClick={onClose}
+              onClick={handleCancelar}
               className="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition cursor-pointer"
               disabled={carregando}
             >

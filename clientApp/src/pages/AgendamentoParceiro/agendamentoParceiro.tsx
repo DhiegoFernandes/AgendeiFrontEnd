@@ -155,7 +155,7 @@ export default function AgendaPrestador() {
       // Combinar data e hora selecionados
       const dataSelecionada = format(modalEdit.date, "yyyy-MM-dd");
       const dataHoraCompleta = `${dataSelecionada}T${modalEdit.hora}:00`;
-      
+
       // Requisição PUT para atualizar o agendamento
       await api.put(`/agendamentos/${modalEdit.id}`, {
         dataHora: dataHoraCompleta

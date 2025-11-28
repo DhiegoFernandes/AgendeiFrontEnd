@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../services/api";
 import ModalPlanos from "../../components/ModalPlanos";
 import type { TipoPlano } from "../../components/ModalPlanos";
@@ -33,6 +33,7 @@ function validarEndereco(endereco: string) {
 
 export default function PrimeiroAcessoNegocio() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [nome, setNome] = useState("");
   const [cep, setCep] = useState("");
@@ -69,8 +70,20 @@ export default function PrimeiroAcessoNegocio() {
         const dados = response.data;
         setParceiroId(dados.id);
 
-        if (dados.negocio) {
-          navigate("/parceiro/perfil")
+        const negocio = dados.negocio;
+        
+        // Se tem negócio ativo, redireciona para perfil
+        if (negocio && negocio.id && negocio.ativo) {
+          navigate("/parceiro/perfil");
+          return;
+        }
+
+        // Se tem negócio mas está desativado, ou se veio com parâmetro escolherPlano
+        if ((negocio && negocio.id && !negocio.ativo) || searchParams.get("escolherPlano") === "true") {
+          setNegocioCriado(true);
+          setModalPlanosAberto(true);
+          setPopupMessage("Seu negócio está desativado. Escolha um plano para ativá-lo.");
+          setPopup(true);
         }
 
         console.log("Usuário carregado:", dados);
@@ -80,7 +93,7 @@ export default function PrimeiroAcessoNegocio() {
     }
 
     buscarDadosUsuario();
-  }, [])
+  }, [navigate, searchParams])
 
   const enderecoRef = useRef<HTMLInputElement>(null);
 
@@ -409,13 +422,14 @@ export default function PrimeiroAcessoNegocio() {
         <ModalPlanos
           isOpen={modalPlanosAberto}
           onClose={() => {
-            setModalPlanosAberto(false);
-            // Se fechar sem escolher, redirecionar mesmo assim
-            navigate("/parceiro/perfil");
+            // Não permite fechar sem escolher plano quando o negócio foi recém criado
+            // O modal só fecha quando um plano é selecionado
           }}
           onSelecionarPlano={handleAtualizarPlano}
           planoAtual={planoAtual}
           carregando={carregandoPlano}
+          permitirCancelar={false}
+          mensagemCancelar="Você precisa escolher um plano para ativar seu negócio. O negócio ficará desativado até que você selecione um plano."
         />
       )}
     </div>
