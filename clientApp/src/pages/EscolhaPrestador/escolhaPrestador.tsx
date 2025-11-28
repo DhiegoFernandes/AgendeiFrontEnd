@@ -28,9 +28,15 @@ export default function EscolhaPrestador() {
         const negocio = userData.negocio;
 
         if (negocio && negocio.id) {
-          // Se tem negócio, vai direto para o perfil (não precisa passar pela escolha)
-          navigate("/parceiro/perfil");
-          return;
+          // Se tem negócio ativo, vai direto para o perfil
+          if (negocio.ativo) {
+            navigate("/parceiro/perfil");
+            return;
+          } else {
+            // Se tem negócio mas está desativado, redireciona para escolher plano
+            navigate("/prestador/criar-negocio?escolherPlano=true");
+            return;
+          }
         }
 
         // Se chegou aqui, não tem negócio - mostra a página de escolha

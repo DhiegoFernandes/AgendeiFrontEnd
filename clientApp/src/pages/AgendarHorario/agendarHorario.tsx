@@ -114,7 +114,7 @@ export default function AgendarHorario() {
         });
 
         const dados: HorariosDisponiveis = response.data;
-        
+
         // A API já retorna os horários para a data específica consultada
         if (dados.diasDisponiveis && dados.diasDisponiveis.length > 0) {
           const horariosDisponiveis = dados.diasDisponiveis[0].horarios;
@@ -127,7 +127,7 @@ export default function AgendarHorario() {
         setErroHorarios("Erro ao buscar horários disponíveis");
         setHorarios([]);
       } finally {
-        setLoadingHorarios(false);
+      setLoadingHorarios(false);
       }
     }
 
@@ -207,9 +207,9 @@ export default function AgendarHorario() {
                 {negocioNome && <span>{negocioNome}</span>}
               </p>
               {servicoNome && servicoValor && servicoDuracao && (
-                <p className="text-gray-700 mt-1">
+              <p className="text-gray-700 mt-1">
                   {servicoNome} — R$ {servicoValor.toFixed(2)} · {servicoDuracao} min
-                </p>
+              </p>
               )}
             </div>
           </div>
@@ -225,24 +225,24 @@ export default function AgendarHorario() {
         <div className="bg-white mt-2 rounded-2xl shadow px-8 py-6">
           <label className="block font-bold text-lg mb-4">Selecione uma data</label>
           <div className="flex justify-center items-center">
-            <DayPicker
-              mode="single"
-              selected={data}
-              onSelect={d => d && setData(d)}
-              locale={ptBR}
-              weekStartsOn={0}
-              fromDate={new Date()}
-              modifiersClassNames={{
-                selected: "bg-purple-500 text-white !rounded-lg",
-                today: "text-purple-600 font-bold",
-              }}
+          <DayPicker
+            mode="single"
+            selected={data}
+            onSelect={d => d && setData(d)}
+            locale={ptBR}
+            weekStartsOn={0}
+            fromDate={new Date()}
+            modifiersClassNames={{
+              selected: "bg-purple-500 text-white !rounded-lg",
+              today: "text-purple-600 font-bold",
+            }}
               className="mx-auto"
-              classNames={{
-                head_row: "text-gray-500 font-bold",
+            classNames={{
+              head_row: "text-gray-500 font-bold",
                 month: "mx-auto",
                 caption: "flex justify-center",
-              }}
-            />
+            }}
+          />
           </div>
         </div>
 
@@ -307,12 +307,12 @@ export default function AgendarHorario() {
               </span>
             </span>
             {servicoValor && (
-              <div className="flex justify-between mt-2 text-xl font-extrabold">
-                <span className="text-purple-700">Valor total:</span>
-                <span className="text-purple-700">
+            <div className="flex justify-between mt-2 text-xl font-extrabold">
+              <span className="text-purple-700">Valor total:</span>
+              <span className="text-purple-700">
                   R$ {servicoValor.toFixed(2)}
-                </span>
-              </div>
+              </span>
+            </div>
             )}
           </div>
         </div>
@@ -359,7 +359,7 @@ export default function AgendarHorario() {
                 {prestadorNome && (
                   <p className="text-gray-600 text-sm">Com {prestadorNome}</p>
                 )}
-              </div>
+                </div>
               {servicoValor && (
                 <div className="ml-auto">
                   <p className="font-bold text-purple-700">R$ {servicoValor.toFixed(2)}</p>

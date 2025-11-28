@@ -47,7 +47,7 @@ export default function GerenciarPerfilParceiro() {
         setEmail(user.email || "");
         setTelefone(user.telefone || "");
         setParceiroId(user.id);
-
+        
         // Buscar plano atual diretamente da resposta
         if (user.plano) {
           setPlanoAtual(user.plano as TipoPlano);

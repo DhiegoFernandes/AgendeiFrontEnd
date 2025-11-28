@@ -305,12 +305,12 @@ export default function PoliticaPrivacidade() {
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
                   8.2 Como Exercer os Direitos
                 </h3>
-                <ul className="list-disc ml-6 space-y-1">
+              <ul className="list-disc ml-6 space-y-1">
                   <li><strong>E-mail:</strong> contato@agendei.com.br</li>
                   <li><strong>Prazo de Resposta:</strong> Até 15 dias úteis</li>
                   <li><strong>Identificação:</strong> Necessária para verificar identidade</li>
                   <li><strong>Gratuidade:</strong> Exercício de direitos é gratuito</li>
-                </ul>
+              </ul>
               </div>
             </div>
           </section>
@@ -338,7 +338,7 @@ export default function PoliticaPrivacidade() {
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Pais/responsáveis são responsáveis por menores em sua conta</li>
                   <li>Devem supervisionar uso da plataforma por menores</li>
-                </ul>
+              </ul>
               </div>
             </div>
           </section>
@@ -363,11 +363,11 @@ export default function PoliticaPrivacidade() {
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
                   10.2 Notificação de Mudanças
                 </h3>
-                <ul className="list-disc ml-6 space-y-1">
+              <ul className="list-disc ml-6 space-y-1">
                   <li><strong>E-mail:</strong> Para mudanças significativas</li>
                   <li><strong>Plataforma:</strong> Banner ou popup informativo</li>
                   <li><strong>Prazo:</strong> 30 dias de antecedência para mudanças importantes</li>
-                </ul>
+              </ul>
               </div>
             </div>
           </section>

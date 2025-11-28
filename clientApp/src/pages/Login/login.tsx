@@ -35,7 +35,28 @@ export default function Login() {
         } else if (perfil === "cliente") {
           navigate(`/cliente/comercios`);
         } else {
-          navigate(`/prestador/escolha`);
+          // Para prestador, verificar se o negócio está desativado
+          try {
+            const userResponse = await api.get("/usuarios/me", {
+              headers: {
+                Authorization: `Bearer ${response.data.token}`,
+                'Content-Type': 'application/json'
+              },
+            });
+
+            const negocio = userResponse.data.negocio;
+            
+            // Se tem negócio mas está desativado, redirecionar para escolher plano
+            if (negocio && negocio.id && !negocio.ativo) {
+              navigate("/prestador/criar-negocio?escolherPlano=true");
+            } else {
+              navigate(`/prestador/escolha`);
+            }
+          } catch (error) {
+            // Se der erro ao buscar dados, vai para escolha normalmente
+            console.error("Erro ao verificar negócio:", error);
+            navigate(`/prestador/escolha`);
+          }
         }
     } catch (error: any) {
         const mensagemErro = error?.response?.data?.message || 

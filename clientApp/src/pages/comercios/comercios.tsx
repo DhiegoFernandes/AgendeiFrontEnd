@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
@@ -23,6 +23,7 @@ interface Negocio {
   id: number;
   nome: string;
   endereco: string;
+  numero: string;
   cep: string;
   notaMedia: number;
   distanciaKm: number;
@@ -33,8 +34,9 @@ interface NegocioFormatado {
   id: number;
   nome: string;
   endereco: string;
+  numero: string;
   cep: string;
-  rating: number;
+  rating: number | null;
   distancia: string;
   categoria: string;
 }
@@ -42,13 +44,14 @@ interface NegocioFormatado {
 export default function Comercios() {
   const [cat, setCat] = useState("todos");
   const [q, setQ] = useState("");
+  const [notaMinima, setNotaMinima] = useState<number | null>(null);
   const [negocios, setNegocios] = useState<NegocioFormatado[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Função para carregar negócios da API
-  async function carregarNegocios() {
+  const carregarNegocios = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -67,14 +70,15 @@ export default function Comercios() {
           'Content-Type': 'application/json'
         }
       });
-
+      
       // Transformar dados da API para o formato local
       const negociosFormatados: NegocioFormatado[] = response.data.map((negocio: Negocio) => ({
         id: negocio.id,
         nome: negocio.nome,
         endereco: negocio.endereco,
+        numero: negocio.numero || "",
         cep: negocio.cep,
-        rating: negocio.notaMedia,
+        rating: negocio.notaMedia || null,
         distancia: `${negocio.distanciaKm.toFixed(1)} km`,
         categoria: negocio.categoria,
       }));
@@ -87,12 +91,12 @@ export default function Comercios() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [notaMinima]);
 
-  // Carregar negócios ao montar o componente
+  // Carregar negócios quando nota mínima mudar
   useEffect(() => {
     carregarNegocios();
-  }, []);
+  }, [carregarNegocios]);
 
   const filtrar = () =>
     negocios.filter(c => {
@@ -163,14 +167,15 @@ export default function Comercios() {
   </button>
 </div>
       </header>
-      {/* Categorias */}
+      {/* Categorias e Filtro de Avaliação */}
       <nav className="w-full overflow-x-auto bg-white border-b border-b-gray-100 ">
-        <div className="flex gap-2 py-4 px-6 min-w-full max-w-full">
+        <div className="flex gap-2 py-4 px-6 items-center">
+          {/* Categorias */}
           {categorias.map(c => (
             <button
               key={c.tag}
               className={`
-                px-5 py-2 rounded-full font-semibold cursor-pointer
+                px-5 py-2 rounded-full font-semibold cursor-pointer whitespace-nowrap
                 ${cat === c.tag
                   ? "bg-purple-600 text-white shadow"
                   : "bg-purple-50 text-purple-600 hover:bg-purple-100 cursor-pointer"}
@@ -181,6 +186,33 @@ export default function Comercios() {
               {c.nome}
             </button>
           ))}
+          {/* Filtro de Avaliação */}
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <label className="text-sm font-semibold text-gray-700">
+              Nota mínima:
+            </label>
+            <select
+              value={notaMinima || ""}
+              onChange={(e) => setNotaMinima(e.target.value ? Number(e.target.value) : null)}
+              className="px-4 py-2 rounded-full border border-gray-300 bg-white text-purple-600 font-semibold focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer"
+            >
+              <option value="">Todas</option>
+              <option value="1">1 ⭐</option>
+              <option value="2">2 ⭐</option>
+              <option value="3">3 ⭐</option>
+              <option value="4">4 ⭐</option>
+              <option value="5">5 ⭐</option>
+            </select>
+            {notaMinima && (
+              <button
+                onClick={() => setNotaMinima(null)}
+                className="text-xs text-purple-600 hover:text-purple-700 font-medium underline cursor-pointer ml-1"
+                title="Limpar filtro"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
       </nav>
       {/* Destaque */}
@@ -202,31 +234,31 @@ export default function Comercios() {
         {!loading && !error && (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filtrar().map(c => (
-              <div key={c.id} className="bg-white rounded-xl shadow-lg flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl">
-                {/* Banner Foto - Carrossel */}
-                <CarrosselFotos negocioId={c.id} />
-                {/* Conteúdo */}
-                <div className="flex-1 flex flex-col gap-2 px-5 pt-3 pb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-lg text-gray-900">{c.nome}</h3>
-                    <div className="flex items-center gap-1 font-semibold text-yellow-500">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 1.5l2.59 6.85h7.2l-5.8 4.22L16.12 19 10 14.88 3.88 19l1.13-6.43-5.8-4.22h7.2z" /></svg>
-                      <span className="text-gray-800 ml-1">{c.rating}</span>
-                    </div>
-                  </div>
-                  <p className="text-gray-700 text-base leading-tight">{c.categoria}</p>
-                  <p className="text-gray-400 text-sm">{c.distancia} · {c.endereco}</p>
-                  <div className="flex flex-wrap gap-2 my-1">
-                  </div>
-                  <div className="mt-auto flex justify-end">
-                    <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-purple-700 transition cursor-pointer"
-                      onClick={() => navigate("/cliente/escolher-servico", { state: { negocioId: c.id } })}>
-                      Agendar
-                    </button>
+            <div key={c.id} className="bg-white rounded-xl shadow-lg flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-xl">
+              {/* Banner Foto - Carrossel */}
+              <CarrosselFotos negocioId={c.id} />
+              {/* Conteúdo */}
+              <div className="flex-1 flex flex-col gap-2 px-5 pt-3 pb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-lg text-gray-900">{c.nome}</h3>
+                  <div className="flex items-center gap-1 font-semibold text-yellow-500">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 1.5l2.59 6.85h7.2l-5.8 4.22L16.12 19 10 14.88 3.88 19l1.13-6.43-5.8-4.22h7.2z"/></svg>
+                    <span className="text-gray-800 ml-1">{c.rating}</span>
                   </div>
                 </div>
+                <p className="text-gray-700 text-base leading-tight">{c.categoria}</p>
+                <p className="text-gray-400 text-sm">{c.distancia} · {c.endereco}</p>
+                <div className="flex flex-wrap gap-2 my-1">
+                </div>
+                <div className="mt-auto flex justify-end">
+                  <button className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-purple-700 transition cursor-pointer"
+                  onClick={() => navigate("/cliente/escolher-servico", { state: { negocioId: c.id } })}>
+                    Agendar
+                  </button>
+                </div>
               </div>
-            ))}
+            </div>
+          ))}
             {filtrar().length === 0 && (
               <div className="col-span-full text-center text-gray-400 mt-8">
                 Nenhum negócio encontrado.

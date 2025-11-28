@@ -13,7 +13,7 @@ const navs = [
   { path: "/admin/painelAdm", ico: <AiOutlineHome />, label: "Dashboard" },
   { path: "/admin/clienteAdm", ico: <FiUsers />, label: "Clientes" },
   { path: "/admin/parceiroAdm", ico: <FiBriefcase />, label: "Prestadores" },
-  { path: "/admin/servicosAdm", ico: <FiClipboard />, label: "Serviços" },
+  { path: "/admin/servicosAdm", ico: <FiClipboard />, label: "Negócios" },
   { path: "/admin/configuracaoAdm", ico: <FiSettings />, label: "Configurações" },
 ];
 
@@ -82,7 +82,6 @@ export default function ADMNavBar() {
             <FiX />
           </button>
           <div className="brand-id flex items-center gap-3">
-            <div className="logo rounded-lg bg-purple-100 w-9 h-9 flex items-center justify-center font-extrabold text-purple-600 text-lg">A</div>
             <span className="brand-title font-bold text-xl md:block block">Admin Panel</span>
           </div>
         </div>
