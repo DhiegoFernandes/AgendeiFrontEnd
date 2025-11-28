@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ClientNavbar from "../../components/ClientNavbar";
 import api from "../../services/api";
+import { FiArrowLeft } from "react-icons/fi";
 
 interface UserData {
   id: number;
@@ -304,6 +305,17 @@ export default function AlterarDadosCliente() {
       <main className="flex-1 w-full flex flex-col items-center mt-5">
         <section className="bg-white max-w-md w-full rounded-2xl shadow-xl px-7 py-8 flex flex-col items-center gap-2 mb-8">
 
+          <div className="w-full flex items-center mb-4">
+            <button
+              type="button"
+              onClick={onVoltarPerfil}
+              className="flex items-center text-purple-600 hover:text-purple-800 font-semibold transition"
+            >
+              <FiArrowLeft className="mr-2 text-lg" />
+              Voltar
+            </button>
+          </div>
+
           <form className="w-full flex flex-col gap-4" autoComplete="off" onSubmit={onSalvar}>
             {/* Nome */}
             <div>
@@ -405,6 +417,14 @@ export default function AlterarDadosCliente() {
               />
             </div>
 
+            <button
+              type="button"
+              onClick={() => navigate("/esqueceuSenha")}
+              className="flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition shadow"
+            >
+              Redefinir Senha por email
+            </button>
+
             {/* BOTÕES */}
             <div className="flex sm:flex-row justify-center gap-3">
               <button
@@ -416,6 +436,8 @@ export default function AlterarDadosCliente() {
               >
                 {salvando ? "Salvando..." : "Salvar alterações"}
               </button>
+
+
             </div>
           </form>
         </section>

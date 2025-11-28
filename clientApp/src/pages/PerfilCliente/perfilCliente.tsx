@@ -28,6 +28,24 @@ export default function PerfilCliente() {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
+
+  // Dentro do PerfilCliente
+  const [popup, setPopup] = useState<{ msg: string; ok?: () => void } | null>(null);
+
+  function handlePopupOk() { setPopup(null); }
+  function handlePopupSim() { popup?.ok?.(); setPopup(null); }
+
+  // Função de logout
+  function confirmarLogout() {
+    setPopup({
+      msg: "Deseja realmente sair?",
+      ok: () => {
+        localStorage.removeItem("token"); // Remove token
+        navigate('/'); // Redireciona
+      }
+    });
+  }
+
   useEffect(() => {
     async function buscarDadosUsuario() {
       const token = localStorage.getItem("token");
@@ -107,6 +125,16 @@ export default function PerfilCliente() {
           </div>
           <div className="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
             <button
+              className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow flex items-center gap-2"
+              onClick={() => navigate(-1)}
+            >
+              <HiOutlineArrowLeft />
+              Voltar
+            </button>
+
+            
+
+            <button
               className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow"
               onClick={() => navigate("/cliente/alterar-dados")}
             >
@@ -169,13 +197,48 @@ export default function PerfilCliente() {
         <section className="flex justify-center mb-10">
           <button
             className="flex items-center gap-2 py-3 px-7 rounded-xl border-2 border-red-300 text-red-600 font-bold bg-white hover:bg-red-50 transition text-lg shadow"
-            onClick={() => navigate('/')}
+            onClick={confirmarLogout}
           >
             <HiOutlineLogout />
             Sair
           </button>
         </section>
+
       </main>
+
+      {popup && (
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white px-7 py-10 rounded-2xl shadow-lg w-full max-w-[380px] flex flex-col items-center">
+            <span className="text-xl font-bold text-purple-700 mb-4 text-center">{popup.msg}</span>
+            <div className="flex gap-4">
+              {popup.ok ? (
+                <>
+                  <button
+                    className="px-6 py-2 rounded-lg bg-gradient-to-r from-red-600 to-purple-700 text-white font-bold hover:brightness-105 shadow cursor-pointer"
+                    onClick={handlePopupSim}
+                  >
+                    Sim
+                  </button>
+                  <button
+                    className="px-6 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 font-bold hover:bg-gray-100 shadow cursor-pointer"
+                    onClick={handlePopupOk}
+                  >
+                    Não
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="px-8 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold hover:brightness-105 shadow cursor-pointer"
+                  onClick={handlePopupOk}
+                >
+                  Ok
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

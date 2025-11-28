@@ -35,7 +35,7 @@ const ClientNavbar = () => {
           {/* Logo */}
           <div 
             className="flex items-center cursor-pointer" 
-            onClick={() => navigate("/cliente")}
+            onClick={() => navigate("/cliente/comercios")}
           >
             <img src={LogoAgendei} alt="Agendei" className="h-15" />
           </div>

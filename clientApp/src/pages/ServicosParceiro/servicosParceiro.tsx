@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import Header from "../../components/Header";
 
-const COMERCIO = "Barbearia Estilo";
-const PRESTADOR = "Ricardo Almeida";
 
 function currencyMask(value: string) {
   let v = value.replace(/\D/g, "");
@@ -567,6 +565,7 @@ export default function ServicosParceiro() {
           </div>
         ))}
       </div>
+      
     </div>
   );
 }
