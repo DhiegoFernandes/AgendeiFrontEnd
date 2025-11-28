@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import api from "../../services/api";
 import { CiImageOn } from "react-icons/ci";
@@ -6,6 +7,7 @@ import ModalPlanos from "../../components/ModalPlanos";
 import type { TipoPlano } from "../../components/ModalPlanos";
 
 export default function GerenciarPerfilParceiro() {
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [nome, setNome] = useState("");
@@ -233,10 +235,13 @@ export default function GerenciarPerfilParceiro() {
     }
 
     try {
+      // Remover formatação do telefone (apenas números)
+      const telefoneSemFormatacao = telefone.replace(/\D/g, "");
+      
       const dadosAtualizacao = {
         nome: nome,
         email: email,
-        telefone: telefone
+        telefone: telefoneSemFormatacao
       };
 
       await api.put(`/usuarios/me/atualizar`, dadosAtualizacao, {
@@ -480,6 +485,15 @@ export default function GerenciarPerfilParceiro() {
             type="submit"
           >
             Atualizar dados
+          </button>
+          
+          {/* Botão de redefinir senha */}
+          <button
+            type="button"
+            onClick={() => navigate("/esqueceuSenha")}
+            className="w-full bg-transparent border-2 border-purple-600 text-purple-600 py-3 rounded-xl font-bold text-lg shadow-sm hover:bg-purple-50 transition cursor-pointer"
+          >
+            Redefinir senha
           </button>
         </form>
         
