@@ -33,7 +33,37 @@ export default function Login() {
         if (perfil === "admin") {
           navigate("/admin/painelAdm");
         } else if (perfil === "cliente") {
-          navigate(`/cliente/comercios`);
+          // Para cliente, verificar se está ativo
+          try {
+            const userResponse = await api.get("/usuarios/me", {
+              headers: {
+                Authorization: `Bearer ${response.data.token}`,
+                'Content-Type': 'application/json'
+              },
+            });
+
+            const user = userResponse.data;
+            
+            // Verificar se o cliente está ativo
+            if (user.ativo === false) {
+              // Limpar localStorage
+              localStorage.removeItem("token");
+              localStorage.removeItem("perfil");
+              localStorage.removeItem("nome");
+              
+              // Mostrar mensagem de erro
+              setErro("Seu perfil foi desativado. Se isso foi um engano, entre em contato com os administradores.");
+              setCarregando(false);
+              return;
+            }
+
+            // Se está ativo, permite acesso
+            navigate(`/cliente/comercios`);
+          } catch (error) {
+            // Se der erro ao buscar dados, permite acesso normalmente
+            console.error("Erro ao verificar dados do cliente:", error);
+            navigate(`/cliente/comercios`);
+          }
         } else {
           // Para prestador, verificar status e negócio
           try {
