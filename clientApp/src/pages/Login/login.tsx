@@ -35,7 +35,7 @@ export default function Login() {
         } else if (perfil === "cliente") {
           navigate(`/cliente/comercios`);
         } else {
-          // Para prestador, verificar se o negócio está desativado
+          // Para prestador, verificar status e negócio
           try {
             const userResponse = await api.get("/usuarios/me", {
               headers: {
@@ -44,7 +44,22 @@ export default function Login() {
               },
             });
 
-            const negocio = userResponse.data.negocio;
+            const user = userResponse.data;
+            
+            // Verificar se o prestador está ativo
+            if (user.ativo === false) {
+              // Limpar localStorage
+              localStorage.removeItem("token");
+              localStorage.removeItem("perfil");
+              localStorage.removeItem("nome");
+              
+              // Mostrar mensagem de erro
+              setErro("Seu perfil foi desativado. Se isso foi um engano, entre em contato com os administradores.");
+              setCarregando(false);
+              return;
+            }
+
+            const negocio = user.negocio;
             
             // Se tem negócio mas está desativado, redirecionar para escolher plano
             if (negocio && negocio.id && !negocio.ativo) {
