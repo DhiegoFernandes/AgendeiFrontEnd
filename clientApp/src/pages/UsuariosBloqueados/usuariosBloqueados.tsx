@@ -23,7 +23,6 @@ export default function UsuariosBloqueados() {
   const [processando, setProcessando] = useState<number | null>(null);
   const [filtro, setFiltro] = useState<"todos" | "bloqueados">("todos");
   const [popup, setPopup] = useState<string | false>(false);
-  const [prestadorId, setPrestadorId] = useState<number | null>(null);
 
   // Carregar todos os clientes do negócio
   async function carregarClientes() {
@@ -138,32 +137,7 @@ export default function UsuariosBloqueados() {
     }
   }
 
-  // Buscar ID do prestador ao carregar a página
   useEffect(() => {
-    async function buscarPrestadorId() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
-      try {
-        const response = await api.get("/usuarios/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        });
-
-        if (response.data && response.data.id) {
-          setPrestadorId(response.data.id);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar ID do prestador:", error);
-      }
-    }
-
-    buscarPrestadorId();
     carregarClientes();
     carregarClientesBloqueados();
   }, []);
