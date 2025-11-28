@@ -70,8 +70,6 @@ const ClientNavbar = () => {
               </div>
               <span className="font-medium text-sm">Meu Perfil</span>
             </button>
-            {/* Logout Button */}
-            <LogoutButton variant="default" />
           </div>
           
           {/* Mobile Menu Button */}

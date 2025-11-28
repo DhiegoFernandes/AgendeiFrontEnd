@@ -1,18 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { FaCut } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { buscarFotosNegocio, buscarImagemFoto, construirUrlFoto } from "../../services/fotoService";
 import type { FotoNegocio } from "../../types/user";
 import ClientNavbar from "../../components/ClientNavbar";
-
-const categorias = [
-  { tag: "todos", nome: "Todos" },
-  { tag: "cortes", nome: "Cortes" },
-  { tag: "barbas", nome: "Barbas" },
-  { tag: "tratamentos", nome: "Tratamentos" },
-  { tag: "combos", nome: "Combos" },
-];
+import ListaServicosPorPrestador from "../../components/ListaServicosPorPrestador";
 
 // Interface para os dados do negócio
 interface NegocioData {
@@ -51,13 +43,9 @@ export default function EscolherServico() {
   const navigate = useNavigate();
   const negocioId = location.state?.negocioId as number | undefined;
   
-  const [categoria, setCategoria] = useState("todos");
   const [servicoSel, setServicoSel] = useState<number | null>(null);
   const [showMap, setShowMap] = useState(false);
   const [busca, setBusca] = useState("");
-  const [distancia, setDistancia] = useState<string | null>(null);
-  const [tempo, setTempo] = useState<string | null>(null);
-  const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [mapUrl, setMapUrl] = useState("");
   
@@ -179,21 +167,17 @@ export default function EscolherServico() {
   }, [negocioId]);
   
   const servicosFiltrados = servicos.filter(s => {
-    const matchCategoria = categoria === "todos" || true; // Remover filtro de categoria por enquanto, já que a API não retorna categoria
     const matchBusca = !busca || 
       s.titulo.toLowerCase().includes(busca.toLowerCase()) ||
       s.descricao.toLowerCase().includes(busca.toLowerCase()) ||
       s.nomePrestador.toLowerCase().includes(busca.toLowerCase());
-    return matchCategoria && matchBusca;
+    return matchBusca;
   });
 
   async function handleVerMapa() {
     if (!negocio) return;
     
     setShowMap(true);
-    setCarregando(true);
-    setDistancia(null);
-    setTempo(null);
     setErro(null);
     
     // Montar endereço completo do negócio
@@ -215,51 +199,20 @@ export default function EscolherServico() {
             
             // Configuramos um URL padrão de direções
             setMapUrl(`https://www.google.com/maps?saddr=${origem}&daddr=${destino}&output=embed`);
-            
-            // Fazemos uma chamada direta para o Google Maps para estimar a distância/tempo
-            // Primeiro, estimamos manualmente baseado na localização
-            // Calculamos a distância em linha reta (Haversine)
-            const distanciaKm = calcularDistanciaHaversine(
-              latitude, longitude, 
-              -23.5616, -46.6560 // Coordenadas aproximadas da Av. Paulista
-            ).toFixed(1);
-            
-            // Estimamos o tempo (aproximadamente 2 minutos por km em tráfego moderado)
-            const tempoMin = Math.round(parseFloat(distanciaKm) * 2);
-            
-            setDistancia(`${distanciaKm} km`);
-            setTempo(`${tempoMin} min`);
-            setCarregando(false);
           } catch (error) {
             console.error("Erro ao calcular distância:", error);
             setErro("Não foi possível calcular a distância exata");
-            setCarregando(false);
           }
         },
         (error) => {
           console.error("Erro de geolocalização:", error);
           setErro("Não foi possível obter sua localização");
-          setCarregando(false);
         }
       );
     } else {
       setErro("Geolocalização não suportada no seu navegador");
-      setCarregando(false);
     }
   }
-  
-  // Função para calcular distância entre dois pontos (fórmula de Haversine)
-  const calcularDistanciaHaversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Raio da Terra em km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c; // Distância em km
-  };
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] pb-24">
@@ -357,42 +310,11 @@ export default function EscolherServico() {
             Carregando serviços...
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
-            {servicosFiltrados.map((s) => (
-              <label
-                key={s.id}
-                className={`flex items-center px-6 py-5 rounded-2xl shadow-sm bg-white cursor-pointer border-2 transition-all
-                  ${servicoSel === s.id ? "border-purple-500 bg-purple-50" : "border-white hover:border-purple-300"}
-                `}
-              >
-                <input
-                  type="radio"
-                  checked={servicoSel === s.id}
-                  onChange={() => setServicoSel(s.id)}
-                  className="sr-only"
-                  name="servico"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex gap-2 items-center">
-                    <span className={`font-bold text-lg text-gray-900 ${servicoSel === s.id ? "text-purple-700" : ""}`}>{s.titulo}</span>
-                  </div>
-                  <p className="text-gray-500 mt-1 mb-2 font-medium">{s.descricao}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block bg-indigo-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">{s.duracaoMinutos} min</span>
-                    {s.nomePrestador && (
-                      <span className="text-xs text-gray-500">por {s.nomePrestador}</span>
-                    )}
-                  </div>
-                </div>
-                <span className="font-bold text-lg text-purple-800 min-w-[80px] text-right">{`R$ ${s.valor.toFixed(2)}`}</span>
-              </label>
-            ))}
-            {servicosFiltrados.length === 0 && (
-              <div className="text-center text-gray-400 py-12">
-                Nenhum serviço disponível.
-              </div>
-            )}
-          </div>
+          <ListaServicosPorPrestador
+            servicos={servicosFiltrados}
+            servicoSel={servicoSel}
+            onSelecionarServico={setServicoSel}
+          />
         )}
       </main>
 
