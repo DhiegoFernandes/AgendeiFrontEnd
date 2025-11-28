@@ -49,6 +49,7 @@ export default function ParceiroAdm() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const size = 10;
+  const [erros, setErros] = useState<any>({});
 
   // Buscar prestadores
   useEffect(() => {
@@ -100,8 +101,58 @@ export default function ParceiroAdm() {
     setPage(0);
   };
 
+  function validarPrestador(p: PrestadorType) {
+    const e: any = {};
+
+    // NOME — somente letras e espaços
+    if (!p.nome || p.nome.trim() === "") {
+      e.nome = "Nome é obrigatório.";
+    } else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(p.nome)) {
+      e.nome = "Nome deve conter apenas letras.";
+    }
+
+    // EMAIL — básico e confiável
+    if (!p.email || p.email.trim() === "") {
+      e.email = "Email é obrigatório.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) {
+      e.email = "Email inválido.";
+    }
+
+    // TELEFONE — somente números, mínimo 11, máximo 15
+    if (!p.telefone || p.telefone.trim() === "") {
+      e.telefone = "Telefone é obrigatório.";
+    } else {
+
+      // NÃO PODE conter letras ou símbolos
+      if (!/^[0-9()\-+\s]*$/.test(p.telefone)) {
+        e.telefone = "Telefone deve conter apenas números e caracteres de formatação.";
+      }
+
+      // Agora remove os caracteres de máscara
+      const tel = p.telefone.replace(/\D/g, "");
+
+      if (tel.length < 11) {
+        e.telefone = "Telefone deve ter pelo menos 11 números.";
+      } else if (tel.length > 15) {
+        e.telefone = "Telefone deve ter no máximo 15 números.";
+      }
+    }
+
+
+
+    return e;
+  }
+
   async function handleSalvar() {
     if (!edita) return;
+
+    const errosVal = validarPrestador(edita);
+    setErros(errosVal);
+
+    if (Object.keys(errosVal).length > 0) {
+      setModalPopup("Corrija os campos antes de salvar.");
+      return;
+    }
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -125,7 +176,7 @@ export default function ParceiroAdm() {
 
       setModalPopup("Dados do prestador alterados com sucesso!");
       setEdita(null);
-      
+
       // Recarregar lista
       const params: any = {
         perfil: "PRESTADOR",
@@ -156,7 +207,7 @@ export default function ParceiroAdm() {
   return (
     <>
       <h2 className="text-2xl font-bold mb-6">Lista de Prestadores</h2>
-      
+
       <form onSubmit={handleBusca} className="mb-4 flex items-center gap-2 max-w-lg">
         <div className="relative w-full">
           <input
@@ -191,14 +242,13 @@ export default function ParceiroAdm() {
                   <div className="font-bold">{p.nome}</div>
                   <div className="text-gray-500 text-sm">{p.email}</div>
                   <div className="text-gray-400 text-xs">
-                    {p.negocio ? `Negócio: ${p.negocio.nome}` : "Sem negócio cadastrado"} • 
-                    {p.plano ? ` Plano: ${p.plano}` : " Sem plano"} • 
+                    {p.negocio ? `Negócio: ${p.negocio.nome}` : "Sem negócio cadastrado"} •
+                    {p.plano ? ` Plano: ${p.plano}` : " Sem plano"} •
                     {p.ativo ? " Ativo" : " Inativo"}
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  p.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                }`}>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${p.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}>
                   {p.ativo ? "Ativo" : "Inativo"}
                 </span>
               </li>
@@ -243,7 +293,7 @@ export default function ParceiroAdm() {
             autoComplete="off"
           >
             <h2 className="text-xl font-bold text-purple-700 mb-2 text-center">Editar Prestador</h2>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="nomePrestador">
                 <FiUser className="inline mr-1" /> Nome
@@ -254,9 +304,11 @@ export default function ParceiroAdm() {
                 onChange={e => setEdita(v => (v ? { ...v, nome: e.target.value } : v))}
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
                 required
-              />
+              />{erros.nome && (
+                <p className="text-red-600 text-sm mt-1">{erros.nome}</p>
+              )}
             </div>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="emailPrestador">
                 <FiMail className="inline mr-1" /> Email
@@ -268,9 +320,12 @@ export default function ParceiroAdm() {
                 onChange={e => setEdita(v => (v ? { ...v, email: e.target.value } : v))}
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
                 required
-              />
+              /> {erros.email && (
+                <p className="text-red-600 text-sm mt-1">{erros.email}</p>
+              )}
+
             </div>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="telefonePrestador">
                 <FiPhone className="inline mr-1" /> Telefone
@@ -281,7 +336,9 @@ export default function ParceiroAdm() {
                 onChange={e => setEdita(v => (v ? { ...v, telefone: e.target.value } : v))}
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
                 required
-              />
+              />{erros.telefone && (
+                <p className="text-red-600 text-sm mt-1">{erros.telefone}</p>
+              )}
             </div>
 
             <div>

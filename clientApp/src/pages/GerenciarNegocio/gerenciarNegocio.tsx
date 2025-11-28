@@ -5,7 +5,7 @@ import api from "../../services/api";
 import { HiOutlineLogout } from "react-icons/hi";
 import ModalVisualizarFotos from "../../components/ModalVisualizarFotos";
 
-const CATEGORIAS_FIXAS = ["BELEZA", "ESTETICA", "SAUDE", "FITNESS", "BARBEARIA", "MAQUIAGEM", "MANICURE", "SPA", "OUTROS"];
+const CATEGORIAS_FIXAS = ["BELEZA", "ESTETICA", "BARBEARIA", "MAQUIAGEM", "MANICURE", "OUTROS"];
 
 export default function GerenciarNegocio() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);

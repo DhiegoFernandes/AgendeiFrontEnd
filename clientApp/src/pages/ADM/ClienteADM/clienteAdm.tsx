@@ -40,6 +40,8 @@ export default function ClienteAdm() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const size = 10;
+  const [erros, setErros] = useState<any>({});
+
 
   // Buscar clientes
   useEffect(() => {
@@ -91,8 +93,78 @@ export default function ClienteAdm() {
     setPage(0);
   };
 
+  function validarCampos(cliente: ClienteType) {
+    const errosTemp: any = {};
+
+    // Nome
+    if (!cliente.nome || cliente.nome.trim().length < 3) {
+      errosTemp.nome = "O nome deve ter pelo menos 3 caracteres.";
+    } else if (!/^[A-Za-zÀ-ÿ\s]+$/.test(cliente.nome)) {
+      errosTemp.nome = "O nome deve conter apenas letras.";
+    }
+
+
+    // Email
+    if (!cliente.email) {
+      errosTemp.email = "O email é obrigatório.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cliente.email)) {
+      errosTemp.email = "Formato de email inválido.";
+    }
+
+    // Telefone
+    if (!/^[0-9()\-\s+]*$/.test(cliente.telefone)) {
+      errosTemp.telefone = "Telefone deve conter apenas números (com ou sem máscara).";
+    }
+
+    const tel = cliente.telefone.replace(/\D/g, "");
+
+    if (tel.length < 11) {
+      errosTemp.telefone = "Telefone deve ter pelo menos 11 dígitos.";
+    } else if (tel.length > 15) {
+      errosTemp.telefone = "Telefone deve ter no máximo 15 dígitos.";
+    }
+
+    // CEP
+    if (cliente.cep && cliente.cep.trim() !== "") {
+      // Se tiver qualquer letra, bloqueia imediatamente
+      if (!/^\d+$/.test(cliente.cep)) {
+        errosTemp.cep = "CEP deve conter apenas números.";
+      }
+      // só passa se for 100% números
+
+      if (cliente.cep.length !== 8) {
+        errosTemp.cep = "CEP deve ter exatamente 8 dígitos.";
+      }
+    }
+
+
+    // Endereço
+    if (cliente.endereco && cliente.endereco.length < 3) {
+      errosTemp.endereco = "Endereço muito curto.";
+    }
+
+    // Número
+    if (!cliente.numero || cliente.numero.trim() === "") {
+      errosTemp.numero = "Número é obrigatório.";
+    } else if (!/^\d+$/.test(cliente.numero)) {
+      errosTemp.numero = "Número deve conter apenas dígitos.";
+    } else if (Number(cliente.numero) <= 0) {
+      errosTemp.numero = "Número não pode ser negativo ou zero.";
+    }
+
+
+    setErros(errosTemp);
+    return Object.keys(errosTemp).length === 0;
+  }
+
   async function handleSalvar() {
     if (!edita) return;
+
+    // VALIDAR
+    if (!validarCampos(edita)) {
+      setModalPopup("Corrija os erros antes de salvar.");
+      return;
+    }
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -119,7 +191,7 @@ export default function ClienteAdm() {
 
       setModalPopup("Dados alterados com sucesso!");
       setEdita(null);
-      
+
       // Recarregar lista
       const params: any = {
         perfil: "CLIENTE",
@@ -150,7 +222,7 @@ export default function ClienteAdm() {
   return (
     <>
       <h2 className="text-2xl font-bold mb-6">Lista de Clientes</h2>
-      
+
       <form onSubmit={handleBusca} className="mb-4 flex items-center gap-2 max-w-lg">
         <div className="relative w-full">
           <input
@@ -186,9 +258,8 @@ export default function ClienteAdm() {
                   <div className="text-gray-500 text-sm">{c.email}</div>
                   <div className="text-gray-400 text-xs">{c.telefone}</div>
                 </div>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  c.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                }`}>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${c.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}>
                   {c.ativo ? "Ativo" : "Inativo"}
                 </span>
               </li>
@@ -233,7 +304,7 @@ export default function ClienteAdm() {
             autoComplete="off"
           >
             <h2 className="text-xl font-bold text-purple-700 mb-2 text-center">Editar Cliente</h2>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="nomeCliente">
                 <FiUser className="inline mr-1" /> Nome
@@ -241,75 +312,123 @@ export default function ClienteAdm() {
               <input
                 id="nomeCliente"
                 value={edita.nome}
-                onChange={e => setEdita(v => (v ? { ...v, nome: e.target.value } : v))}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
+                onChange={e => {
+                  setEdita(v => (v ? { ...v, nome: e.target.value } : v));
+                  setErros((prev: any) => ({ ...prev, nome: "" })); // limpa erro ao digitar
+                }}
+                className={`w-full px-4 py-2 border-2 rounded-lg text-base outline-none
+      ${erros.nome ? "border-red-400" : "border-purple-200 focus:ring-purple-400 focus:ring-2"}
+    `}
                 required
               />
+              {erros.nome && <p className="text-red-500 text-sm mt-1">{erros.nome}</p>}
             </div>
-            
+
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="emailCliente">
                 <FiMail className="inline mr-1" /> Email
               </label>
+
               <input
                 id="emailCliente"
-                type="email"
                 value={edita.email}
-                onChange={e => setEdita(v => (v ? { ...v, email: e.target.value } : v))}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
+                onChange={e => {
+                  setEdita(v => (v ? { ...v, email: e.target.value } : v));
+                  setErros((prev: any) => ({ ...prev, email: "" }));
+                }}
+                className={`w-full px-4 py-2 border-2 rounded-lg text-base outline-none
+      ${erros.email ? "border-red-400" : "border-purple-200 focus:ring-purple-400 focus:ring-2"}
+    `}
                 required
               />
+
+              {erros.email && <p className="text-red-500 text-sm mt-1">{erros.email}</p>}
             </div>
-            
+
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="telefoneCliente">
                 <FiPhone className="inline mr-1" /> Telefone
               </label>
+
               <input
                 id="telefoneCliente"
                 value={edita.telefone}
-                onChange={e => setEdita(v => (v ? { ...v, telefone: e.target.value } : v))}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
-                required
+                onChange={e => {
+                  setEdita(v => (v ? { ...v, telefone: e.target.value } : v));
+                  setErros((prev: any) => ({ ...prev, telefone: "" }));
+                }}
+                className={`w-full px-4 py-2 border-2 rounded-lg text-base outline-none
+      ${erros.telefone ? "border-red-400" : "border-purple-200 focus:ring-purple-400 focus:ring-2"}
+    `}
               />
+
+              {erros.telefone && <p className="text-red-500 text-sm mt-1">{erros.telefone}</p>}
             </div>
-            
+
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="cepCliente">
                 <FiMapPin className="inline mr-1" /> CEP
               </label>
+
               <input
                 id="cepCliente"
                 value={edita.cep || ""}
-                onChange={e => setEdita(v => (v ? { ...v, cep: e.target.value } : v))}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
-                placeholder="00000-000"
+                onChange={e => {
+                  setEdita(v => (v ? { ...v, cep: e.target.value } : v));
+                  setErros((prev: any) => ({ ...prev, cep: "" }));
+                }}
+                className={`w-full px-4 py-2 border-2 rounded-lg text-base outline-none
+      ${erros.cep ? "border-red-400" : "border-purple-200 focus:ring-purple-400 focus:ring-2"}
+    `}
               />
+
+              {erros.cep && <p className="text-red-500 text-sm mt-1">{erros.cep}</p>}
             </div>
-            
+
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="enderecoCliente">
-                <FiMapPin className="inline mr-1" /> Endereço
+                Endereço
               </label>
+
               <input
                 id="enderecoCliente"
                 value={edita.endereco || ""}
-                onChange={e => setEdita(v => (v ? { ...v, endereco: e.target.value } : v))}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
+                onChange={e => {
+                  setEdita(v => (v ? { ...v, endereco: e.target.value } : v));
+                  setErros((prev: any) => ({ ...prev, endereco: "" }));
+                }}
+                className={`w-full px-4 py-2 border-2 rounded-lg text-base outline-none
+      ${erros.endereco ? "border-red-400" : "border-purple-200 focus:ring-purple-400 focus:ring-2"}
+    `}
               />
+
+              {erros.endereco && <p className="text-red-500 text-sm mt-1">{erros.endereco}</p>}
             </div>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="numeroCliente">
                 Número
               </label>
+
               <input
                 id="numeroCliente"
                 value={edita.numero || ""}
-                onChange={e => setEdita(v => (v ? { ...v, numero: e.target.value } : v))}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-lg text-base focus:ring-2 focus:ring-purple-400 outline-none"
+                onChange={e => {
+                  setEdita(v => (v ? { ...v, numero: e.target.value } : v));
+                  setErros((prev: any) => ({ ...prev, numero: "" }));
+                }}
+                className={`w-full px-4 py-2 border-2 rounded-lg text-base outline-none
+      ${erros.numero ? "border-red-400" : "border-purple-200 focus:ring-purple-400 focus:ring-2"}
+    `}
               />
+
+              {erros.numero && <p className="text-red-500 text-sm mt-1">{erros.numero}</p>}
             </div>
+
 
             <div>
               <label className="block font-bold text-gray-700 mb-1">Status</label>

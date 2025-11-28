@@ -10,12 +10,9 @@ const categorias = [
   { nome: "Todos", tag: "todos" },
   { nome: "Beleza", tag: "BELEZA" },
   { nome: "Estética", tag: "ESTETICA" },
-  { nome: "Saúde", tag: "SAUDE" },
-  { nome: "Fitness", tag: "FITNESS" },
   { nome: "Barbearia", tag: "BARBEARIA" },
   { nome: "Maquiagem", tag: "MAQUIAGEM" },
   { nome: "Manicure", tag: "MANICURE" },
-  { nome: "SPA", tag: "SPA" },
   { nome: "Outros", tag: "OUTROS" }
 ];
 

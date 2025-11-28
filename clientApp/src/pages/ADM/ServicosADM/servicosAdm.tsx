@@ -13,7 +13,7 @@ interface Negocio {
   ativo: boolean;
 }
 
-const CATEGORIAS_FIXAS = ["BELEZA", "ESTETICA", "SAUDE", "FITNESS", "BARBEARIA", "MAQUIAGEM", "MANICURE", "SPA", "OUTROS"];
+const CATEGORIAS_FIXAS = ["BELEZA", "ESTETICA", "BARBEARIA", "MAQUIAGEM", "MANICURE", "OUTROS"];
 
 export default function ServicosAdm() {
   const [negocios, setNegocios] = useState<Negocio[]>([]);
@@ -35,7 +35,7 @@ export default function ServicosAdm() {
       setLoading(true);
       try {
         let response;
-        
+
         if (pesquisa.trim()) {
           // Buscar por nome
           response = await api.get<Negocio[] | { content: Negocio[] }>("/negocios/buscar-por-nome", {
@@ -77,8 +77,57 @@ export default function ServicosAdm() {
     e.preventDefault();
   };
 
+  function validarNegocio(negocio: Negocio) {
+    const erros: any = {};
+
+    // Nome — não pode ter números
+    if (!negocio.nome.trim()) {
+      erros.nome = "Nome é obrigatório.";
+    }
+
+    // CEP — só números e 8 dígitos
+    const cepSomenteNumeros = negocio.cep.replace(/\D/g, "");
+    if (!cepSomenteNumeros) {
+      erros.cep = "CEP é obrigatório.";
+    } else if (!/^[0-9]+$/.test(cepSomenteNumeros)) {
+      erros.cep = "CEP deve conter apenas números.";
+    } else if (cepSomenteNumeros.length !== 8) {
+      erros.cep = "CEP deve ter exatamente 8 números.";
+    }
+
+    // Endereço — obrigatório
+    if (!negocio.endereco.trim()) {
+      erros.endereco = "Endereço é obrigatório.";
+    }
+
+    // Número — não pode ter letra e nem ser negativo
+    if (!negocio.numero.trim()) {
+      erros.numero = "Número é obrigatório.";
+    } else if (!/^[0-9]+$/.test(negocio.numero)) {
+      erros.numero = "Número deve conter apenas números positivos.";
+    } else if (Number(negocio.numero) < 0) {
+      erros.numero = "Número não pode ser negativo.";
+    }
+
+    // Categoria — validar lista
+    if (!CATEGORIAS_FIXAS.includes(negocio.categoria)) {
+      erros.categoria = "Categoria inválida.";
+    }
+
+    return erros;
+  }
+
+
   async function handleSalvar() {
     if (!edita) return;
+
+    const erros = validarNegocio(edita);
+
+    if (Object.keys(erros).length > 0) {
+      const primeiraMensagem = Object.values(erros)[0];
+      setModalPopup(primeiraMensagem as string);
+      return;
+    }
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -104,7 +153,7 @@ export default function ServicosAdm() {
 
       setModalPopup("Dados do negócio alterados com sucesso!");
       setEdita(null);
-      
+
       // Recarregar lista
       try {
         let response;
@@ -141,7 +190,7 @@ export default function ServicosAdm() {
   return (
     <>
       <h2 className="text-2xl font-bold mb-6">Lista de Negócios</h2>
-      
+
       <form onSubmit={handleBusca} className="mb-4 flex items-center gap-2 max-w-lg">
         <div className="relative w-full">
           <input
@@ -179,13 +228,12 @@ export default function ServicosAdm() {
                     {negocio.endereco}, {negocio.numero} - {negocio.cep}
                   </div>
                   <div className="text-gray-400 text-xs">
-                    Categoria: {negocio.categoria} • 
+                    Categoria: {negocio.categoria} •
                     {negocio.ativo ? " Ativo" : " Inativo"}
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  negocio.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                }`}>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${negocio.ativo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}>
                   {negocio.ativo ? "Ativo" : "Inativo"}
                 </span>
               </li>
@@ -207,7 +255,7 @@ export default function ServicosAdm() {
             autoComplete="off"
           >
             <h2 className="text-xl font-bold text-purple-700 mb-2 text-center">Editar Negócio</h2>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="nomeNegocio">
                 Nome do Negócio
@@ -220,7 +268,7 @@ export default function ServicosAdm() {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="cepNegocio">
                 CEP
@@ -234,7 +282,7 @@ export default function ServicosAdm() {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="enderecoNegocio">
                 Endereço
@@ -247,7 +295,7 @@ export default function ServicosAdm() {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block font-bold text-gray-700 mb-1" htmlFor="numeroNegocio">
                 Número

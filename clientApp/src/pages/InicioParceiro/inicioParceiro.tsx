@@ -6,17 +6,7 @@ import type { TipoPlano } from "../../components/ModalPlanos";
 import { toast } from "react-toastify";
 
 const PRESTADOR_NOME = localStorage.getItem("nome");
-const CATEGORIAS_FIXAS = [
-  "BELEZA",
-  "ESTETICA",
-  "SAUDE",
-  "FITNESS",
-  "BARBEARIA",
-  "MAQUIAGEM",
-  "MANICURE",
-  "SPA",
-  "OUTROS"
-];
+const CATEGORIAS_FIXAS = ["BELEZA", "ESTETICA", "BARBEARIA", "MAQUIAGEM", "MANICURE", "OUTROS"];
 
 function validarNomeNegocio(nome: string) {
   return nome.trim().length >= 3;
