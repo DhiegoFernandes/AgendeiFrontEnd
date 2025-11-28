@@ -85,16 +85,10 @@ export default function UsuariosBloqueados() {
       return;
     }
 
-    if (!prestadorId) {
-      setPopup("Erro: ID do prestador não encontrado!");
-      return;
-    }
 
     try {
       setProcessando(clienteId);
-      await api.put(`/agendamentos/clientes/${clienteId}/bloquear`, {
-        prestadorId: prestadorId
-      }, {
+      await api.put(`/agendamentos/clientes/${clienteId}/bloquear`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -102,7 +96,7 @@ export default function UsuariosBloqueados() {
       });
 
       setPopup("Cliente bloqueado com sucesso!");
-      
+
       // Recarregar listas
       await Promise.all([carregarClientes(), carregarClientesBloqueados()]);
     } catch (error: any) {
@@ -122,16 +116,9 @@ export default function UsuariosBloqueados() {
       return;
     }
 
-    if (!prestadorId) {
-      setPopup("Erro: ID do prestador não encontrado!");
-      return;
-    }
-
     try {
       setProcessando(clienteId);
-      await api.put(`/agendamentos/clientes/${clienteId}/desbloquear`, {
-        prestadorId: prestadorId
-      }, {
+      await api.put(`/agendamentos/clientes/${clienteId}/desbloquear`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -139,7 +126,7 @@ export default function UsuariosBloqueados() {
       });
 
       setPopup("Cliente desbloqueado com sucesso!");
-      
+
       // Recarregar listas
       await Promise.all([carregarClientes(), carregarClientesBloqueados()]);
     } catch (error: any) {
@@ -206,14 +193,13 @@ export default function UsuariosBloqueados() {
 
         {/* Filtros */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex gap-4">  
+          <div className="flex gap-4">
             <button
               onClick={() => setFiltro("todos")}
-              className={`flex-1 py-3 px-6 rounded-xl font-bold transition cursor-pointer ${
-                filtro === "todos"
-                  ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`flex-1 py-3 px-6 rounded-xl font-bold transition cursor-pointer ${filtro === "todos"
+                ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-lg"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <FaUsers size={18} />
@@ -222,11 +208,10 @@ export default function UsuariosBloqueados() {
             </button>
             <button
               onClick={() => setFiltro("bloqueados")}
-              className={`flex-1 py-3 px-6 rounded-xl font-bold transition cursor-pointer ${
-                filtro === "bloqueados"
-                  ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`flex-1 py-3 px-6 rounded-xl font-bold transition cursor-pointer ${filtro === "bloqueados"
+                ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <FaBan size={18} />
@@ -247,8 +232,8 @@ export default function UsuariosBloqueados() {
             <div className="text-center py-12">
               <FaUsers className="text-gray-300 text-5xl mx-auto mb-4" />
               <p className="text-gray-500 font-semibold text-lg">
-                {filtro === "todos" 
-                  ? "Nenhum cliente encontrado" 
+                {filtro === "todos"
+                  ? "Nenhum cliente encontrado"
                   : "Nenhum cliente bloqueado"}
               </p>
             </div>
@@ -257,11 +242,10 @@ export default function UsuariosBloqueados() {
               {clientesExibidos.map((cliente) => (
                 <div
                   key={cliente.id}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border-2 transition ${
-                    cliente.bloqueado
-                      ? "bg-red-50 border-red-200"
-                      : "bg-purple-50 border-purple-200"
-                  }`}
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border-2 transition ${cliente.bloqueado
+                    ? "bg-red-50 border-red-200"
+                    : "bg-purple-50 border-purple-200"
+                    }`}
                 >
                   <div className="flex-1 mb-4 sm:mb-0">
                     <div className="flex items-center gap-3 mb-2">
@@ -277,13 +261,12 @@ export default function UsuariosBloqueados() {
                       <p><strong>Telefone:</strong> {cliente.telefone}</p>
                       <p>
                         <strong>Taxa de Cancelamento:</strong>{" "}
-                        <span className={`font-bold ${
-                          cliente.taxaCancelamento >= 50 
-                            ? "text-red-600" 
-                            : cliente.taxaCancelamento >= 25 
-                            ? "text-yellow-600" 
+                        <span className={`font-bold ${cliente.taxaCancelamento >= 50
+                          ? "text-red-600"
+                          : cliente.taxaCancelamento >= 25
+                            ? "text-yellow-600"
                             : "text-green-600"
-                        }`}>
+                          }`}>
                           {cliente.taxaCancelamento.toFixed(2)}%
                         </span>
                       </p>
@@ -294,11 +277,10 @@ export default function UsuariosBloqueados() {
                       <button
                         onClick={() => desbloquearCliente(cliente.id)}
                         disabled={processando === cliente.id}
-                        className={`px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 ${
-                          processando === cliente.id
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-green-600 to-green-500 text-white hover:brightness-110 shadow cursor-pointer"
-                        }`}
+                        className={`px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 ${processando === cliente.id
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-gradient-to-r from-green-600 to-green-500 text-white hover:brightness-110 shadow cursor-pointer"
+                          }`}
                       >
                         {processando === cliente.id ? (
                           <>
@@ -316,11 +298,10 @@ export default function UsuariosBloqueados() {
                       <button
                         onClick={() => bloquearCliente(cliente.id)}
                         disabled={processando === cliente.id}
-                        className={`px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 ${
-                          processando === cliente.id
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:brightness-110 shadow cursor-pointer"
-                        }`}
+                        className={`px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 ${processando === cliente.id
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:brightness-110 shadow cursor-pointer"
+                          }`}
                       >
                         {processando === cliente.id ? (
                           <>
