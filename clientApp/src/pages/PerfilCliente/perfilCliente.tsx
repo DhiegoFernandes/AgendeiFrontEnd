@@ -125,7 +125,7 @@ export default function PerfilCliente() {
           </div>
           <div className="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
             <button
-              className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow flex items-center gap-2"
+              className="px-5 py-2 rounded-lg border-2 cursor-pointer border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow flex items-center gap-2"
               onClick={() => navigate(-1)}
             >
               <HiOutlineArrowLeft />
@@ -135,19 +135,19 @@ export default function PerfilCliente() {
             
 
             <button
-              className="px-5 py-2 rounded-lg border-2 border-white text-white bg-white/10 hover:bg-white/20 font-semibold shadow"
+              className="px-5 py-2 rounded-lg border-2 border-white cursor-pointer text-white bg-white/10 hover:bg-white/20 font-semibold shadow"
               onClick={() => navigate("/cliente/alterar-dados")}
             >
               Editar Perfil
             </button>
             <button
-              className="px-5 py-2 rounded-lg border-2 border-white text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
+              className="px-5 py-2 rounded-lg border-2 border-white cursor-pointer text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
               onClick={() => navigate("/cliente/agendamento")}
             >
               Ver Agendamentos
             </button>
             <button
-              className="px-5 py-2 rounded-lg border-2 border-white text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
+              className="px-5 py-2 rounded-lg border-2 border-white cursor-pointer text-purple-900 bg-white/90 hover:bg-white font-semibold shadow"
               onClick={() => navigate("/cliente/comercios")}
             >
               Procurar Comercios
@@ -196,7 +196,7 @@ export default function PerfilCliente() {
         {/* Botão de sair */}
         <section className="flex justify-center mb-10">
           <button
-            className="flex items-center gap-2 py-3 px-7 rounded-xl border-2 border-red-300 text-red-600 font-bold bg-white hover:bg-red-50 transition text-lg shadow"
+            className="flex items-center gap-2 py-3 px-7 cursor-pointer rounded-xl border-2 border-red-300 text-red-600 font-bold bg-white hover:bg-red-50 transition text-lg shadow"
             onClick={confirmarLogout}
           >
             <HiOutlineLogout />

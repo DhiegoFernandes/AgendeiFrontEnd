@@ -419,7 +419,7 @@ export default function PerfilPrestador() {
             <div className="flex gap-4 w-full pt-2">
               <button
                 type="submit"
-                className="flex-1 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-md hover:shadow-lg transition-all"
+                className="flex-1 py-3 rounded-xl cursor-pointer bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-md hover:shadow-lg transition-all"
               >
                 Enviar convite
               </button>
@@ -427,7 +427,7 @@ export default function PerfilPrestador() {
               <button
                 type="button"
                 onClick={() => setModalConvite(false)}
-                className="flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                className="flex-1 py-3 rounded-xl bg-gray-200 cursor-pointer text-gray-700 font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm"
               >
                 Cancelar
               </button>

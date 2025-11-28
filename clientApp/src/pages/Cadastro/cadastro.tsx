@@ -332,8 +332,7 @@ export default function Cadastro() {
             />
             <label htmlFor="terms" className="text-gray-900 text-sm select-none">
               Eu concordo com os{" "}
-              <a href="#" className="text-blue-700 font-bold underline">Termos de Uso</a> e{" "}
-              <a href="#" className="text-blue-700 font-bold underline">Política de Privacidade</a>
+              <a href="/politicaPrivacidade" className="text-blue-700 font-bold underline">Política de Privacidade</a>
             </label>
           </div>
           <div className="flex gap-4">

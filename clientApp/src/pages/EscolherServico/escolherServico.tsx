@@ -256,7 +256,7 @@ export default function EscolherServico() {
             </div>
             <button
               onClick={handleVerMapa}
-              className="ml-auto px-4 py-2 font-semibold text-purple-600 border border-purple-300 rounded-lg shadow-sm hover:bg-purple-50 transition text-[16px] self-start"
+              className="ml-auto px-4 py-2 font-semibold cursor-pointer text-purple-600 border border-purple-300 rounded-lg shadow-sm hover:bg-purple-50 transition text-[16px] self-start"
             >
               Ver mapa
             </button>
@@ -321,7 +321,7 @@ export default function EscolherServico() {
       {/* Botão fixo "Continuar" */}
       <footer className="fixed left-0 right-0 bottom-0 flex justify-center z-30 bg-opacity-0 pointer-events-none">
         <button
-          className={`pointer-events-auto w-full max-w-2xl bg-purple-600 h-14 text-white text-lg font-bold rounded-xl shadow-lg mb-4 mx-2
+          className={`pointer-events-auto w-full max-w-2xl cursor-pointer bg-purple-600 h-14 text-white text-lg font-bold rounded-xl shadow-lg mb-4 mx-2
                       transition focus:ring-4 ring-purple-300
                       ${servicoSel === null ? "opacity-60 cursor-not-allowed" : "hover:bg-purple-700"}`}
           disabled={servicoSel === null}

@@ -148,7 +148,7 @@ export default function PerfilCliente() {
           </div>
 
           <button
-            className="w-full mt-7 bg-gradient-to-r from-purple-600 to-purple-500 hover:brightness-110 text-white font-bold py-3 px-6 rounded-lg shadow-lg text-lg transition"
+            className="w-full mt-7 bg-gradient-to-r cursor-pointer from-purple-600 to-purple-500 hover:brightness-110 text-white font-bold py-3 px-6 rounded-lg shadow-lg text-lg transition"
             onClick={() => navigate("/cliente/alterar-dados")}
           >
             Alterar dados

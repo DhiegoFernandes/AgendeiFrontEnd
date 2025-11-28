@@ -420,7 +420,7 @@ export default function AlterarDadosCliente() {
             <button
               type="button"
               onClick={() => navigate("/esqueceuSenha")}
-              className="flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition shadow"
+              className="flex items-center justify-center px-4 py-2 bg-purple-600 cursor-pointer hover:bg-purple-700 text-white rounded-lg font-semibold transition shadow"
             >
               Redefinir Senha por email
             </button>
