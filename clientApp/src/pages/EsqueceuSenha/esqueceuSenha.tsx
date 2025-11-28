@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoAgendei from "../../assets/LogoAgendei.png"; // Ajuste o caminho conforme necessário
 import { HiOutlineMail, HiOutlineArrowLeft, HiOutlineLockClosed } from "react-icons/hi";
+import api from "../../services/api";
 
 export default function RecuperarSenha() {
   const navigate = useNavigate();
@@ -33,20 +34,23 @@ export default function RecuperarSenha() {
       return;
     }
     
-    // Simulando envio
+    // Limpar localStorage
+    localStorage.clear();
+    
+    // Enviar requisição
     setIsLoading(true);
     
     try {
-      // Aqui você faria a chamada real para sua API
-      // await api.post("/auth/recuperar-senha", { email });
-      
-      // Simulando uma chamada
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await api.post("/auth/recuperar-senha", { email });
       
       // Mostrar mensagem de sucesso
       setSuccess(true);
-    } catch (err) {
-      setError("Não foi possível enviar o e-mail de recuperação. Tente novamente.");
+    } catch (err: any) {
+      const mensagemErro = err?.response?.data?.message || 
+                          err?.response?.data?.errorMessage || 
+                          err?.response?.data?.error ||
+                          "Não foi possível enviar o e-mail de recuperação. Tente novamente.";
+      setError(mensagemErro);
     } finally {
       setIsLoading(false);
     }

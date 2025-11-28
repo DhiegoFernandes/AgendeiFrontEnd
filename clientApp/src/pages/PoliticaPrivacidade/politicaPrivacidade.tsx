@@ -64,31 +64,28 @@ export default function PoliticaPrivacidade() {
       {/* Main Content */}
       <main className="flex-1 container mx-auto max-w-4xl px-4 py-10">
         <h1 className="text-3xl md:text-4xl font-bold text-purple-600 mb-2 mt-5">
-          Política de Privacidade - Agendei
+          Termos de uso – Agendei
         </h1>
         <p className="text-gray-500 text-sm mb-8">
-          Última atualização: Janeiro de 2025
+          Última atualização: Janeiro de 2025 | Versão 2.0
         </p>
 
         {/* Sections */}
         <div className="space-y-6">
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              1. INTRODUÇÃO
+              1. Introdução
             </h2>
             <div className="space-y-4 text-gray-700">
               <p>
-                A presente Política de Privacidade descreve como o Agendei coleta, utiliza, armazena e protege as informações pessoais dos usuários da nossa plataforma de agendamentos de serviços estéticos.
-              </p>
-              <p>
-                Esta política está em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018) e demais legislações aplicáveis à proteção de dados pessoais no Brasil.
+                Esta política está em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018) e demais legislações aplicáveis à proteção de dados pessoais no Brasil. Art. 7º O tratamento de dados pessoais somente poderá ser realizado nas seguintes hipóteses: I - mediante o fornecimento de consentimento pelo titular; V - quando necessário para a execução de contrato ou de procedimentos preliminares relacionados a contrato do qual seja parte o titular, a pedido do titular dos dados; IX - quando necessário para atender aos interesses legítimos do controlador ou de terceiro, exceto no caso de prevalecerem direitos e liberdades fundamentais do titular que exijam a proteção dos dados pessoais.
               </p>
             </div>
           </section>
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              2. RESPONSÁVEL PELO TRATAMENTO DOS DADOS
+              2. Responsável pelo tratamento dos dados
             </h2>
             <div className="space-y-4 text-gray-700">
               <p><strong>Agendei</strong></p>
@@ -100,12 +97,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              3. DADOS PESSOAIS COLETADOS
+              3. Dados pessoais coletados
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  3.1 Dados Coletados de Clientes
+                  Dados coletados de clientes:
                 </h3>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
                   <li><strong>Dados de Identificação:</strong> Nome completo, e-mail, telefone</li>
@@ -117,7 +114,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  3.2 Dados Coletados de Prestadores
+                  Dados coletados de prestadores:
                 </h3>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
                   <li><strong>Dados de Identificação:</strong> Nome completo, e-mail, telefone</li>
@@ -133,12 +130,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              4. FINALIDADES DO TRATAMENTO
+              4. Finalidades do tratamento
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  4.1 Finalidades Principais
+                  Finalidades principais:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>Prestação do Serviço:</strong> Conectar clientes e prestadores de serviços</li>
@@ -148,28 +145,17 @@ export default function PoliticaPrivacidade() {
                   <li><strong>Funcionamento da Plataforma:</strong> Garantir o correto funcionamento do sistema</li>
                 </ul>
               </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  4.2 Finalidades Secundárias
-                </h3>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li><strong>Análise de Dados:</strong> Estatísticas agregadas e anonimizadas para melhorias</li>
-                  <li><strong>Segurança:</strong> Prevenir uso inadequado da plataforma</li>
-                  <li><strong>Suporte:</strong> Atender dúvidas e solicitações dos usuários</li>
-                </ul>
-              </div>
             </div>
           </section>
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              5. BASE LEGAL PARA O TRATAMENTO
+              5. Base legal para o tratamento
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  5.1 Execução de Contrato
+                  Execução de contrato:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Dados necessários para prestação do serviço de agendamentos</li>
@@ -179,7 +165,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  5.2 Legítimo Interesse
+                  Legítimo interesse:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Análise de uso da plataforma para melhorias</li>
@@ -190,7 +176,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  5.3 Cumprimento de Obrigação Legal
+                  Consentimento:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Dados para cumprimento de obrigações fiscais e contábeis</li>
@@ -202,15 +188,15 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              6. COMPARTILHAMENTO DE DADOS
+              6. Compartilhamento de dados
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  6.1 Compartilhamento com Prestadores
+                  Compartilhamento com prestadores:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
-                  <li><strong>Dados do Cliente:</strong> Nome, telefone, e-mail (apenas para agendamentos específicos)</li>
+                  <li><strong>Dados do cliente:</strong> Nome, telefone, e-mail (apenas para agendamentos específicos)</li>
                   <li><strong>Finalidade:</strong> Permitir que prestadores entrem em contato e prestem serviços</li>
                   <li><strong>Limitação:</strong> Apenas dados necessários para o agendamento específico</li>
                 </ul>
@@ -218,19 +204,18 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  6.2 Compartilhamento com Serviços Externos
+                  Compartilhamento com Serviços Externos:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>ViaCEP:</strong> CEP para busca automática de endereços</li>
                   <li><strong>Google Maps:</strong> Endereços para localização e cálculo de rotas</li>
                   <li><strong>Google Calendar:</strong> Horários de agendamentos (quando implementado)</li>
-                  <li><strong>EmailJS:</strong> Dados para envio de e-mails (quando implementado)</li>
                 </ul>
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  6.3 Compartilhamento com Autoridades
+                  Compartilhamento com Autoridades:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Quando exigido por lei ou ordem judicial</li>
@@ -243,12 +228,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              7. ARMAZENAMENTO E SEGURANÇA
+              7. Armazenamento e segurança
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  7.1 Período de Armazenamento
+                  Período de armazenamento:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>Dados de Conta:</strong> Mantidos enquanto a conta estiver ativa</li>
@@ -260,7 +245,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  7.2 Medidas de Segurança
+                  Medidas de segurança:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>Senhas:</strong> Senhas são protegidas com hash criptográfico</li>
@@ -272,7 +257,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  7.3 Localização dos Dados
+                  Localização dos dados:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Dados são armazenados em servidores no Brasil</li>
@@ -284,12 +269,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              8. DIREITOS DOS TITULARES
+              8. Direitos dos titulares
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  8.1 Direitos Garantidos pela LGPD
+                  Direitos garantidos pela LGPD:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>Confirmação e Acesso:</strong> Saber se seus dados são tratados e acessá-los</li>
@@ -303,11 +288,10 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  8.2 Como Exercer os Direitos
+                  Como exercer os direitos:
                 </h3>
               <ul className="list-disc ml-6 space-y-1">
                   <li><strong>E-mail:</strong> contato@agendei.com.br</li>
-                  <li><strong>Prazo de Resposta:</strong> Até 15 dias úteis</li>
                   <li><strong>Identificação:</strong> Necessária para verificar identidade</li>
                   <li><strong>Gratuidade:</strong> Exercício de direitos é gratuito</li>
               </ul>
@@ -317,40 +301,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              9. MENORES DE IDADE
+              9. Alterações na política
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  9.1 Proteção de Menores
-                </h3>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li>Não coletamos intencionalmente dados de menores de 18 anos</li>
-                  <li>Menores devem ter autorização de responsável legal</li>
-                  <li>Responsáveis podem solicitar exclusão de dados de menores</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  9.2 Responsabilidade
-                </h3>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li>Pais/responsáveis são responsáveis por menores em sua conta</li>
-                  <li>Devem supervisionar uso da plataforma por menores</li>
-              </ul>
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
-            <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              10. ALTERAÇÕES NA POLÍTICA
-            </h2>
-            <div className="space-y-5 text-gray-700">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  10.1 Modificações
+                  Modificações:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Política pode ser atualizada periodicamente</li>
@@ -361,12 +317,11 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  10.2 Notificação de Mudanças
+                  Notificação de mudanças:
                 </h3>
               <ul className="list-disc ml-6 space-y-1">
                   <li><strong>E-mail:</strong> Para mudanças significativas</li>
                   <li><strong>Plataforma:</strong> Banner ou popup informativo</li>
-                  <li><strong>Prazo:</strong> 30 dias de antecedência para mudanças importantes</li>
               </ul>
               </div>
             </div>
@@ -374,12 +329,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              11. RESPONSABILIDADE E LIMITAÇÕES
+              10. Responsabilidade e limitações
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  11.1 Responsabilidade do Agendei
+                  Responsabilidade do Agendei:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Implementamos medidas de segurança adequadas para o nível de dados tratados</li>
@@ -390,7 +345,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  11.2 Limitações
+                  Limitações:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Não somos responsáveis por ações de terceiros</li>
@@ -403,12 +358,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              12. VIOLAÇÃO DE DADOS
+              11. Violação de dados
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  12.1 O que é uma Violação
+                  O que é uma Violação:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Acesso não autorizado a dados pessoais</li>
@@ -419,7 +374,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  12.2 Nossa Resposta
+                  Nossa resposta:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Investigação imediata do incidente</li>
@@ -433,12 +388,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              13. CONTATO E DÚVIDAS
+              12. Contato e dúvidas
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  13.1 Contato Principal
+                  Contato principal:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>E-mail:</strong> contato@agendei.com.br</li>
@@ -448,7 +403,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  13.2 Outros Contatos
+                  Outros contatos:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong>Suporte:</strong> contato@agendei.com.br</li>
@@ -460,12 +415,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              14. LEGISLAÇÃO APLICÁVEL
+              13. Legislação aplicável
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  14.1 Leis Aplicáveis
+                  Leis aplicáveis:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</li>
@@ -477,7 +432,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  14.2 Autoridade de Controle
+                  Autoridade de controle:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Autoridade Nacional de Proteção de Dados (ANPD)</li>
@@ -490,12 +445,12 @@ export default function PoliticaPrivacidade() {
 
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <h2 className="text-xl md:text-2xl font-bold text-purple-800 pb-3 border-b border-gray-100 mb-4">
-              15. DISPOSIÇÕES FINAIS
+              14. Disposições finais
             </h2>
             <div className="space-y-5 text-gray-700">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  15.1 Interpretação
+                  Interpretação:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Esta política deve ser interpretada em conjunto com os Termos de Uso</li>
@@ -505,7 +460,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  15.2 Vigência
+                  Vigência:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Política entra em vigor na data de publicação</li>
@@ -515,7 +470,7 @@ export default function PoliticaPrivacidade() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
-                  15.3 Idioma
+                  Idioma:
                 </h3>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Política redigida em português brasileiro</li>
@@ -527,11 +482,11 @@ export default function PoliticaPrivacidade() {
           <section className="bg-white rounded-xl shadow-sm p-6 md:p-8 border border-gray-100">
             <div className="space-y-4 text-gray-700">
               <p className="font-semibold text-lg text-purple-800">
-                Ao utilizar a plataforma Agendei, você declara ter lido, compreendido e aceito integralmente esta Política de Privacidade.
+                Ao utilizar a plataforma Agendei, você declara ter lido, compreendido e aceito integralmente esta política de privacidade.
               </p>
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <p><strong>Data de vigência:</strong> Janeiro de 2025</p>
-                <p><strong>Versão:</strong> 1.0</p>
+                <p><strong>Versão:</strong> 2.0</p>
               </div>
             </div>
           </section>
