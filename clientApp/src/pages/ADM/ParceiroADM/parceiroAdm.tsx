@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiUser, FiSearch, FiMapPin, FiPhone, FiMail } from "react-icons/fi";
+import { FiUser, FiSearch, FiPhone, FiMail } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import api from "../../../services/api";
 
@@ -32,10 +32,6 @@ interface PageResponse {
   size: number;
   first: boolean;
   last: boolean;
-}
-
-function normaliza(s: string) {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
 export default function ParceiroAdm() {

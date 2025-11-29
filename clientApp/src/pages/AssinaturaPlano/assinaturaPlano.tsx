@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { HiCheck, HiX } from "react-icons/hi";
+import { HiCheck } from "react-icons/hi";
 import { FaCreditCard, FaQrcode, FaBarcode, FaSpinner } from "react-icons/fa";
 
 type TipoPlano = "BASICO" | "INTERMEDIARIO" | "AVANCADO";
@@ -403,4 +403,3 @@ export default function AssinaturaPlano() {
     </div>
   );
 }
-

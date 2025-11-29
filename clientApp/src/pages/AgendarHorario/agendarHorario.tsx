@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { format, formatISO } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -46,7 +46,6 @@ export default function AgendarHorario() {
   
   // Dados do negócio e prestador (serão buscados da API)
   const [negocioNome, setNegocioNome] = useState<string>("");
-  const [prestadorNome, setPrestadorNome] = useState<string>(location.state?.nomePrestador || "");
   const [notaMedia, setNotaMedia] = useState<number | null>(null);
 
   // Buscar dados do negócio ao carregar
@@ -199,7 +198,7 @@ export default function AgendarHorario() {
               className="w-20 h-20 object-cover rounded-xl border bg-gray-50"
             />
             <div className="flex flex-col flex-1">
-              <h3 className="font-extrabold text-2xl text-gray-900">{prestadorNome || "Prestador"}</h3>
+              <h3 className="font-extrabold text-2xl text-gray-900">{negocioNome || "Negócio"}</h3>
               <p className="text-gray-600 flex items-center gap-2 font-semibold mt-1">
                 {notaMedia !== null && notaMedia !== undefined && (
                   <span className="text-yellow-500 text-lg">★ {notaMedia.toFixed(1)}</span>
@@ -291,8 +290,8 @@ export default function AgendarHorario() {
             {servicoNome && (
               <span>Serviço: <span className="font-extrabold">{servicoNome}</span></span>
             )}
-            {prestadorNome && (
-              <span>Profissional: <span className="font-extrabold">{prestadorNome}</span></span>
+            {negocioNome && (
+              <span>Negócio: <span className="font-extrabold">{negocioNome}</span></span>
             )}
             <span>
               Data:{" "}
@@ -350,14 +349,14 @@ export default function AgendarHorario() {
                 <div className="p-2 bg-purple-100 rounded-full">
                   <img 
                     src={salaoDois} 
-                    alt={prestadorNome || "Prestador"} 
+                    alt={negocioNome || "Negócio"} 
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </div>
                 <div>
                 <h4 className="font-bold text-gray-800">{servicoNome || "Serviço"}</h4>
-                {prestadorNome && (
-                  <p className="text-gray-600 text-sm">Com {prestadorNome}</p>
+                {negocioNome && (
+                  <p className="text-gray-600 text-sm">Com {negocioNome}</p>
                 )}
                 </div>
               {servicoValor && (

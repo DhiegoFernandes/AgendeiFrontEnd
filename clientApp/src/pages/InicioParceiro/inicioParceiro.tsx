@@ -41,9 +41,6 @@ export default function PrimeiroAcessoNegocio() {
   const [planoAtual, setPlanoAtual] = useState<TipoPlano | undefined>(undefined);
   const [carregandoPlano, setCarregandoPlano] = useState(false);
 
-  //validação
-  const [buscandoCep, setBuscandoCep] = useState(false);
-
   useEffect(() => {
     async function buscarDadosUsuario() {
       const token = localStorage.getItem("token");
@@ -98,7 +95,6 @@ export default function PrimeiroAcessoNegocio() {
 
     if (soNumeros.length !== 8) return;
 
-    setBuscandoCep(true);
     setEndereco("Buscando...");
 
     try {
@@ -115,8 +111,6 @@ export default function PrimeiroAcessoNegocio() {
     } catch {
       setEndereco("");
       toast.error("Erro a buscar o CEP!");
-    } finally {
-      setBuscandoCep(false);
     }
   }
 

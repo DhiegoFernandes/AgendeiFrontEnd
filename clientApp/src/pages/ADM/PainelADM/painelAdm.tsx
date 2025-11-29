@@ -123,15 +123,6 @@ function Dashboard() {
     return telefone;
   }
 
-  function getInitials(nome: string) {
-    return nome
-      .split(" ")
-      .map(n => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  }
-
   return (
     <section className="w-full min-h-screen bg-gray-50">
       {/* Barra superior */}

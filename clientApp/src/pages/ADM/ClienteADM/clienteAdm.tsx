@@ -25,10 +25,6 @@ interface PageResponse {
   last: boolean;
 }
 
-function normaliza(s: string) {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-
 export default function ClienteAdm() {
   const [clientes, setClientes] = useState<ClienteType[]>([]);
   const [edita, setEdita] = useState<ClienteType | null>(null);
