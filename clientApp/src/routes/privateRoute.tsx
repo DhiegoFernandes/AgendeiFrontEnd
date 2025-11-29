@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, type ReactNode } from "react";
 import { validateToken } from "../services/authService";
 
