@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import {
-  FiPlus, FiEdit, FiX, FiArrowLeft
+  FiPlus, FiEdit, FiX
 } from "react-icons/fi";
 import { AiOutlineClockCircle } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import Header from "../../components/Header";
 
@@ -16,7 +15,6 @@ function currencyMask(value: string) {
 }
 
 export default function ServicosParceiro() {
-  const navigate = useNavigate();
   const [servicos, setServicos] = useState<any[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({

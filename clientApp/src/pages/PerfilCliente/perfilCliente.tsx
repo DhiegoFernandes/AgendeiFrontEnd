@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineArrowLeft, HiOutlineLogout, HiOutlineUserCircle, HiOutlineMail } from "react-icons/hi";
-import { FiLock } from "react-icons/fi";
 import api from "../../services/api";
 
 function getInitials(nome: string) {

@@ -1,29 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { RiArrowLeftSLine, RiUserReceivedLine } from "react-icons/ri";
+import { RiArrowLeftSLine } from "react-icons/ri";
 import LogoAgendei from "../assets/LogoAgendei.png"; // Ajuste o caminho conforme necessário
 
-interface HeaderProps {
-  profilePath?: string;        // Caminho para a página de perfil
-  showProfileIcon?: boolean;   // Se deve mostrar o ícone de perfil
-  customIcon?: React.ReactNode; // Ícone personalizado opcional
-  onProfileClick?: () => void; // Função personalizada ao clicar no perfil
-}
-
-const Header: React.FC<HeaderProps> = ({
-  profilePath = "/parceiro/perfil",
-  showProfileIcon = true,
-  customIcon,
-  onProfileClick
-}) => {
+const Header: React.FC = () => {
   const navigate = useNavigate();
-
-  const handleProfileClick = () => {
-    if (onProfileClick) {
-      onProfileClick();
-    } else if (profilePath) {
-      navigate(profilePath);
-    }
-  };
 
   const handleBack = () => {
     navigate(-1); // volta para a página anterior
@@ -66,7 +46,6 @@ const Header: React.FC<HeaderProps> = ({
 
 
         <div className="flex items-center gap-4">
-          {/* Botão Voltar */}
           <button
             onClick={handleBack}
             className="flex items-center gap-1 px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700 transition-all cursor-pointer 
@@ -75,16 +54,6 @@ const Header: React.FC<HeaderProps> = ({
             <RiArrowLeftSLine size={20} />
             Voltar
           </button>
-
-          {/* Ícone de perfil */}
-          {/* {showProfileIcon && (
-            <button
-              onClick={handleProfileClick}
-              className="text-purple-600 bg-purple-100 rounded-full p-2 hover:bg-purple-200 transition-colors"
-            >
-              {customIcon || <RiUserReceivedLine size={24} />}
-            </button>
-          )} */}
         </div>
       </div>
     </header>

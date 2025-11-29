@@ -3,7 +3,6 @@ import LogoAgendeiHori from "../../assets/AgendeiHorizontal.png";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import CarrosselFotos from "../../components/CarrosselFotos";
-import ClientNavbar from "../../components/ClientNavbar";
 import { FaCalendarAlt, FaUser } from "react-icons/fa";
 
 const categorias = [
