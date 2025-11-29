@@ -1,18 +1,15 @@
 # Configuração de Deploy no Vercel
 
-## Variáveis de Ambiente
+## Proxy para Resolver Mixed Content
 
-Para fazer o deploy no Vercel, você precisa configurar a variável de ambiente `VITE_API_BASE_URL`.
+O projeto utiliza um **proxy serverless** no Vercel para resolver o problema de mixed content (HTTPS → HTTP). O arquivo `api/proxy.js` cria automaticamente um endpoint `/api/proxy` que faz a ponte entre o frontend HTTPS e o backend HTTP.
 
-### Como configurar no Vercel:
+### Como funciona:
 
-1. Acesse o painel do Vercel: https://vercel.com/dashboard
-2. Selecione seu projeto
-3. Vá em **Settings** > **Environment Variables**
-4. Adicione a seguinte variável:
-   - **Name**: `VITE_API_BASE_URL`
-   - **Value**: `http://152.67.42.48:8080/`
-   - **Environment**: Selecione **Production**, **Preview** e **Development** (ou apenas Production se preferir)
+- **Em produção (Vercel)**: O frontend chama `/api/proxy`, que é uma função serverless que faz a requisição para `http://152.67.42.48:8080`
+- **Em desenvolvimento local**: O frontend chama diretamente `http://localhost:8083/`
+
+✅ **Não é necessário configurar variáveis de ambiente no Vercel para produção!** O proxy já está configurado com a URL do backend.
 
 ### Para desenvolvimento local:
 
@@ -26,5 +23,5 @@ VITE_API_BASE_URL=http://localhost:8083/
 
 ### Verificação:
 
-Após configurar, faça o rebuild do projeto no Vercel. A aplicação usará automaticamente a URL de produção configurada.
+Após fazer o deploy, o Vercel automaticamente detecta a pasta `/api` e cria a função serverless. As requisições do frontend serão roteadas através do proxy sem problemas de mixed content.
 
