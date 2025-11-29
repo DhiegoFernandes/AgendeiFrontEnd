@@ -1,13 +1,32 @@
 import axios from "axios";
 
-// Detecta se está em produção (Vercel)
-const isProduction = import.meta.env.PROD;
+// ============================================
+// CONFIGURAÇÃO DE DEPLOY
+// ============================================
+// Para usar HTTP direto (sem proxy), defina:
+// VITE_USE_HTTP_DIRECT=true
+// 
+// Isso é útil se você estiver usando um serviço de deploy
+// que permite HTTP (Netlify, Railway, Render, servidor próprio)
+// ============================================
 
-// Em produção: usa o proxy do Vercel para evitar mixed content (HTTPS -> HTTP)
-// Em desenvolvimento: usa a URL direta do backend
-const baseURL = isProduction 
-    ? "/api/proxy"  // Proxy serverless do Vercel
-    : (import.meta.env.VITE_API_BASE_URL || "http://localhost:8083/");
+const useHttpDirect = import.meta.env.VITE_USE_HTTP_DIRECT === 'true';
+const isProduction = import.meta.env.PROD;
+const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://152.67.42.48:8080/";
+
+// Determina a baseURL baseado na configuração
+let baseURL: string;
+
+if (useHttpDirect) {
+  // Usa HTTP direto (para serviços que permitem HTTP)
+  baseURL = backendUrl;
+} else if (isProduction) {
+  // Usa proxy do Vercel (para evitar mixed content)
+  baseURL = "/api/proxy";
+} else {
+  // Desenvolvimento local
+  baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8083/";
+}
 
 const api = axios.create({
     baseURL: baseURL,
