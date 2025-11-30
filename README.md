@@ -1,5 +1,7 @@
 # Agendei - Frontend
 
+Versão: v1.0.0 Último Commit: <INSIRA_AQUI_O_HASH_DO_ULTIMO_COMMIT> Data: 30/11/2025
+
 Aplicação web desenvolvida em React com TypeScript para gerenciamento de agendamentos de serviços. O frontend permite que clientes agendem serviços e que parceiros gerenciem seus negócios, serviços e agendamentos.
 
 ## 🚀 Tecnologias
