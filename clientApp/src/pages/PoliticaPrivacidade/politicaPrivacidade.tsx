@@ -67,7 +67,7 @@ export default function PoliticaPrivacidade() {
           Termos de uso – Agendei
         </h1>
         <p className="text-gray-500 text-sm mb-8">
-          Última atualização: Janeiro de 2025 | Versão 2.0
+          Última atualização: 30 de Novembro de 2025 | Versão 3.0
         </p>
 
         {/* Sections */}
@@ -485,8 +485,8 @@ export default function PoliticaPrivacidade() {
                 Ao utilizar a plataforma Agendei, você declara ter lido, compreendido e aceito integralmente esta política de privacidade.
               </p>
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <p><strong>Data de vigência:</strong> Janeiro de 2025</p>
-                <p><strong>Versão:</strong> 2.0</p>
+                <p><strong>Data de vigência:</strong> 30 de Novembro de 2025</p>
+                <p><strong>Versão:</strong> 3.0</p>
               </div>
             </div>
           </section>
@@ -496,7 +496,7 @@ export default function PoliticaPrivacidade() {
       {/* Footer */}
       <footer className="bg-gray-50 border-t border-gray-200 py-8 mt-12">
         <div className="container mx-auto max-w-4xl px-4 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} Agendei. Todos os direitos reservados.</p>
+          <p>{new Date().getFullYear()} Agendei.</p>
         </div>
       </footer>
     </div>
