@@ -10,11 +10,11 @@ import salaoTres from "../../assets/salaoTres.png";
 // Importação dos ícones do React Icons
 import { HiOutlineMenu, HiLightBulb } from "react-icons/hi";
 import { FaMapLocationDot } from "react-icons/fa6";
-import { 
-  FaBolt, 
-  FaClock, 
-  FaBriefcase, 
-  FaUsers, 
+import {
+  FaBolt,
+  FaClock,
+  FaBriefcase,
+  FaUsers,
   FaChartBar,
   FaRegStar
 } from "react-icons/fa";
@@ -24,10 +24,10 @@ function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [periodoAnual, setPeriodoAnual] = useState(false);
-  
+
   // Array com as imagens para o slideshow
   const backgroundImages = [salaoUm, salaoDois, salaoTres];
-  
+
   // Preços dos planos
   const precos = {
     basico: { mensal: 49.90, anual: 49.90 * 0.82 },
@@ -44,15 +44,15 @@ function Home() {
       setMenuOpen(false);
     }
   }
-  
+
   // Efeito para alternar as imagens do slideshow a cada 5 segundos
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex(prevIndex => 
+      setCurrentImageIndex(prevIndex =>
         prevIndex === backgroundImages.length - 1 ? 0 : prevIndex + 1
       );
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -66,8 +66,8 @@ function Home() {
           </a>
 
           {/* Menu Hamburger - Mobile (sempre visível em mobile, posicionado à direita) */}
-          <button 
-            onClick={handleToggle} 
+          <button
+            onClick={handleToggle}
             className="md:hidden flex items-center justify-center w-10 h-10 bg-indigo-50 text-indigo-700 rounded-lg cursor-pointer absolute right-5"
             aria-expanded={menuOpen}
             aria-controls="nav"
@@ -77,13 +77,13 @@ function Home() {
           </button>
 
           {/* Menu de navegação */}
-          <nav 
-            onClick={handleNavClick} 
-            id="nav" 
-            className={`${menuOpen 
-              ? "fixed inset-x-0 top-[72px] bg-white shadow-lg transform translate-y-0 opacity-100 z-50" 
+          <nav
+            onClick={handleNavClick}
+            id="nav"
+            className={`${menuOpen
+              ? "fixed inset-x-0 top-[72px] bg-white shadow-lg transform translate-y-0 opacity-100 z-50"
               : "transform -translate-y-8 opacity-0 pointer-events-none md:transform-none md:opacity-100 md:pointer-events-auto"
-            } transition-all duration-200 md:static md:shadow-none`}
+              } transition-all duration-200 md:static md:shadow-none`}
             aria-label="Principal"
           >
             <ul className="flex flex-col md:flex-row items-start md:items-center gap-0 md:gap-6 text-base mt-16 md:mt-16">
@@ -98,8 +98,8 @@ function Home() {
                 </a>
               </li>
               <li className="w-full md:w-auto p-4 md:p-0">
-                <a 
-                  onClick={() => navigate('/cadastro')} 
+                <a
+                  onClick={() => navigate('/cadastro')}
                   className="block w-full md:w-auto text-center py-3 px-5 md:py-2.5 md:px-4 bg-purple-600 text-white font-bold rounded-xl md:rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
                 >
                   Cadastrar
@@ -111,7 +111,7 @@ function Home() {
       </header>
 
       <main id="inicio">
-        <section 
+        <section
           className="relative overflow-hidden text-white py-16 md:py-20 lg:py-24"
           aria-labelledby="ttl-hero"
           style={{
@@ -124,8 +124,8 @@ function Home() {
           <div className="container mx-auto px-5">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               <div>
-                <h1 
-                  id="ttl-hero" 
+                <h1
+                  id="ttl-hero"
                   className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4"
                 >
                   Simplifique seus <span className="text-orange-300">Agendamentos</span>
@@ -141,8 +141,8 @@ function Home() {
                 </div>
               </div>
 
-              <aside 
-                className="bg-white text-gray-800 rounded-2xl shadow-xl p-5 max-w-md mx-auto w-full animate-float" 
+              <aside
+                className="bg-white text-gray-800 rounded-2xl shadow-xl p-5 max-w-md mx-auto w-full animate-float"
                 aria-label="Próximo agendamento"
                 style={{
                   animation: 'float 3s ease-in-out infinite alternate'
@@ -169,7 +169,7 @@ function Home() {
               </aside>
             </div>
           </div>
-          
+
           <span className="absolute right-1/4 top-1/4 w-56 h-56 rounded-full bg-gradient-radial from-white/15 to-transparent" aria-hidden="true"></span>
           <span className="absolute right-[6%] top-1/3 w-40 h-40 rounded-full bg-gradient-radial from-white/15 to-transparent" aria-hidden="true"></span>
         </section>
@@ -294,21 +294,19 @@ function Home() {
               <div className="inline-flex items-center gap-3 bg-white rounded-full p-1 shadow-sm border border-gray-200">
                 <button
                   onClick={() => setPeriodoAnual(false)}
-                  className={`px-6 py-2 rounded-full font-semibold transition-all cursor-pointer ${
-                    !periodoAnual 
-                      ? "bg-purple-600 text-white shadow" 
+                  className={`px-6 py-2 rounded-full font-semibold transition-all cursor-pointer ${!periodoAnual
+                      ? "bg-purple-600 text-white shadow"
                       : "text-gray-600 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   Mensal
                 </button>
                 <button
                   onClick={() => setPeriodoAnual(true)}
-                  className={`px-6 py-2 rounded-full font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-                    periodoAnual 
-                      ? "bg-purple-600 text-white shadow" 
+                  className={`px-6 py-2 rounded-full font-semibold transition-all flex items-center gap-2 cursor-pointer ${periodoAnual
+                      ? "bg-purple-600 text-white shadow"
                       : "text-gray-600 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   Anual
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
@@ -424,8 +422,8 @@ function Home() {
 
             <div className="text-center mt-10">
               <p className="text-gray-600 mb-4">Todos os planos incluem gestão completa de agendamentos, relatórios e muito mais!</p>
-              <a 
-                onClick={() => navigate('/cadastro')} 
+              <a
+                onClick={() => navigate('/cadastro')}
                 className="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-bold rounded-xl hover:brightness-110 transition cursor-pointer shadow-lg"
               >
                 Começar Agora
@@ -441,7 +439,7 @@ function Home() {
               <h2 id="ttl-faq" className="text-3xl font-bold text-center text-gray-900 mb-12">
                 Perguntas Frequentes
               </h2>
-              
+
               <div className="space-y-4">
                 <details className="bg-white rounded-xl p-6 shadow-sm group border border-gray-200">
                   <summary className="font-semibold text-gray-900 cursor-pointer flex items-center justify-between">
@@ -500,7 +498,15 @@ function Home() {
             <nav aria-label="Suporte">
               <h4 className="text-lg font-bold mb-4">Suporte</h4>
               <ul className="space-y-3">
-                <li><a href="/politicaPrivacidade" className="hover:text-white hover:underline transition-colors">Termos de Uso e Políticas de Privacidade</a></li>
+                <li>
+                  <span
+                    onClick={() => navigate('/politicaPrivacidade')}
+                    className="hover:text-white hover:underline transition-colors cursor-pointer"
+                  >
+                    Termos de Uso e Políticas de Privacidade
+                  </span>
+                </li>
+
               </ul>
             </nav>
           </div>
@@ -510,7 +516,7 @@ function Home() {
           </div>
         </div>
       </footer>
-      
+
       {/* Estilo para a animação de flutuação */}
       <style >{`
         @keyframes float {
