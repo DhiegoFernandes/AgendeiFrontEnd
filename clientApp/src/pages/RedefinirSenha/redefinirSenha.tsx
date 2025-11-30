@@ -3,11 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import LogoAgendei from "../../assets/LogoAgendei.png"; // Ajuste o caminho conforme necessário
 import { HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { FiCheck, FiX } from "react-icons/fi";
+import api from "../../services/api";
 
 export default function RedefinirSenha() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [email, setEmail] = useState("");
   const [codigo, setCodigo] = useState("");
   const [senha, setSenha] = useState("");
@@ -17,21 +18,21 @@ export default function RedefinirSenha() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  
+
   // Extrair email e código da URL ao carregar a página
   useEffect(() => {
     const emailParam = searchParams.get("email") || "";
     const codigoParam = searchParams.get("codigo") || "";
-    
+
     setEmail(emailParam);
     setCodigo(codigoParam);
-    
+
     // Verificar se os parâmetros foram fornecidos
     if (!emailParam || !codigoParam) {
       setError("Link inválido. Por favor, use o link enviado no seu e-mail.");
     }
   }, [searchParams]);
-  
+
   // Validação de requisitos de senha
   const validarSenha = (senha: string) => {
     return {
@@ -42,62 +43,63 @@ export default function RedefinirSenha() {
       especial: /[!@#$%^&*(),.?":{}|<>]/.test(senha)
     };
   };
-  
+
   const requisitos = validarSenha(senha);
   const senhaValida = Object.values(requisitos).every(v => v);
-  
+
   // Função para redefinir senha
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
+
     // Limpar estados
     setError(null);
-    
     // Validações
     if (!email || !codigo) {
       setError("Link inválido ou expirado. Solicite uma nova recuperação de senha.");
       return;
     }
-    
     if (!senha.trim()) {
       setError("Por favor, informe sua nova senha");
       return;
     }
-    
     if (!senhaValida) {
       setError("A senha não atende aos requisitos de segurança");
       return;
     }
-    
     if (senha !== confirmarSenha) {
       setError("As senhas não coincidem");
       return;
     }
-    
-    // Enviar solicitação
+
     setIsLoading(true);
-    
+
     try {
-      // Aqui você faria a chamada real para sua API
-      // await api.post("/auth/redefinir-senha", { email, codigo, novaSenha: senha });
-      
-      // Simulando uma chamada
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mostrar mensagem de sucesso
-      setSuccess(true);
-      
-      // Redirecionar para login após 5 segundos
-      setTimeout(() => {
-        navigate("/login");
-      }, 5000);
-    } catch (err) {
-      setError("Não foi possível redefinir a senha. O código pode estar expirado ou inválido.");
+      // Chamada real para API
+      const response = await api.post("/auth/nova-senha", {
+        email,
+        codigo,
+        novaSenha: senha
+      });
+
+      // Checar se a resposta da API foi sucesso
+      if (response.status === 200) {
+        setSuccess(true);
+        setTimeout(() => navigate("/login"), 5000);
+      } else {
+        setError("Não foi possível redefinir a senha. Tente novamente.");
+      }
+    } catch (err: any) {
+      // Tratar erro vindo da API
+      if (err.response?.data?.mensagem) {
+        setError(err.response.data.mensagem);
+      } else {
+        setError("Erro ao redefinir a senha. O código pode estar expirado ou inválido.");
+      }
     } finally {
       setIsLoading(false);
     }
   }
-  
+
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center justify-center p-4">
       {!success ? (
@@ -111,13 +113,13 @@ export default function RedefinirSenha() {
               Crie uma nova senha segura para sua conta
             </p>
           </div>
-          
+
           {error && (
             <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Campo Nova Senha */}
             <div>
@@ -146,7 +148,7 @@ export default function RedefinirSenha() {
                 </button>
               </div>
             </div>
-            
+
             {/* Requisitos de senha */}
             {senha && (
               <div className="bg-gray-50 rounded-xl p-4">
@@ -177,7 +179,7 @@ export default function RedefinirSenha() {
                 </ul>
               </div>
             )}
-            
+
             {/* Campo Confirmar Senha */}
             <div>
               <label htmlFor="confirmarSenha" className="block text-sm font-medium text-gray-700 mb-1">
@@ -213,27 +215,26 @@ export default function RedefinirSenha() {
                 </p>
               )}
             </div>
-            
+
             <button
               type="submit"
               disabled={isLoading || !senhaValida || senha !== confirmarSenha}
-              className={`w-full py-3 px-4 cursor-pointer bg-gradient-to-r from-purple-600 to-purple-500 text-white font-bold rounded-xl shadow-md hover:brightness-105 transition ${
-                (isLoading || !senhaValida || senha !== confirmarSenha) ? 'opacity-60 cursor-not-allowed' : ''
-              }`}
+              className={`w-full py-3 px-4 cursor-pointer bg-gradient-to-r from-purple-600 to-purple-500 text-white font-bold rounded-xl shadow-md hover:brightness-105 transition ${(isLoading || !senhaValida || senha !== confirmarSenha) ? 'opacity-60 cursor-not-allowed' : ''
+                }`}
             >
               {isLoading ? "Redefinindo senha..." : "Redefinir senha"}
             </button>
           </form>
-          
+
           <div className="mt-6 flex items-center justify-center">
-            <button 
-              onClick={() => navigate("/login")} 
+            <button
+              onClick={() => navigate("/login")}
               className="text-purple-600 hover:text-purple-800 transition-colors text-sm cursor-pointer"
             >
               Voltar para login
             </button>
           </div>
-          
+
           <div className="mt-8 pt-6 border-t border-gray-200">
             <div className="bg-purple-50 rounded-xl p-4">
               <h3 className="flex items-center text-sm font-semibold text-purple-800">
@@ -256,20 +257,20 @@ export default function RedefinirSenha() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            
+
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center">
               Senha redefinida!
             </h1>
-            
+
             <p className="text-gray-500 mt-4 text-center">
               Sua senha foi redefinida com sucesso.
             </p>
-            
+
             <p className="text-sm text-gray-500 text-center mt-2 mb-6">
               Você será redirecionado para o login em alguns segundos...
             </p>
-            
-            <button 
+
+            <button
               onClick={() => navigate("/login")}
               className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-bold rounded-xl shadow-md hover:brightness-105 transition"
             >
