@@ -52,11 +52,13 @@ export default function DisponibilidadePrestador() {
   const [horarioAlmoco, setHorarioAlmoco] = useState<string>("12:00");
   const [salvandoAlmoco, setSalvandoAlmoco] = useState(false);
 
+  const [confirmarAlmocoPopup, setConfirmarAlmocoPopup] = useState(false);
+
   // Função para carregar disponibilidades da API
   const carregarDisponibilidades = async () => {
     setLoadingInitial(true);
     setError(null);
-    
+
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Token de autenticação não encontrado!");
@@ -73,11 +75,11 @@ export default function DisponibilidadePrestador() {
       });
 
       const disponibilidadesAPI: DisponibilidadeAPI[] = response.data;
-      
+
       // Mapear dados da API para o formato local
       const diasAtualizados = DISPONIBILIDADE_INICIAL.map(dia => {
         const disponibilidadeAPI = disponibilidadesAPI.find(d => d.diaSemana === dia.apiValue);
-        
+
         if (disponibilidadeAPI) {
           return {
             ...dia,
@@ -86,7 +88,7 @@ export default function DisponibilidadePrestador() {
             ativo: disponibilidadeAPI.ativo
           };
         }
-        
+
         // Dias sem disponibilidade: horários zerados e desativados
         return {
           ...dia,
@@ -97,7 +99,8 @@ export default function DisponibilidadePrestador() {
       });
 
       setDias(diasAtualizados);
-      
+
+      // Carregar horário de almoço
       // Carregar horário de almoço
       try {
         const almocoResponse = await api.get('/disponibilidades/almoco', {
@@ -106,15 +109,18 @@ export default function DisponibilidadePrestador() {
             'Content-Type': 'application/json'
           }
         });
-        
-        if (almocoResponse.data && almocoResponse.data.horaInicio) {
-          const horaInicio = almocoResponse.data.horaInicio.substring(0, 5); // Remove segundos
-          setHorarioAlmoco(horaInicio);
+
+        if (almocoResponse.data) {
+          const { horaInicioAlmoco } = almocoResponse.data;
+
+          if (horaInicioAlmoco) {
+            setHorarioAlmoco(horaInicioAlmoco.substring(0, 5)); // "16:00"
+          }
         }
       } catch (almocoErr) {
         console.log('Horário de almoço não configurado ainda ou erro ao carregar:', almocoErr);
-        // Se não houver horário configurado, mantém o padrão
       }
+
     } catch (err) {
       console.error('Erro ao carregar disponibilidades:', err);
       setError('Erro ao carregar disponibilidades. Usando configurações padrão.');
@@ -126,13 +132,13 @@ export default function DisponibilidadePrestador() {
   // Função para salvar horário de um dia específico
   const salvarHorarioDia = async (diaIndex: number) => {
     const dia = dias[diaIndex];
-    
+
     // Verificar se os horários são válidos
     if (dia.inicio === "00:00" && dia.fim === "00:00") {
       setError('Defina horários válidos antes de salvar.');
       return;
     }
-    
+
     if (dia.inicio >= dia.fim) {
       setError('Horário de início deve ser menor que o horário de fim.');
       return;
@@ -186,7 +192,7 @@ export default function DisponibilidadePrestador() {
       setError("Token de autenticação não encontrado!");
       return;
     }
-    
+
     // Verificar se o token não está vazio ou malformado
     if (token.trim() === '') {
       setError("Token de autenticação inválido!");
@@ -196,7 +202,7 @@ export default function DisponibilidadePrestador() {
     try {
       console.log('Enviando PATCH para:', `/disponibilidades/status-dia?dia=${dia.apiValue}&ativo=${novoStatus}`);
       console.log('Token:', token ? 'Token presente' : 'Token ausente');
-      
+
       // Tentar primeiro com PATCH
       const response = await api.patch(`/disponibilidades/status-dia?dia=${dia.apiValue}&ativo=${novoStatus}`, {}, {
         headers: {
@@ -204,7 +210,7 @@ export default function DisponibilidadePrestador() {
           'Content-Type': 'application/json'
         }
       });
-      
+
       console.log('Resposta PATCH:', response);
 
       // Atualizar estado local
@@ -215,7 +221,7 @@ export default function DisponibilidadePrestador() {
       console.error('Erro ao alterar status do dia com PATCH:', err);
       console.error('Status do erro:', err.response?.status);
       console.error('Dados do erro:', err.response?.data);
-      
+
       // Se PATCH falhar com 403, tentar com GET
       if (err.response?.status === 403 || err.response?.status === 405) {
         try {
@@ -226,20 +232,20 @@ export default function DisponibilidadePrestador() {
               'Content-Type': 'application/json'
             }
           });
-          
+
           console.log('Resposta GET:', response);
-          
+
           // Atualizar estado local
           setDias(list => list.map((d, i) =>
             i === diaIndex ? { ...d, ativo: novoStatus } : d
           ));
-          
+
           return; // Sucesso com GET
         } catch (getErr: any) {
           console.error('Erro também com GET:', getErr);
         }
       }
-      
+
       if (err.response?.status === 403) {
         setError('Acesso negado. Verifique suas permissões ou se o token está válido.');
       } else if (err.response?.status === 401) {
@@ -257,7 +263,7 @@ export default function DisponibilidadePrestador() {
   function handleToggle(idx: number) {
     toggleDiaStatus(idx);
   }
-  
+
   function handleHora(idx: number, campo: "inicio" | "fim", value: string) {
     setDias(list => list.map((d, i) =>
       i === idx ? { ...d, [campo]: value } : d
@@ -301,6 +307,18 @@ export default function DisponibilidadePrestador() {
     }
   }
 
+  function abrirPopupAlmoco() {
+    setConfirmarAlmocoPopup(true);
+  }
+
+  function confirmarSalvarAlmoco() {
+    setConfirmarAlmocoPopup(false);
+    salvarHorarioAlmoco(); // chama sua função real após confirmar
+  }
+
+  function cancelarSalvarAlmoco() {
+    setConfirmarAlmocoPopup(false);
+  }
 
   return (
     <div className="min-h-screen bg-[#f6f5fb] flex flex-col items-center">
@@ -308,7 +326,6 @@ export default function DisponibilidadePrestador() {
         <
           Header
         />
-      
       <div className="max-w-3xl w-full flex flex-col items-center mt-5">
         <section className="w-full flex flex-col items-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-1 text-center">Atualizar Disponibilidade</h2>
@@ -316,7 +333,7 @@ export default function DisponibilidadePrestador() {
           <p className="text-gray-400 text-sm text-center mt-2">
             💡 <strong>Dica:</strong> Defina os horários, e clique em "Salvar" para cada dia
           </p>
-          
+
           {error && (
             <div className="mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
               {error}
@@ -357,7 +374,7 @@ export default function DisponibilidadePrestador() {
                 </div>
                 <button
                   type="button"
-                  onClick={salvarHorarioAlmoco}
+                  onClick={abrirPopupAlmoco}
                   disabled={salvandoAlmoco}
                   className="bg-orange-500 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-orange-600 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 >
@@ -393,28 +410,26 @@ export default function DisponibilidadePrestador() {
                         type="time"
                         value={dia.inicio}
                         onChange={e => handleHora(idx, "inicio", e.target.value)}
-                        className={`border rounded px-3 py-1 text-sm w-28 focus:ring-2 focus:ring-purple-400 outline-none mx-1 ${
-                          dia.inicio === "00:00" && !dia.ativo 
-                            ? "border-gray-200 bg-gray-50 text-gray-400" 
+                        className={`border rounded px-3 py-1 text-sm w-28 focus:ring-2 focus:ring-purple-400 outline-none mx-1 ${dia.inicio === "00:00" && !dia.ativo
+                            ? "border-gray-200 bg-gray-50 text-gray-400"
                             : "border-gray-300 bg-white"
-                        }`}
-                        min="05:00"
-                        max="23:00"
-                        placeholder="00:00"
-                      />
-                      <HiOutlineClock className="text-gray-400" />
-                    </span>
-                  </label>
-                  <label className="font-semibold text-sm text-gray-700">
-                    Fim
-                    <span className="flex items-center gap-1">
-                      <input
-                        type="time"
-                        value={dia.fim}
-                        onChange={e => handleHora(idx, "fim", e.target.value)}
-                        className={`border rounded px-3 py-1 text-sm w-28 focus:ring-2 focus:ring-purple-400 outline-none mx-1 ${
-                          dia.fim === "00:00" && !dia.ativo 
-                            ? "border-gray-200 bg-gray-50 text-gray-400" 
+                            }`}
+                          min="05:00"
+                          max="23:00"
+                          placeholder="00:00"
+                        />
+                        <HiOutlineClock className="text-gray-400" />
+                      </span>
+                    </label>
+                    <label className="font-semibold text-sm text-gray-700">
+                      Fim
+                      <span className="flex items-center gap-1">
+                        <input
+                          type="time"
+                          value={dia.fim}
+                          onChange={e => handleHora(idx, "fim", e.target.value)}
+                          className={`border rounded px-3 py-1 text-sm w-28 focus:ring-2 focus:ring-purple-400 outline-none mx-1 ${dia.fim === "00:00" && !dia.ativo
+                            ? "border-gray-200 bg-gray-50 text-gray-400"
                             : "border-gray-300 bg-white"
                         }`}
                         min="05:00"
@@ -425,7 +440,7 @@ export default function DisponibilidadePrestador() {
                     </span>
                   </label>
                 </div>
-                
+
                 {/* Botão Salvar Horário - Sempre visível */}
                 <button
                   type="button"
@@ -435,7 +450,7 @@ export default function DisponibilidadePrestador() {
                 >
                   {savingDay === idx ? "Salvando..." : "Salvar"}
                 </button>
-                
+
                 {/* Toggle */}
                 <button
                   tabIndex={0}
@@ -479,6 +494,41 @@ export default function DisponibilidadePrestador() {
           </div>
         </div>
       )}
+
+      {
+        confirmarAlmocoPopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Atualizar horário de almoço
+              </h2>
+
+              <p className="text-gray-600 mb-6">
+                Ao atualizar seu horário de almoço, <strong>todos os seus agendamentos
+                  pendentes dentro desse intervalo serão CANCELADOS</strong>.<br />
+                Deseja mesmo alterar seu horário de almoço?
+              </p>
+
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={cancelarSalvarAlmoco}
+                  className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 w-24"
+                >
+                  Não
+                </button>
+
+                <button
+                  onClick={confirmarSalvarAlmoco}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 w-24"
+                >
+                  Sim
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
     </div>
   );
 }
