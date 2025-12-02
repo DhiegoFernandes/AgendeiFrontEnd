@@ -66,7 +66,7 @@ export default function Comercios() {
           'Content-Type': 'application/json'
         }
       });
-      
+
       // Transformar dados da API para o formato local
       const negociosFormatados: NegocioFormatado[] = response.data.map((negocio: Negocio) => ({
         id: negocio.id,
@@ -103,7 +103,11 @@ export default function Comercios() {
         c.nome.toLowerCase().includes(q.toLowerCase()) ||
         c.endereco.toLowerCase().includes(q.toLowerCase()) ||
         c.categoria.toLowerCase().includes(q.toLowerCase());
-      return matchCat && matchQ;
+
+      const matchNota =
+        notaMinima === null || (c.rating ?? 0) >= notaMinima;
+
+      return matchCat && matchQ && matchNota;
     });
 
   return (
