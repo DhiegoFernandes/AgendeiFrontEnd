@@ -33,8 +33,7 @@ import AssinaturaPlano from '../pages/AssinaturaPlano/assinaturaPlano';
 import UsuariosBloqueados from '../pages/UsuariosBloqueados/usuariosBloqueados';
 import EsqueceuSenha from '../pages/EsqueceuSenha/esqueceuSenha';
 import RedefinirSenha from '../pages/RedefinirSenha/redefinirSenha';
-
-// import { PrivateRoute } from './privateRoute';
+import { PrivateRoute } from './privateRoute';
 
 function AppRoutes(){
     return (
@@ -47,37 +46,37 @@ function AppRoutes(){
                 <Route path='/esqueceuSenha' element={<EsqueceuSenha />} />
                 <Route path='/redefinirSenha' element={<RedefinirSenha />} />
 
-                <Route path="/cliente/comercios" element={<Comercios />} />
-                <Route path='/cliente/escolher-servico' element={<EscolherServico />} />
-                <Route path='/cliente/agendar-horario' element={<AgendarHorario />} />
-                <Route path='/cliente/agendamento' element={<AgendamentosCliente />} />
-                <Route path='/cliente/dados' element={<DadosCliente />} />
-                <Route path='/cliente/perfil' element={<PerfilCliente />} />
-                <Route path='/cliente/fazer-avaliacao' element={<FazerAvaliacao />} />
-                <Route path='/cliente/alterar-dados' element={<AlterarDadosCliente />} />
+                <Route path="/cliente/comercios" element={<PrivateRoute requiredProfile="cliente"><Comercios /></PrivateRoute>} />
+                <Route path='/cliente/escolher-servico' element={<PrivateRoute requiredProfile="cliente"><EscolherServico /></PrivateRoute>} />
+                <Route path='/cliente/agendar-horario' element={<PrivateRoute requiredProfile="cliente"><AgendarHorario /></PrivateRoute>} />
+                <Route path='/cliente/agendamento' element={<PrivateRoute requiredProfile="cliente"><AgendamentosCliente /></PrivateRoute>} />
+                <Route path='/cliente/dados' element={<PrivateRoute requiredProfile="cliente"><DadosCliente /></PrivateRoute>} />
+                <Route path='/cliente/perfil' element={<PrivateRoute requiredProfile="cliente"><PerfilCliente /></PrivateRoute>} />
+                <Route path='/cliente/fazer-avaliacao' element={<PrivateRoute requiredProfile="cliente"><FazerAvaliacao /></PrivateRoute>} />
+                <Route path='/cliente/alterar-dados' element={<PrivateRoute requiredProfile="cliente"><AlterarDadosCliente /></PrivateRoute>} />
 
-                <Route path='/prestador/escolha' element={<EscolhaPrestador />} />
-                <Route path='/prestador/assinatura' element={<AssinaturaPlano />} />
-                <Route path='/prestador/criar-negocio' element={<InicioParceiro />} />
-                <Route path='/parceiro/perfil' element={<PerfilParceiro />} />
-                <Route path='/parceiro/agendamento' element={<AgendamentoParceiro />} />
-                <Route path='/parceiro/relatorio' element={<RelatorioParceiro />} />
-                <Route path='/parceiro/servicos' element={<ServicosParceiro />} />
-                <Route path='/parceiro/dados' element={<DadosParceiro />} />
-                <Route path='/parceiro/alterar-dados' element={<AlterarDadosParceiro />} />
-                <Route path='/parceiro/avaliações' element={<AvaliacoesParceiro />} />
-                <Route path='/parceiro/gerenciar-negocio' element={<GerenciarNegocio />} />
-                <Route path='/parceiro/horarioDeTrabalhoParceiro' element={<HorarioDeTrabalhoParceiro />} />
-                <Route path='/parceiro/gerenciar-perfil' element={<GerenciarPerfilParceiro />} />
-                <Route path='/parceiro/usuarios-bloqueados' element={<UsuariosBloqueados />} />
+                <Route path='/prestador/escolha' element={<PrivateRoute requiredProfile="prestador"><EscolhaPrestador /></PrivateRoute>} />
+                <Route path='/prestador/assinatura' element={<PrivateRoute requiredProfile="prestador"><AssinaturaPlano /></PrivateRoute>} />
+                <Route path='/prestador/criar-negocio' element={<PrivateRoute requiredProfile="prestador"><InicioParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/perfil' element={<PrivateRoute requiredProfile="prestador"><PerfilParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/agendamento' element={<PrivateRoute requiredProfile="prestador"><AgendamentoParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/relatorio' element={<PrivateRoute requiredProfile="prestador"><RelatorioParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/servicos' element={<PrivateRoute requiredProfile="prestador"><ServicosParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/dados' element={<PrivateRoute requiredProfile="prestador"><DadosParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/alterar-dados' element={<PrivateRoute requiredProfile="prestador"><AlterarDadosParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/avaliações' element={<PrivateRoute requiredProfile="prestador"><AvaliacoesParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/gerenciar-negocio' element={<PrivateRoute requiredProfile="prestador"><GerenciarNegocio /></PrivateRoute>} />
+                <Route path='/parceiro/horarioDeTrabalhoParceiro' element={<PrivateRoute requiredProfile="prestador"><HorarioDeTrabalhoParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/gerenciar-perfil' element={<PrivateRoute requiredProfile="prestador"><GerenciarPerfilParceiro /></PrivateRoute>} />
+                <Route path='/parceiro/usuarios-bloqueados' element={<PrivateRoute requiredProfile="prestador"><UsuariosBloqueados /></PrivateRoute>} />
 
-                <Route path="/admin" element={<ADMNavBar />}>
-                    <Route index element={<PainelADM />} />
-                    <Route path="painelAdm" element={<PainelADM />} />
-                    <Route path="clienteAdm" element={<ClienteADM />} />
-                    <Route path="parceiroAdm" element={<ParceiroADM />} />
-                    <Route path="servicosAdm" element={<ServicosADM />} />
-                    <Route path="configuracaoAdm" element={<ConfiguracaoADM />} />
+                <Route path="/admin" element={<PrivateRoute requiredProfile="admin"><ADMNavBar /></PrivateRoute>}>
+                    <Route index element={<PrivateRoute requiredProfile="admin"><PainelADM /></PrivateRoute>} />
+                    <Route path="painelAdm" element={<PrivateRoute requiredProfile="admin"><PainelADM /></PrivateRoute>} />
+                    <Route path="clienteAdm" element={<PrivateRoute requiredProfile="admin"><ClienteADM /></PrivateRoute>} />
+                    <Route path="parceiroAdm" element={<PrivateRoute requiredProfile="admin"><ParceiroADM /></PrivateRoute>} />
+                    <Route path="servicosAdm" element={<PrivateRoute requiredProfile="admin"><ServicosADM /></PrivateRoute>} />
+                    <Route path="configuracaoAdm" element={<PrivateRoute requiredProfile="admin"><ConfiguracaoADM /></PrivateRoute>} />
                 </Route>
 
                 
